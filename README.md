@@ -76,13 +76,13 @@ ExpenseTracker is an ambitious project aiming to leverage the Spring Boot framew
 
 ### MILESTONE 1 - BUILD THE BASIC APP
 
-- ✅ GitHub actions for Testing
-  - ✅ Avoid running the action when updating only the readme
-- ✅ Spring Boot Controllers & API Endpoints
-  - ✅ Set up environment variables
+- [ ] GitHub actions for Testing
+  - [ ] Avoid running the action when updating only the readme
+- [ ] Spring Boot Controllers & API Endpoints
+  - [ ] Set up environment variables
   - [ ] Implement POST /api/budgets to create a new budget.
-  - ✅ Implement GET /api/budgets to retrieve all existing budgets.
-    - ✅ Test it
+  - [ ]  Implement GET /api/budgets to retrieve all existing budgets.
+    - [ ] Test it
   - [ ] Implement GET /api/budgets/:id to retrieve a single budget by its ID.
   - [ ] Implement GET /api/budgets/:id/expenses to retrieve all expenses associated with a specific budget.
   - [ ] Implement PATCH /api/budgets/:id to update the details of a single budget, including its associated expenses.
@@ -138,8 +138,7 @@ ExpenseTracker is an ambitious project aiming to leverage the Spring Boot framew
 ### MILESTONE 4 - BUILD CI/CD PIPELINE
 
 - [ ] GitHub actions for continuous integration and delivery
-- [ ] 
-  - ✅ Send Email Notifications of Pipeline Status
+- [ ] Send Email Notifications of Pipeline Status
 
 ## Future Changes
 
