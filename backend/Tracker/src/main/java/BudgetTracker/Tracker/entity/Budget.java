@@ -1,6 +1,4 @@
 package BudgetTracker.Tracker.entity;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +24,7 @@ public class Budget {
 
     @Column(name = "budget_amount")
     private int budgetAmount;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -35,9 +34,8 @@ public class Budget {
 
     //method to calculate remaining budget
     @Transient
-    public int getRemainingBudget() {
+    public int calculateRemainingBudget() {
         int totalExpenses = expenses.stream().mapToInt(Expenses::getExpensesAmount).sum();
         return budgetAmount - totalExpenses;
     }
-
 }

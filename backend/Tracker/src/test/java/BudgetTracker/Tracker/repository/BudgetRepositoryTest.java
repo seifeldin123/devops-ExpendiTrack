@@ -130,4 +130,36 @@ public class BudgetRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("Should calculate remaining budget correctly")
+    void testGetRemainingBudget() {
+        // Save the budget to the database
+        Budget savedBudget = budgetRepository.save(budget);
+
+        // Add more expenses
+        Expenses additionalExpenses = new Expenses();
+        additionalExpenses.setExpensesDescription("Food");
+        additionalExpenses.setExpensesAmount(300);
+        additionalExpenses.setExpensesDate(Instant.now());
+        additionalExpenses.setUser(user);
+        additionalExpenses.setBudget(savedBudget);
+
+        // Create a new set with the additional expense
+        Set<Expenses> updatedExpenses = new HashSet<>(savedBudget.getExpenses());
+        updatedExpenses.add(additionalExpenses);
+
+        // Set the updated set to the expenses property
+        savedBudget.setExpenses(updatedExpenses);
+
+        budgetRepository.save(savedBudget);
+
+        // Retrieve the budget by its ID
+        Optional<Budget> retrievedBudgetOptional = budgetRepository.findById(savedBudget.getBudgetId());
+
+        assertTrue(retrievedBudgetOptional.isPresent());
+        Budget retrievedBudget = retrievedBudgetOptional.get();
+
+        // Ensure the remaining budget is calculated correctly (1000 - 200 - 300 = 500)
+        assertEquals(500, retrievedBudget.calculateRemainingBudget());
+    }
 }
