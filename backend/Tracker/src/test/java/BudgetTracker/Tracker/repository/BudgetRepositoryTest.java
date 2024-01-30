@@ -3,6 +3,7 @@ package BudgetTracker.Tracker.repository;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.entity.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,11 @@ public class BudgetRepositoryTest {
         budget.setUser(user);
         budget.setExpenses(Set.of(expenses));
     }
-
+    @AfterEach
+    void tearDown() {
+        // Delete all user records from the repository after each test
+        userRepository.deleteAll();
+    }
     @Test
     @DisplayName("Should save the budget to the database")
     public void testSave() {
@@ -78,7 +83,7 @@ public class BudgetRepositoryTest {
 
     @Test
     @DisplayName("Should return the budget list with a size of 1")
-     void testFindAll() {
+    void testFindAll() {
         // Save the budget to the database
         budgetRepository.save(budget);
         // Retrieve the list of budget from the database
@@ -91,7 +96,7 @@ public class BudgetRepositoryTest {
 
     @Test
     @DisplayName("Should return budget by its id")
-     void testFindById() {
+    void testFindById() {
         // Save the budget to the database
         Budget savedBudget = budgetRepository.save(budget);
         // Retrieve the budget by its ID
@@ -115,7 +120,7 @@ public class BudgetRepositoryTest {
 
     @Test
     @DisplayName("Should delete by id an existing budget from the database")
-     void testDeleteById() {
+    void testDeleteById() {
         // Save the first budget to the database
         Budget savedBudget1 = budgetRepository.save(budget);
         // Get the ID of the budget

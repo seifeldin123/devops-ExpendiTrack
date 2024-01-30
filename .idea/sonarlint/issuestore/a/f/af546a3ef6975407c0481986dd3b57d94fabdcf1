@@ -1,3 +1,6 @@
 
-o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ˆáòê
-asecrets:S6703"HMake sure this database password gets changed and removed from the code.(ä§˜
+@
+java:S5786F"Remove this 'public' modifier.(“´òâúÿÿÿÿ8ÇÂ®Õ1
+;
+java:S5786"Remove this 'public' modifier.(ÀŒ™¯8ÇÂ®Õ1
+hsecrets:S6703"HMake sure this database password gets changed and removed from the code.(ä§˜8ÖÿÈ­Õ1
