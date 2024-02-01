@@ -13,6 +13,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -116,6 +117,21 @@ public class BudgetRepositoryTest {
         Expenses retrievedExpenses = expensesRepository.findById(expenses.getExpensesId()).orElse(null);
         assertNotNull(retrievedExpenses);
         assertEquals(expenses.getExpensesId(), retrievedExpenses.getExpensesId());
+    }
+    @Test
+    @DisplayName("Should return a list of budgets for a given user id")
+    void testFindByUserId() {
+        // Save a budget for a specific user to the database
+        Budget savedBudget = budgetRepository.save(budget);
+
+        // Call the findByUserId method with the user's id
+        List<Budget> budgetsForUser = budgetRepository.findByUserId(user.getId());
+
+        // Verify that the returned list is not null
+        assertNotNull(budgetsForUser);
+
+        // Verify that the list contains the saved budget
+        assertTrue(budgetsForUser.contains(savedBudget));
     }
 
     @Test

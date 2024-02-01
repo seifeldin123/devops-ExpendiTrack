@@ -29,3 +29,11 @@ Tbackend/Tracker/src/main/java/BudgetTracker/Tracker/repository/BudgetRepository
 Rbackend/Tracker/src/test/java/BudgetTracker/Tracker/service/BudgetServiceTest.java,2\4\24038beb45a34b734b0d6b8a0f65e545e2aa6673
 Š
 Zbackend/Tracker/src/test/java/BudgetTracker/Tracker/repository/ExpensesRepositoryTest.java,9\b\9b31da11f932dc61ae89a462a0a1d4eb57650462
+‚
+Rbackend/Tracker/src/main/java/BudgetTracker/Tracker/repository/UserRepository.java,e\1\e1ed922553cb47c3df58f0408cead3d3d6d4aad1
+J
+backend/Tracker/.gitignore,d\6\d628fee7dc92573be3f0fc1abf1fede2334167f0
+„
+Tbackend/Tracker/src/main/java/BudgetTracker/Tracker/controller/BudgetController.java,a\9\a95dba0e4844e201d1252bd063d9acd1e6ceb749
+~
+Nbackend/Tracker/src/main/java/BudgetTracker/Tracker/service/BudgetService.java,d\f\df5c13934bed401439a65c286c5202478ae43ee9
