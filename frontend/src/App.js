@@ -1,11 +1,30 @@
-import './styles/App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { UserProvider } from './contexts/UserContext';
+import MainLayout from './layouts/MainLayout';
+import Dashboard from './pages/Dashboard';
+import PageNotFound from './pages/PageNotFound';
+import LoginComponent from './components/LoginComponent';
+import SignUp from './components/SignUp';
+import PrivateRoute from './components/PrivateRoute';
+import Welcome from "./components/Welcome";
+
 
 function App() {
-  return (
-      <div className="App">
-        <h1>Welcome to the Budgeting App</h1>
-      </div>
-  );
+    return (
+        <UserProvider>
+            <Router>
+                <MainLayout>
+                    <Routes>
+                        <Route path="/" element={<Welcome />} />
+                        <Route path="/login" element={<LoginComponent />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                        <Route path="*" element={<PageNotFound />} />
+                    </Routes>
+                </MainLayout>
+            </Router>
+        </UserProvider>
+    );
 }
-
 export default App;

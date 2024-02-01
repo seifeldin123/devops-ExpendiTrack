@@ -1,8 +1,8 @@
 import React from 'react';
-import { useUserContext } from '../contexts/UserContext';
+import {useUserContext} from '../contexts/UserContext';
 
 const Dashboard = () => {
-    const { user } = useUserContext(); // Retrieve the current user from context
+    const {user} = useUserContext(); // Retrieve the current user from context
 
     return (
         <div data-testid="dashboard"> {/* Added data-testid here for testing */}
