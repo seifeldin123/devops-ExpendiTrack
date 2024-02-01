@@ -13,6 +13,7 @@ describe('Nav', () => {
                 </UserContext.Provider>
             </Router>
         );
+        // Ensure that Dashboard and Logout are displayed for authenticated users
         expect(screen.getByText('Dashboard')).toBeInTheDocument();
         expect(screen.getByText('Logout')).toBeInTheDocument();
     });
@@ -25,6 +26,7 @@ describe('Nav', () => {
                 </UserContext.Provider>
             </Router>
         );
+        // Ensure that Login and Sign Up are displayed for unauthenticated users
         expect(screen.getByText('Login')).toBeInTheDocument();
         expect(screen.getByText('Sign Up')).toBeInTheDocument();
     });

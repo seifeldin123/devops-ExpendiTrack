@@ -10,11 +10,13 @@ const Nav = () => {
         <nav>
             <ul>
                 {user ? (
+                    // Display dashboard and logout for authenticated users
                     <>
                         <li><Link to="/dashboard">Dashboard</Link></li>
                         <li><LogoutComponent /></li>
                     </>
                 ) : (
+                    // Display login and sign up for unauthenticated users
                     <>
                         <li><Link to="/login">Login</Link></li>
                         <li><Link to="/signup">Sign Up</Link></li>
