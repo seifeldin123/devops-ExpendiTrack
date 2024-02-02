@@ -12,9 +12,10 @@ describe('Welcome', () => {
             </BrowserRouter>
         );
         // Ensure that the expected welcome message and navigation links are rendered
-        expect(screen.getByText('Welcome to Our App!')).toBeInTheDocument();
-        expect(screen.getByText('This is the best place to manage your budget efficiently.')).toBeInTheDocument();
-        expect(screen.getByText('Login')).toBeInTheDocument();
-        expect(screen.getByText('Sign Up')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /Welcome to Our Budget Management App!/i })).toBeInTheDocument();
+        expect(screen.getByText(/This platform is designed to help you track and manage your finances with ease./i)).toBeInTheDocument();
+        // Check for presence of buttons instead of links
+        expect(screen.getByRole('button', { name: /Login to Your Account/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Create a New Account/i })).toBeInTheDocument();
     });
 });

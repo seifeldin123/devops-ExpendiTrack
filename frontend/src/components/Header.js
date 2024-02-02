@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Nav from "./Nav";
+import LogoutComponent from "./LogoutComponent";
 
 const Header = () => {
 
@@ -89,9 +90,49 @@ const Header = () => {
                                 <li role="presentation"><a role="menuitem"
                                                            href="https://www.canada.ca/en/services/immigration-citizenship.html">Immigration
                                     and citizenship</a></li>
-                                {/* More menu items */}
+                                <li role="presentation"><a role="menuitem" href="https://travel.gc.ca/">Travel and
+                                    tourism</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/business.html">Business
+                                    and industry</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/benefits.html">Benefits</a>
+                                </li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/health.html">Health</a>
+                                </li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/taxes.html">Taxes</a>
+                                </li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/environment.html">Environment
+                                    and natural resources</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/defence.html">National
+                                    security and defence</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/culture.html">Culture,
+                                    history and sport</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/policing.html">Policing,
+                                    justice and emergencies</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/transport.html">Transport
+                                    and infrastructure</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.international.gc.ca/world-monde/index.aspx?lang=eng">Canada
+                                    and the world</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/finance.html">Money
+                                    and
+                                    finances</a></li>
+                                <li role="presentation"><a role="menuitem"
+                                                           href="https://www.canada.ca/en/services/science.html">Science
+                                    and
+                                    innovation</a></li>
                             </ul>
                         </nav>
+                        <LogoutComponent/>
                         {/* End of Navigation menu section */}
                     </div>
                 </div>

@@ -19,8 +19,14 @@ const LogoutComponent = () => {
 
     return (
         // Ensure the button is accessible by providing a meaningful aria-label
-        <button onClick={handleLogout} aria-label="Logout of your account">Logout</button>
-    );
+        <div className="col-xs-5 col-xs-offset-7 col-md-offset-0 col-md-4">
+            <section id="wb-so">
+                <h2 className="wb-inv">Sign out</h2>
+                <button className="btn btn-primary" onClick={handleLogout}>Sign out</button>
+            </section>
+        </div>
+    )
+        ;
 };
 
 export default LogoutComponent;

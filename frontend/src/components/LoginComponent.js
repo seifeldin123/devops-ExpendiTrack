@@ -36,23 +36,53 @@ const LoginComponent = () => {
 
     return (
         <div>
-            <h2>Login</h2>
-            {error && <div style={{ color: 'red' }}>{error}</div>}
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                required
-            />
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                required
-            />
-            <button onClick={handleLogin}>Login</button>
+            <form className="form-horizontal" onSubmit={handleLogin}>
+                <h2>Login</h2>
+                {error && <div style={{color: 'red'}}>{error}</div>}
+
+
+                <div className="form-group">
+                    <div>
+                        <label htmlFor="username" className="col-sm-3 control-label">Username</label>
+                    </div>
+
+                    <div className="col-sm-9">
+                        <input
+                            className="form-control"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Username"
+                            required/>
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <div>
+                        <label htmlFor="email" className="col-sm-3 control-label">Email</label>
+                    </div>
+
+                    <div className="col-sm-9">
+                        <input
+                            className="form-control"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
+                            required/>
+                    </div>
+                </div>
+
+                <div className="col-sm-offset-3 col-sm-9">
+                    <button type="submit" className="btn btn-primary">Login</button>
+                </div>
+            </form>
+            <div>
+                <p>Don't have an account yet?
+                    <button className="btn btn-call-to-action" type="button"
+                            onClick={() => navigate('/signup')}>Sign up here</button>
+                </p>
+            </div>
         </div>
     );
 };
