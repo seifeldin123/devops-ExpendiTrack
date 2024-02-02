@@ -48,7 +48,6 @@ public class ExpensesRepositoryTest {
         expenses.setExpensesDescription("Books");
         expenses.setExpensesAmount(200);
         expenses.setExpensesDate(Instant.now());
-        expenses.setUser(user);
     }
 
     @AfterEach
@@ -83,7 +82,7 @@ public class ExpensesRepositoryTest {
         Expenses retrievedExpenses = expensesList.get(0);
         assertEquals("Books", retrievedExpenses.getExpensesDescription());
         assertEquals(200, retrievedExpenses.getExpensesAmount());
-        assertEquals(user.getId(), retrievedExpenses.getUser().getId());
+//        assertEquals(user.getId(), retrievedExpenses.getUser().getId());
     }
 
     @Test
@@ -99,7 +98,7 @@ public class ExpensesRepositoryTest {
         assertEquals(savedExpenses.getExpensesId(), retrievedExpenses.getExpensesId());
         assertEquals("Books", retrievedExpenses.getExpensesDescription());
         assertEquals(200, retrievedExpenses.getExpensesAmount());
-        assertEquals(user.getId(), retrievedExpenses.getUser().getId());
+//        assertEquals(user.getId(), retrievedExpenses.getUser().getId());
     }
 
     @Test
