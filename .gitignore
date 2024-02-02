@@ -128,4 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-.idea/inspectionProfiles/Project_Default.xml
+
+.idea/
+
+.vscode
+
+*.iml
