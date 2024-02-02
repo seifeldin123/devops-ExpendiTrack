@@ -1,5 +1,6 @@
 package BudgetTracker.Tracker.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class User {
     @Column(name = "user_email")
     private String email;
 
+    @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private Set<Budget> budgets = new HashSet<>();
 }
