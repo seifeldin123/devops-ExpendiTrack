@@ -15,7 +15,7 @@ const Welcome = () => {
     };
 
     return (
-        <main aria-labelledby="welcome-heading">
+        <main className="container" aria-labelledby="welcome-heading">
             <h1 id="welcome-heading">Welcome to Our Budget Management App!</h1>
             <p>This platform is designed to help you track and manage your finances with ease. Join us to start optimizing your budget today!</p>
             <nav aria-label="Main navigation">

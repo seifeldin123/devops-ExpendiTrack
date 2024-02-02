@@ -32,7 +32,7 @@ describe('SignUpForm', () => {
         renderComponent();
 
         // Assert that the Name and Email input fields, and the Sign Up button are rendered
-        expect(screen.getByPlaceholderText('Name')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument();
     });
@@ -41,11 +41,11 @@ describe('SignUpForm', () => {
         renderComponent();
 
         // Simulate user input by changing the values of Name and Email input fields
-        fireEvent.change(screen.getByPlaceholderText('Name'), { target: { value: 'John Doe' } });
+        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'John Doe' } });
         fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'john@example.com' } });
 
         // Assert that the input fields have the expected values
-        expect(screen.getByPlaceholderText('Name').value).toBe('John Doe');
+        expect(screen.getByPlaceholderText('Username').value).toBe('John Doe');
         expect(screen.getByPlaceholderText('Email').value).toBe('john@example.com');
     });
 

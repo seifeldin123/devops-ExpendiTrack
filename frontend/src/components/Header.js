@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import Nav from "./Nav";
 import LogoutComponent from "./LogoutComponent";
+import {useUserContext} from "../contexts/UserContext";
 
 const Header = () => {
 
     // State to hold the search query
     const [searchQuery, setSearchQuery] = useState('');
+
+    const { user } = useUserContext(); // Use the useContext hook to access the current user
+
 
     // Handler to update the search query state
     const handleSearchChange = (event) => {
@@ -132,9 +136,14 @@ const Header = () => {
                                     innovation</a></li>
                             </ul>
                         </nav>
-                        <LogoutComponent/>
                         {/* End of Navigation menu section */}
                     </div>
+                    {/* If user is logged in show Logout component*/}
+                    {user && (
+
+                        <LogoutComponent/>
+
+                    )}
                 </div>
             </div>
 

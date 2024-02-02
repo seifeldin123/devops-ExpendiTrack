@@ -1,33 +1,39 @@
+// Nav.test.js
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Nav from '../Nav';
-import {UserContext, UserProvider} from '../../contexts/UserContext';
+import * as UserContextModule from '../../contexts/UserContext'; // Import the module to mock the hook
 
-describe('Nav', () => {
-    it('shows dashboard and logout for authenticated users', () => {
+// Mock the useUserContext hook
+jest.mock('../../contexts/UserContext', () => ({
+    useUserContext: jest.fn(),
+}));
+
+describe('Nav Component', () => {
+    it('shows Dashboard link for authenticated users', () => {
+        // Mock useUserContext to return a user object, simulating an authenticated user
+        UserContextModule.useUserContext.mockImplementation(() => ({ user: { name: 'John Doe' } }));
+
         render(
             <Router>
-                <UserContext.Provider value={{ user: { name: 'John Doe' } }}>
-                    <Nav />
-                </UserContext.Provider>
+                <Nav />
             </Router>
         );
-        // Ensure that Dashboard and Logout are displayed for authenticated users
+
         expect(screen.getByText('Dashboard')).toBeInTheDocument();
-        expect(screen.getByText('Logout')).toBeInTheDocument();
     });
 
     it('renders Canada.ca and GCWeb links for unauthenticated users', () => {
+        // Mock useUserContext to return null for user, simulating an unauthenticated user
+        UserContextModule.useUserContext.mockImplementation(() => ({ user: null }));
+
         render(
             <Router>
-                <UserProvider>
-                    <Nav />
-                </UserProvider>
+                <Nav />
             </Router>
         );
 
-        // Assert that Canada.ca and GCWeb links are rendered
         expect(screen.getByText('Canada.ca')).toBeInTheDocument();
         expect(screen.getByText('GCWeb')).toBeInTheDocument();
     });

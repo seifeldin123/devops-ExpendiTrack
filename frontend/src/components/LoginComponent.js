@@ -10,8 +10,10 @@ const LoginComponent = () => {
     const navigate = useNavigate(); // Use navigate for redirection after login
     const [error, setError] = useState(''); // State to hold error messages
 
-
-    const handleLogin = async () => {
+    // Modified to accept the event argument
+    const handleLogin = async (event) => {
+        event.preventDefault(); // Prevent the default form submission behavior
+        console.log("Logging in");
         setError(''); // Clear previous errors
         if (!username.trim() || !email.trim()) {
             setError('Please enter both username and email'); // Set error
@@ -20,7 +22,6 @@ const LoginComponent = () => {
 
         try {
             const user = await findUser(username, email);
-            // Assuming `findUser` returns null or a specific message when the user is not found
             if (user && user !== "User not found. Proceed with creation.") {
                 setUser(user); // Set the user in context if found
                 navigate('/dashboard'); // Navigate to the Dashboard upon successful login
@@ -35,9 +36,9 @@ const LoginComponent = () => {
 
 
     return (
-        <div>
+        <div className="container" >
             <form className="form-horizontal" onSubmit={handleLogin}>
-                <h2>Login</h2>
+                <h1>Login</h1>
                 {error && <div style={{color: 'red'}}>{error}</div>}
 
 
@@ -48,6 +49,7 @@ const LoginComponent = () => {
 
                     <div className="col-sm-9">
                         <input
+                            id="username"
                             className="form-control"
                             type="text"
                             value={username}
@@ -64,6 +66,7 @@ const LoginComponent = () => {
 
                     <div className="col-sm-9">
                         <input
+                            id="email"
                             className="form-control"
                             type="email"
                             value={email}
@@ -77,12 +80,15 @@ const LoginComponent = () => {
                     <button type="submit" className="btn btn-primary">Login</button>
                 </div>
             </form>
-            <div>
-                <p>Don't have an account yet?
-                    <button className="btn btn-call-to-action" type="button"
-                            onClick={() => navigate('/signup')}>Sign up here</button>
+            <section>
+                <p className="mrgn-tp-lg">
+                    Don't have an account yet?
+                    <button className="btn btn-default" type="button"
+                            onClick={() => navigate('/signup')}>Sign up here
+                    </button>
                 </p>
-            </div>
+
+            </section>
         </div>
     );
 };

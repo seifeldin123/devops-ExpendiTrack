@@ -36,9 +36,9 @@ const SignUp = () => {
     };
 
     return (
-        <div>
+        <div className="container" >
             <form className="form-horizontal" onSubmit={handleSubmit}>
-                <h2>Create Account</h2>
+                <h1>Create Account</h1>
                 {error && <div style={{color: 'red'}}>{error}</div>}
 
                 <div className="form-group">
@@ -47,12 +47,14 @@ const SignUp = () => {
                     </div>
 
                     <div className="col-sm-9">
-                        <input className="form-control"
-                               type="text"
-                               value={name}
-                               onChange={(e) => setName(e.target.value)}
-                               placeholder="Username"
-                               required/>
+                        <input
+                            id="username"
+                            className="form-control"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Username"
+                            required/>
                     </div>
                 </div>
 
@@ -63,6 +65,7 @@ const SignUp = () => {
 
                     <div className="col-sm-9">
                         <input
+                            id="email"
                             className="form-control"
                             type="email"
                             value={email}
@@ -73,17 +76,19 @@ const SignUp = () => {
                 </div>
 
                 <div className="col-sm-offset-3 col-sm-9">
-                    <button type="submit" className="btn btn-primary">Signup</button>
+                    <button type="submit" className="btn btn-primary">Sign Up</button>
                 </div>
 
             </form>
-            <div>
-                <p>Already have an account?
-                    <button className="btn btn-call-to-action" type="button" onClick={() => navigate('/login')}>
+            <section>
+                <p className="mrgn-tp-lg">
+                    Already have an account?
+                    <button className="btn btn-default" type="button" onClick={() => navigate('/login')}>
                         Login here
                     </button>
                 </p>
-            </div>
+
+            </section>
         </div>
     );
 };
