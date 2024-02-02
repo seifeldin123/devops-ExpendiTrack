@@ -57,6 +57,7 @@ public class BudgetRepositoryTest {
         expenses.setExpensesAmount(200);
         expenses.setExpensesDate(Instant.now());
 
+
         // Create budgets
         budget = new Budget();
         budget.setBudgetDescription("College");
@@ -145,7 +146,7 @@ public class BudgetRepositoryTest {
         additionalExpenses.setExpensesDescription("Food");
         additionalExpenses.setExpensesAmount(300);
         additionalExpenses.setExpensesDate(Instant.now());
-//        additionalExpenses.setUser(user);
+
         additionalExpenses.setBudget(savedBudget);
 
         // Create a new set with the additional expense
