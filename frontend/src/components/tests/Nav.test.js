@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Nav from './Nav';
-import { UserContext } from '../contexts/UserContext';
+import Nav from '../Nav';
+import {UserContext, UserProvider} from '../../contexts/UserContext';
 
 describe('Nav', () => {
     it('shows dashboard and logout for authenticated users', () => {
@@ -18,16 +18,17 @@ describe('Nav', () => {
         expect(screen.getByText('Logout')).toBeInTheDocument();
     });
 
-    it('shows login and signup for unauthenticated users', () => {
+    it('renders Canada.ca and GCWeb links for unauthenticated users', () => {
         render(
             <Router>
-                <UserContext.Provider value={{ user: null }}>
+                <UserProvider>
                     <Nav />
-                </UserContext.Provider>
+                </UserProvider>
             </Router>
         );
-        // Ensure that Login and Sign Up are displayed for unauthenticated users
-        expect(screen.getByText('Login')).toBeInTheDocument();
-        expect(screen.getByText('Sign Up')).toBeInTheDocument();
+
+        // Assert that Canada.ca and GCWeb links are rendered
+        expect(screen.getByText('Canada.ca')).toBeInTheDocument();
+        expect(screen.getByText('GCWeb')).toBeInTheDocument();
     });
 });

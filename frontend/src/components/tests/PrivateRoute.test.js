@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { UserContext } from '../contexts/UserContext';
-import PrivateRoute from './PrivateRoute';
+import { UserContext } from '../../contexts/UserContext';
+import PrivateRoute from '../PrivateRoute';
 
 // Mock components for testing
 const DashboardMock = () => <div>Dashboard</div>;

@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { UserProvider } from '../contexts/UserContext';
-import SignUp from './SignUp';
+import { UserProvider } from '../../contexts/UserContext';
+import SignUp from '../SignUp';
 
 // Describe block for the SignUp page test suite
 describe('SignUpForm', () => {

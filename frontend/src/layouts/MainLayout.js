@@ -1,11 +1,13 @@
 import React from 'react';
-import Nav from '../components/Nav';
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const MainLayout = ({ children }) => {
     return (
         <div>
-            <Nav /> {/* Render the navigation bar */}
+            <Header />
             <main>{children}</main> {/* Render the main content */}
+            <Footer />
         </div>
     );
 };

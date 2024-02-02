@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import LoginComponent from './LoginComponent';
-import { UserProvider } from '../contexts/UserContext';
+import LoginComponent from '../LoginComponent';
+import { UserProvider } from '../../contexts/UserContext';
 
 // Test suite for LoginComponent
 describe('LoginComponent', () => {

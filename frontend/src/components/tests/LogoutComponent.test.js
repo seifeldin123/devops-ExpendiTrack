@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import LogoutComponent from './LogoutComponent';
-import { UserContext } from "../contexts/UserContext";
+import LogoutComponent from '../LogoutComponent';
+import { UserContext } from "../../contexts/UserContext";
 
 // Mock UserProvider for testing
 const mockSetUser = jest.fn();

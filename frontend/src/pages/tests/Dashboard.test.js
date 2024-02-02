@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { UserContext } from '../contexts/UserContext';
-import Dashboard from './Dashboard';
+import { UserContext } from '../../contexts/UserContext';
+import Dashboard from '../Dashboard';
 
 // Describe block for the Dashboard page test suite
 describe('Dashboard', () => {

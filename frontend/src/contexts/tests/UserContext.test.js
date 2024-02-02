@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { render, screen, act } from '@testing-library/react';
-import { UserContext, UserProvider } from './UserContext';
+import { UserContext, UserProvider } from '../UserContext';
 
 // A mock component to consume our context
 const MockConsumerComponent = () => {
