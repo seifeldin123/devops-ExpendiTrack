@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { createUser, findUser } from '../userService';
+import { createUser, findUser } from '../UserService';
 
 // Describe block for the UserService test suite
 describe('userService', () => {

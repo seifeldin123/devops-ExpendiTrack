@@ -12,7 +12,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock findUser Service Call
-jest.mock('../../services/userService', () => ({
+jest.mock('../../services/UserService', () => ({
     findUser: jest.fn(),
 }))
 
@@ -66,7 +66,7 @@ describe('LoginComponent', () => {
 
     // Form Submission Test: simulates form submission with valid inputs
     it('submits the form with username and email', async () => {
-        const { findUser } = require('../../services/userService');
+        const { findUser } = require('../../services/UserService');
         findUser.mockResolvedValue({ name: 'testuser', email: 'test@email.com' });
 
         renderComponent();
@@ -83,7 +83,7 @@ describe('LoginComponent', () => {
 
     // Error Handling Test - checks the behavior when login fails due to incorrect credentials
     it('displays an error message for incorrect credentials', async () => {
-        const { findUser } = require('../../services/userService');
+        const { findUser } = require('../../services/UserService');
         findUser.mockResolvedValue(null); // Simulate user not found
 
         renderComponent();

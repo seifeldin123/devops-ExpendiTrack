@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { findUser } from '../services/userService';
+import { findUser } from '../services/UserService';
 import { useUserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 
