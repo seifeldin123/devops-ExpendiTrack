@@ -13,7 +13,6 @@ const LoginComponent = () => {
     // Modified to accept the event argument
     const handleLogin = async (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
-        console.log("Logging in");
         setError(''); // Clear previous errors
         if (!username.trim() || !email.trim()) {
             setError('Please enter both username and email'); // Set error
