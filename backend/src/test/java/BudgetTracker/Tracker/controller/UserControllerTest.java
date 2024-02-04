@@ -2,6 +2,7 @@ package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.CustomDuplicateUserException;
 import BudgetTracker.Tracker.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,7 +51,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().isOk()); // Check if the response status is 200 OK
+                .andExpect(status().isCreated()); // Check if the response status is 200 OK
     }
 
     @Test
@@ -74,6 +76,18 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.name").value(user.getName()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()));
+    }
+
+    @Test
+    public void testsCustomDuplicateUserExceptionOnDuplicateUser () throws Exception {
+        // Mock userService to throw CustomDuplicateUserException
+        given(userService.createNewUser(any(User.class))).willThrow(new CustomDuplicateUserException("An account with these credentials already exists."));
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"testUser\",\"email\":\"test@example.com\"}")) // Example user JSON
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("An account with these credentials already exists."));
     }
 
 }

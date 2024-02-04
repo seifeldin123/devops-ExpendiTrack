@@ -22,10 +22,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", unique = true)
     private String name;
 
-    @Column(name = "user_email")
+    @Column(name = "user_email", unique = true)
     private String email;
 
     @JsonIgnoreProperties("user")

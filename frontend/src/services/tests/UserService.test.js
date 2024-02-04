@@ -32,4 +32,22 @@ describe('userService', () => {
         const response = await createUser(newUser);
         expect(response.data).toEqual(newUser);
     });
+
+    // Test for handling the scenario where an attempt is made to create a user that already exists
+    it('handles duplicate user creation attempt with a custom error message', async () => {
+        const duplicateUserData = { name: 'Alice', email: 'alice@example.com' };
+        // Adjusting mock to reflect a real JSON error response
+        mock.onPost(API_URL, duplicateUserData).reply(400, {
+            message: 'An account with these credentials already exists.'
+        });
+
+        try {
+            await createUser(duplicateUserData);
+        } catch (error) {
+            expect(error).toBe('A user with these credentials already exists. Please login or use different credentials.');
+        }
+    });
+
+
+
 });

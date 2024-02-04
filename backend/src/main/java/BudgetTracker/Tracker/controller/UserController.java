@@ -1,6 +1,7 @@
 package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.CustomDuplicateUserException;
 import BudgetTracker.Tracker.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,13 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createNewUser(user);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User createdUser = userService.createNewUser(user);
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED); // Use CREATED status for new resources
+        } catch (CustomDuplicateUserException e) { // Catch your custom exception
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/find")

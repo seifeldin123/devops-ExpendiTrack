@@ -1,42 +1,32 @@
-import React, {useState} from 'react';
-import {createUser, findUser} from '../services/UserService';
-import {useUserContext} from '../contexts/UserContext';
-import {useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import { createUser } from '../services/UserService';
+import { useUserContext } from '../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
-    // Define state variables for name, email, and error messages
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [error, setError] = useState(''); // Using state for error messages
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    // Access setUser function from UserContext
-    const {setUser} = useUserContext();
+    const { setUser } = useUserContext();
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(''); // Reset error message
+        setError('');
 
         try {
-            const response = await findUser(name, email);
-
-            if (response === "User not found. Proceed with creation.") {
-                const createResponse = await createUser({name, email});
-                if (createResponse.data) {
-                    setUser(createResponse.data); // Set the user in context
-                    navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
-                }
-            } else {
-                setError('User with this name and email already exists');
-            }
+            const response = await createUser({ name, email });
+            setUser(response.data); // Set the user in context
+            navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
         } catch (error) {
-            setError('An error occurred during signup');
+            // Now, error is the message we rejected with in createUser
+            setError(error);
         }
     };
 
     return (
-        <div className="container" >
+        <div className="container">
             <form className="form-horizontal" onSubmit={handleSubmit}>
                 <h1>Create Account</h1>
                 {error && <div style={{color: 'red'}}>{error}</div>}
@@ -45,7 +35,6 @@ const SignUp = () => {
                     <div>
                         <label htmlFor="username" className="col-sm-3 control-label">Username</label>
                     </div>
-
                     <div className="col-sm-9">
                         <input
                             id="username"
@@ -54,7 +43,8 @@ const SignUp = () => {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Username"
-                            required/>
+                            required
+                        />
                     </div>
                 </div>
 
@@ -62,7 +52,6 @@ const SignUp = () => {
                     <div>
                         <label htmlFor="email" className="col-sm-3 control-label">Email</label>
                     </div>
-
                     <div className="col-sm-9">
                         <input
                             id="email"
@@ -71,14 +60,14 @@ const SignUp = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email"
-                            required/>
+                            required
+                        />
                     </div>
                 </div>
 
                 <div className="col-sm-offset-3 col-sm-9">
                     <button type="submit" className="btn btn-primary">Sign Up</button>
                 </div>
-
             </form>
             <section>
                 <p className="mrgn-tp-lg">
@@ -87,7 +76,6 @@ const SignUp = () => {
                         Login here
                     </button>
                 </p>
-
             </section>
         </div>
     );
