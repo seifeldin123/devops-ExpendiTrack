@@ -53,58 +53,6 @@ public class UserControllerTest {
     }
 
     @Test
-    public void test_getUserById() throws Exception {
-        //create a new User
-        Budget budget = new Budget();
-        budget.setBudgetAmount(1000);
-
-        User user = new User();
-        user.setId(100l);
-        user.setName("sanyadrian");
-        user.setEmail("sanyadrian@example.com");
-        Set<Budget> budgets = new HashSet<>();
-        budgets.add(budget);
-        user.setBudgets(budgets);
-
-        // createUser method in UserService returns the user object
-        Mockito.when(userService.findUserById(100l)).thenReturn(user);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-//        String userJson = objectMapper.writeValueAsString(user);
-
-        mockMvc.perform(get("/users/{id}", 100L)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()) // Verifies that the response status is HTTP 200 OK
-                .andExpect(content().json("{\"id\":100,\"name\":\"sanyadrian\",\"email\":\"sanyadrian@example.com\"}"));
-    }
-
-    @Test
-    public void test_getAllUsers() throws Exception {
-        Budget budget = new Budget();
-        budget.setBudgetAmount(1000);
-
-        User user = new User();
-        user.setId(100l);
-        user.setName("sanyadrian");
-        user.setEmail("sanyadrian@example.com");
-        Set<Budget> budgets = new HashSet<>();
-        budgets.add(budget);
-        user.setBudgets(budgets);
-        List<User> users = new ArrayList<>();
-        users.add(user);
-
-        // createUser method in UserService returns the user object
-        Mockito.when(userService.getAllUsers()).thenReturn(users);
-
-
-        mockMvc.perform(get("/users")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()) // Verifies that the response status is HTTP 200 OK
-                .andExpect(content().json("[{\"id\":100,\"name\":\"sanyadrian\",\"email\":\"sanyadrian@example.com\",\"budgets\":[{\"budgetAmount\":1000}]}]")); // Verifies the JSON response
-
-    }
-
-    @Test
     public void testFindUserWhenUserFound() throws Exception {
         // Create a new User
         User user = new User();

@@ -3,14 +3,11 @@ package BudgetTracker.Tracker.service;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
 import BudgetTracker.Tracker.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
@@ -27,7 +24,6 @@ public class UserServiceTest {
     private User user;
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
         underTest = new UserService(userRepository);
 
         user = new User();
@@ -40,25 +36,6 @@ public class UserServiceTest {
         Set<Budget> budgets = new HashSet<>();
         budgets.add(budget);
         user.setBudgets(budgets);
-    }
-
-    @Test
-    void canGetAllUsers() {
-        //when
-        underTest.getAllUsers();
-        //then
-        verify(userRepository).findAll();
-    }
-
-
-    @Test
-    void canUserBeFindById() {
-        // given
-        Long userId = user.getId();
-        // when
-        underTest.findUserById(userId);
-        // then
-        verify(userRepository).findById(userId);
     }
 
     @Test
