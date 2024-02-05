@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * Global exception handler for the application, providing centralized exception handling across all {@code @RequestMapping} methods.
  */
 @ControllerAdvice
-public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Handles CustomDuplicateUserException. This method is invoked when an exception of type CustomDuplicateUserException is thrown.
@@ -21,11 +21,17 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
      * @param request the current web request.
      * @return a {@link ResponseEntity} object containing the custom error message and the HTTP status code.
      */
-    @ExceptionHandler(CustomDuplicateUserException.class)
+    @ExceptionHandler(DuplicateUserException.class)
     protected ResponseEntity<Object> handleDuplicateUser(
-            CustomDuplicateUserException ex, WebRequest request) {
+            DuplicateUserException ex, WebRequest request) {
         String bodyOfResponse = "An account with these credentials already exists.";
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+
+    @ExceptionHandler(DuplicateBudgetNameException.class)
+    public ResponseEntity<?> handleDuplicateBudgetNameException(DuplicateBudgetNameException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -2,7 +2,7 @@ package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
-import BudgetTracker.Tracker.exceptions.CustomDuplicateUserException;
+import BudgetTracker.Tracker.exceptions.DuplicateUserException;
 import BudgetTracker.Tracker.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -81,7 +81,7 @@ public class UserControllerTest {
     @Test
     public void testsCustomDuplicateUserExceptionOnDuplicateUser () throws Exception {
         // Mock userService to throw CustomDuplicateUserException
-        given(userService.createNewUser(any(User.class))).willThrow(new CustomDuplicateUserException("An account with these credentials already exists."));
+        given(userService.createNewUser(any(User.class))).willThrow(new DuplicateUserException("An account with these credentials already exists."));
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)

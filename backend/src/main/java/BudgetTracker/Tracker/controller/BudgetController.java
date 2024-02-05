@@ -1,6 +1,7 @@
 package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.Budget;
+import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
 import BudgetTracker.Tracker.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,32 +22,16 @@ public class BudgetController {
         return new ResponseEntity<>(budgets, HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Budget>> getAllBudgets() {
-        List<Budget> budgets = budgetService.getAllBudgets();
-        return new ResponseEntity<>(budgets, HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public Budget getBudgetById(@PathVariable Long id) {
-
-        return budgetService.getBudgetById(id);
-    }
-
     @PostMapping
-    public Budget createBudget(@RequestBody Budget budget) {
-
-        return budgetService.createBudget(budget);
+    public ResponseEntity<?> createBudget(@RequestBody Budget budget) {
+        try {
+            Budget createdBudget = budgetService.createBudget(budget);
+            return new ResponseEntity<>(createdBudget, HttpStatus.CREATED);
+        } catch (DuplicateBudgetNameException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @PutMapping("/{id}")
-    public Budget updateBudget(@PathVariable Long id, @RequestBody Budget budgetDetails) {
-        return budgetService.updateBudget(id, budgetDetails);
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Budget> deleteBudget(@PathVariable Long id) {
-        budgetService.deleteBudget(id);
-        return ResponseEntity.ok().build();
-    }
+
 }

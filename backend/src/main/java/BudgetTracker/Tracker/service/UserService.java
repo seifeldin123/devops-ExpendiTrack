@@ -1,7 +1,7 @@
 package BudgetTracker.Tracker.service;
 
 import BudgetTracker.Tracker.entity.User;
-import BudgetTracker.Tracker.exceptions.CustomDuplicateUserException;
+import BudgetTracker.Tracker.exceptions.DuplicateUserException;
 import BudgetTracker.Tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class UserService {
     public User createNewUser(User user) {
         Optional<User> existingUser = userRepository.findByNameAndEmail(user.getName(), user.getEmail());
         if (existingUser.isPresent()) {
-            throw new CustomDuplicateUserException("An account with these credentials already exists.");
+            throw new DuplicateUserException("An account with these credentials already exists.");
         }
         return userRepository.save(user);
     }

@@ -152,35 +152,30 @@ public class BudgetRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should calculate remaining budget correctly")
-    void testGetRemainingBudget() {
-        // Save the budget to the database
-        Budget savedBudget = budgetRepository.save(budget);
+    @DisplayName("Check budget exists by description and user ID")
+    void testExistsByBudgetDescriptionAndUserId() {
+        // Given
+        User user = new User();
+        user.setName("Test User");
+        user.setEmail("test@user.com");
+        User savedUser = userRepository.save(user);
 
-        // Add more expenses
-        Expenses additionalExpenses = new Expenses();
-        additionalExpenses.setExpensesDescription("Food");
-        additionalExpenses.setExpensesAmount(300);
-        additionalExpenses.setExpensesDate(Instant.now());
-        additionalExpenses.setUser(user);
-        additionalExpenses.setBudget(savedBudget);
+        Budget budget = new Budget();
+        budget.setBudgetDescription("Test Budget");
+        budget.setBudgetAmount(500);
+        budget.setUser(savedUser);
+        budgetRepository.save(budget);
 
-        // Create a new set with the additional expense
-        Set<Expenses> updatedExpenses = new HashSet<>(savedBudget.getExpenses());
-        updatedExpenses.add(additionalExpenses);
+        // When
+        boolean exists = budgetRepository.existsByBudgetDescriptionAndUserId("Test Budget", savedUser.getId());
 
-        // Set the updated set to the expenses property
-        savedBudget.setExpenses(updatedExpenses);
+        // Then
+        assertTrue(exists, "Budget should exist for given description and user ID");
 
-        budgetRepository.save(savedBudget);
+        // Test for a non-existent budget
+        boolean notExists = budgetRepository.existsByBudgetDescriptionAndUserId("Nonexistent Budget", savedUser.getId());
 
-        // Retrieve the budget by its ID
-        Optional<Budget> retrievedBudgetOptional = budgetRepository.findById(savedBudget.getBudgetId());
-
-        assertTrue(retrievedBudgetOptional.isPresent());
-        Budget retrievedBudget = retrievedBudgetOptional.get();
-
-        // Ensure the remaining budget is calculated correctly (1000 - 200 - 300 = 500)
-        assertEquals(500, retrievedBudget.calculateRemainingBudget());
+        assertFalse(notExists, "Budget should not exist for given description and user ID");
     }
+
 }

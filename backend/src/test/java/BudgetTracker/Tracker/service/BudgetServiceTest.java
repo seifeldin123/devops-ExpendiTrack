@@ -2,6 +2,7 @@ package BudgetTracker.Tracker.service;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
 import BudgetTracker.Tracker.repository.BudgetRepository;
 import BudgetTracker.Tracker.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -13,11 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.*;
 
+import java.util.Arrays;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,19 +37,16 @@ public class BudgetServiceTest {
     @InjectMocks
     private BudgetService budgetService;
 
+    private User user;
     private Budget budget1;
     private Budget budget2;
-    private User user;
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.openMocks(this);
         user = new User();
         user.setId(1L);
         user.setName("Seif");
         user.setEmail("Seif@hotmail.com");
-
-
 
         budget1 = new Budget();
         budget1.setBudgetId(1L);
@@ -58,29 +60,15 @@ public class BudgetServiceTest {
         budget2.setBudgetAmount(500);
         budget2.setUser(user);
     }
+
     @AfterEach
     void tearDown() {
-        // Delete all user records from the repository after each test
         userRepository.deleteAll();
-    }
-    @Test
-    @DisplayName("Get all budgets")
-    public void testGetAllBudgets() {
-        List<Budget> budgets = new ArrayList<>();
-        budgets.add(budget1);
-        budgets.add(budget2);
-        when(budgetRepository.findAll()).thenReturn(budgets);
-
-        List<Budget> result = budgetService.getAllBudgets();
-
-        assertEquals(2, result.size());
-        assertEquals(budgets, result);
-        assertNotNull(result);
     }
 
     @Test
     @DisplayName("Get budgets by user ID")
-    public void testGetBudgetsByUserId() {
+    void testGetBudgetsByUserId() {
         Long userId = 1L;
         List<Budget> userBudgets = Arrays.asList(budget1, budget2);
         when(budgetRepository.findByUserId(userId)).thenReturn(userBudgets);
@@ -89,77 +77,30 @@ public class BudgetServiceTest {
 
         assertEquals(2, result.size());
         assertEquals(userBudgets, result);
-        assertNotNull(result);
     }
 
     @Test
-    @DisplayName("Get a budget by ID")
-    public void testGetBudgetById() {
-        Long budgetId = 1L;
-        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+    @DisplayName("Create a budget successfully")
+    void createBudget_Success() {
+        when(budgetRepository.existsByBudgetDescriptionAndUserId(budget1.getBudgetDescription(), user.getId())).thenReturn(false);
+        when(budgetRepository.save(any(Budget.class))).thenReturn(budget1);
 
-        Budget existingBudget = budgetService.getBudgetById(budgetId);
+        Budget savedBudget = budgetService.createBudget(budget1);
 
-        assertNotNull(existingBudget);
-        assertNotNull(existingBudget.getBudgetId());
-        assertEquals(budgetId, existingBudget.getBudgetId());
+        assertNotNull(savedBudget);
+        assertEquals(budget1.getBudgetDescription(), savedBudget.getBudgetDescription());
+        verify(budgetRepository).save(budget1);
     }
 
     @Test
-    @DisplayName("Create a budget")
-    public void testCreateBudget() {
-        Budget newBudget = new Budget();
-        newBudget.setBudgetDescription("Entertainment");
-        newBudget.setBudgetAmount(200);
-        newBudget.setUser(user);
+    @DisplayName("Fail to create a budget due to duplicate name")
+    void createBudget_ThrowsDuplicateBudgetNameException() {
+        when(budgetRepository.existsByBudgetDescriptionAndUserId(budget1.getBudgetDescription(), user.getId())).thenReturn(true);
 
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        assertThatThrownBy(() -> budgetService.createBudget(budget1))
+                .isInstanceOf(DuplicateBudgetNameException.class)
+                .hasMessageContaining("already exists");
 
-        // Stubbing the save method to return a budget with a non-null budgetId
-        when(budgetRepository.save(any(Budget.class))).thenAnswer(invocation -> {
-            Budget savedBudget = invocation.getArgument(0);
-            savedBudget.setBudgetId(1L); // Set a sample budgetId or adjust as needed
-            return savedBudget;
-        });
-        Budget result = budgetService.createBudget(newBudget);
-
-        assertNotNull(result);
-        assertNotNull(result.getBudgetId());
-        assertEquals("Entertainment", result.getBudgetDescription());
-        assertEquals(200, result.getBudgetAmount());
-        assertEquals(user, result.getUser());
+        verify(budgetRepository, never()).save(any(Budget.class));
     }
-
-
-    @Test
-    @DisplayName("Update a budget")
-    public void testUpdateBudget() {
-        Long budgetId = 1L;
-        Budget updatedBudget = new Budget();
-        updatedBudget.setBudgetDescription("Updated Vacation");
-        updatedBudget.setBudgetAmount(1200);
-        updatedBudget.setUser(user);
-
-        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
-        when(budgetRepository.save(any(Budget.class))).thenReturn(updatedBudget);
-
-        Budget result = budgetService.updateBudget(budgetId, updatedBudget);
-
-        assertNotNull(result);
-        assertEquals("Updated Vacation", result.getBudgetDescription());
-        assertEquals(1200, result.getBudgetAmount());
-        assertEquals(user, result.getUser());
-    }
-
-    @Test
-    @DisplayName("Delete a budget by ID")
-    public void testDeleteBudgetById() {
-        Long budgetId = 1L;
-
-        budgetService.deleteBudget(budgetId);
-
-        verify(budgetRepository, times(1)).deleteById(budgetId);
-    }
-
-
 }

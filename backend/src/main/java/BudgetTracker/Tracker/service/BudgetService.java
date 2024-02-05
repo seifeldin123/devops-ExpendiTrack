@@ -2,6 +2,7 @@ package BudgetTracker.Tracker.service;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
 import BudgetTracker.Tracker.repository.BudgetRepository;
 import BudgetTracker.Tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,49 +18,16 @@ public class BudgetService {
     @Autowired
     private UserRepository userRepository;
 
-
-
-    public List<Budget> getAllBudgets() {
-
-        return budgetRepository.findAll();
-    }
-
-
     public List<Budget> getBudgetsByUserId(Long userId) {
 
         return budgetRepository.findByUserId(userId);
     }
 
-
-    public Budget getBudgetById(Long id) {
-
-        return budgetRepository.findById(id).orElse(null);
-    }
-
     public Budget createBudget(Budget budget) {
-        if (budget.getUser() != null) {
-            Long userId = budget.getUser().getId();
-            User user = userRepository.findById(userId).orElse(null);
-            budget.setUser(user);
+        boolean exists = budgetRepository.existsByBudgetDescriptionAndUserId(budget.getBudgetDescription(), budget.getUser().getId());
+        if (exists) {
+            throw new DuplicateBudgetNameException("A budget with the name \"" + budget.getBudgetDescription() + "\" already exists for this user.");
         }
         return budgetRepository.save(budget);
-    }
-
-    public Budget updateBudget(Long id, Budget budgetDetails) {
-        return budgetRepository.findById(id)
-                .map(budget -> {
-                    budget.setBudgetDescription(budgetDetails.getBudgetDescription());
-                    budget.setBudgetAmount(budgetDetails.getBudgetAmount());
-                    // other fields
-                    return budgetRepository.save(budget);
-                }).orElseGet(() -> {
-                    budgetDetails.setBudgetId(id);
-                    return budgetRepository.save(budgetDetails);
-                });
-    }
-
-    public void deleteBudget(Long id) {
-
-        budgetRepository.deleteById(id);
     }
 }

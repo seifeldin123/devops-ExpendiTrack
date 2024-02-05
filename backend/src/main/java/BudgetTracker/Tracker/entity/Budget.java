@@ -17,10 +17,10 @@ import java.util.Set;
 @Table(name = "budget")
 public class Budget {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long budgetId;
 
-    @Column(name = "budget_description")
+    @Column(name = "budget_description", unique = true)
     private String budgetDescription;
 
     @Column(name = "budget_amount")
@@ -34,10 +34,4 @@ public class Budget {
     @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
     private Set<Expenses> expenses = new HashSet<>();
 
-    //method to calculate remaining budget
-    @Transient
-    public int calculateRemainingBudget() {
-        int totalExpenses = expenses.stream().mapToInt(Expenses::getExpensesAmount).sum();
-        return budgetAmount - totalExpenses;
-    }
 }

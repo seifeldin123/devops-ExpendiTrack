@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface BudgetRepository extends JpaRepository<Budget,Long> {
     List<Budget> findByUserId(Long userId);
+
+    // Method to check if a budget with the specified name exists for a given user ID
+    boolean existsByBudgetDescriptionAndUserId(String budgetDescription, Long budgetId);
 }
