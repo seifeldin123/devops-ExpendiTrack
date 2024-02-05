@@ -26,12 +26,7 @@ public class Budget {
     @Column(name = "budget_amount")
     private int budgetAmount;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
-    private Set<Expenses> expenses = new HashSet<>();
-
 }

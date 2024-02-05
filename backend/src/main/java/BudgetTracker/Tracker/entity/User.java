@@ -28,7 +28,4 @@ public class User {
     @Column(name = "user_email", unique = true)
     private String email;
 
-    @JsonIgnoreProperties("user")
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    private Set<Budget> budgets = new HashSet<>();
 }

@@ -40,7 +40,7 @@ public class UserControllerTest {
         user.setEmail("sanyadrian@example.com");
         Set<Budget> budgets = new HashSet<>();
         budgets.add(budget);
-        user.setBudgets(budgets);
+//        user.setBudgets(budgets);
 
         // createUser method in UserService returns the user
         Mockito.when(userService.createNewUser(any(User.class))).thenReturn(user);

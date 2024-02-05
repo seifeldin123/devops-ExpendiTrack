@@ -35,7 +35,7 @@ public class UserServiceTest {
 
         Set<Budget> budgets = new HashSet<>();
         budgets.add(budget);
-        user.setBudgets(budgets);
+//        user.setBudgets(budgets);
     }
 
     @Test

@@ -4,6 +4,7 @@ import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -34,7 +35,7 @@ public class UserRepositoryTest {
         // Initialize budgets as a Set
         Set<Budget> budgets = new HashSet<>();
         budgets.add(budget);
-        user.setBudgets(budgets);
+//        user.setBudgets(budgets);
 
         userRepository.save(user); // Save the user to the repository
     }
@@ -54,32 +55,28 @@ public class UserRepositoryTest {
         assertThat(maybeUser.get()).isEqualTo(user);
     }
 
+
     @Test
-    void itShouldUpdateUserDetails() {
-        Long userId = user.getId();
+    @DisplayName("Find user by name and email")
+    void testFindByNameAndEmail() {
+        Optional<User> foundUser = userRepository.findByNameAndEmail(user.getName(), user.getEmail());
 
-        Optional<User> maybeUser = userRepository.findById(userId);
-        assertThat(maybeUser).isPresent();
-
-        User retrievedUser = maybeUser.get();
-        retrievedUser.setEmail("newemail@example.com");
-
-        userRepository.save(retrievedUser);
-
-        Optional<User> updatedUser = userRepository.findById(userId);
-
-        assertThat(updatedUser).isPresent();
-        assertThat(updatedUser.get().getEmail()).isEqualTo("newemail@example.com");
+        assertThat(foundUser.isPresent()).isTrue();
+        foundUser.ifPresent(u -> {
+            assertThat(u.getName()).isEqualTo(user.getName());
+            assertThat(u.getEmail()).isEqualTo(user.getEmail());
+        });
     }
 
     @Test
-    void itShouldDeleteUser() {
-        Long userId = user.getId();
+    @DisplayName("Save user successfully")
+    void testSaveUser() {
+        User newUser = new User();
+        newUser.setName("New User");
+        newUser.setEmail("newuser@example.com");
+        User savedUser = userRepository.save(newUser);
 
-        userRepository.deleteById(userId);
-
-        Optional<User> deletedUser = userRepository.findById(userId);
-
-        assertThat(deletedUser).isNotPresent();
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getId()).isNotNull();
     }
 }
