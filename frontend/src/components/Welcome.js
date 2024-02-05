@@ -21,10 +21,14 @@ const Welcome = () => {
             <nav aria-label="Main navigation">
                 <ul style={{ listStyleType: 'none', padding: 0 }}>
                     <li>
-                        <button onClick={handleLoginClick} className="btn btn-call-to-action" type="button">Login to Your Account</button>
+                        <button onClick={handleLoginClick} className="btn btn-call-to-action" type="button">
+                            <span className="glyphicon glyphicon-log-in"></span>&nbsp; &nbsp; Login to Your Account
+                        </button>
                     </li>
                     <li>
-                        <button onClick={handleSignupClick} className="btn btn-call-to-action" type="button">Create a New Account</button>
+                        <button onClick={handleSignupClick} className="btn btn-call-to-action" type="button">
+                            <span className="glyphicon glyphicon-user"></span>&nbsp; &nbsp; Create a New Account
+                        </button>
                     </li>
                 </ul>
             </nav>

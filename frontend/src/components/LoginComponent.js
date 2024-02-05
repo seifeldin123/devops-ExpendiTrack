@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { findUser } from '../services/userService';
+import { findUser } from '../services/UserService';
 import { useUserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 
@@ -13,7 +13,6 @@ const LoginComponent = () => {
     // Modified to accept the event argument
     const handleLogin = async (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
-        console.log("Logging in");
         setError(''); // Clear previous errors
         if (!username.trim() || !email.trim()) {
             setError('Please enter both username and email'); // Set error
@@ -77,18 +76,20 @@ const LoginComponent = () => {
                 </div>
 
                 <div className="col-sm-offset-3 col-sm-9">
-                    <button type="submit" className="btn btn-primary">Login</button>
+                    <button type="submit" className="btn-lg btn-primary">
+                        Login <span className="glyphicon glyphicon-log-in"></span>
+                    </button>
                 </div>
             </form>
-            <section>
-                <p className="mrgn-tp-lg">
-                    Don't have an account yet?
+            <div>
+
+                    <span>Don't have an account yet?</span> &nbsp;
                     <button className="btn btn-default" type="button"
                             onClick={() => navigate('/signup')}>Sign up here
                     </button>
-                </p>
 
-            </section>
+
+            </div>
         </div>
     );
 };
