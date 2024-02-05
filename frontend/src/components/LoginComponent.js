@@ -76,18 +76,20 @@ const LoginComponent = () => {
                 </div>
 
                 <div className="col-sm-offset-3 col-sm-9">
-                    <button type="submit" className="btn btn-primary">Login</button>
+                    <button type="submit" className="btn-lg btn-primary">
+                        Login <span className="glyphicon glyphicon-log-in"></span>
+                    </button>
                 </div>
             </form>
-            <section>
-                <p className="mrgn-tp-lg">
-                    Don't have an account yet?
+            <div>
+
+                    <span>Don't have an account yet?</span> &nbsp;
                     <button className="btn btn-default" type="button"
                             onClick={() => navigate('/signup')}>Sign up here
                     </button>
-                </p>
 
-            </section>
+
+            </div>
         </div>
     );
 };

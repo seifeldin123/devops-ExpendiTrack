@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { createUser } from '../services/UserService';
-import { useUserContext } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {createUser} from '../services/UserService';
+import {useUserContext} from '../contexts/UserContext';
+import {useNavigate} from 'react-router-dom';
 
 const SignUp = () => {
     const [name, setName] = useState('');
@@ -9,14 +9,14 @@ const SignUp = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const { setUser } = useUserContext();
+    const {setUser} = useUserContext();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         try {
-            const user = await createUser({ name, email });
+            const user = await createUser({name, email});
             setUser(user); // Set the user in context
             navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
         } catch (error) {
@@ -66,12 +66,14 @@ const SignUp = () => {
                 </div>
 
                 <div className="col-sm-offset-3 col-sm-9">
-                    <button type="submit" className="btn btn-primary">Sign Up</button>
+                    <button type="submit" className="btn-lg btn-primary">
+                        Sign Up <span className="glyphicon glyphicon-user"></span>
+                    </button>
                 </div>
             </form>
             <section>
                 <p className="mrgn-tp-lg">
-                    Already have an account?
+                    Already have an account? &nbsp;
                     <button className="btn btn-default" type="button" onClick={() => navigate('/login')}>
                         Login here
                     </button>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBudgetContext } from '../contexts/BudgetContext';
 import { useUserContext } from '../contexts/UserContext';
+import '../styles/Budget.css';
 
 const AddBudgetForm = () => {
     const [budgetDescription, setBudgetDescription] = useState('');
@@ -29,24 +30,62 @@ const AddBudgetForm = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            {error && <p className="error">{error}</p>}
-            <h2>Create Budget</h2>
-            <input
-                type="text"
-                value={budgetDescription}
-                onChange={(e) => setBudgetDescription(e.target.value)}
-                placeholder="e.g., Groceries"
-            />
-            <input
-                type="number"
-                value={budgetAmount}
-                onChange={(e) => setBudgetAmount(e.target.value)}
-                placeholder="e.g., 500"
-            />
-            <button type="submit">Create Budget</button>
-        </form>
-    );
+        <div className="budget-form">
+            <form onSubmit={handleSubmit}>
+                {error && <div style={{color: 'red'}}>{error}</div>}
+
+                <section className="panel panel-info">
+
+                    <header className="panel-heading">
+                        <h2 className="panel-title">Create Budget</h2>
+                    </header>
+
+                    <section className="container">
+
+                        <div className="form-group mrgn-tp-sm">
+                            <div className="mrgn-tp-md">
+                                <label htmlFor="budget-description" className="control-label">Budget Name </label>
+                            </div>
+                            <div>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={budgetDescription}
+                                    onChange={(e) => setBudgetDescription(e.target.value)}
+                                    placeholder="e.g., Groceries"
+                                    id="budget-description"
+                                    required="required"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <div>
+                                <label htmlFor="budget-amount" className="control-label">Amount</label>
+                            </div>
+                            <div>
+                                <input
+                                    type="number"
+                                    className="form-control"
+                                    value={budgetAmount}
+                                    onChange={(e) => setBudgetAmount(e.target.value)}
+                                    placeholder="e.g., 500"
+                                    id="budget-amount"
+                                    required="required"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mrgn-bttm-md">
+                            <button type="submit" className="btn-lg btn-primary">
+                                Create Budget <span className="glyphicon glyphicon-usd"></span>
+                            </button>
+                        </div>
+                    </section>
+                </section>
+            </form>
+        </div>
+);
 };
 
 export default AddBudgetForm;

@@ -21,7 +21,8 @@ const LogoutComponent = () => {
         <div className="col-xs-5 col-xs-offset-7 col-md-offset-0 col-md-4">
             <section id="wb-so">
                 <h2 className="wb-inv">Sign out</h2>
-                <button className="btn btn-primary" onClick={handleLogout}>Logout</button>
+                <button className="btn btn-primary" onClick={handleLogout}><span className="glyphicon glyphicon-log-out"></span> &nbsp; Logout
+                </button>
             </section>
         </div>
 
