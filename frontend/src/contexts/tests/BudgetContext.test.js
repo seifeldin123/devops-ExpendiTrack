@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {render, act, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BudgetProvider, useBudgetContext } from '../BudgetContext';
@@ -42,51 +42,56 @@ describe('BudgetProvider', () => {
     });
 
     it('adds a new budget and updates the display', async () => {
-        // Mock getUserBudgets to return an empty array initially
         getBudgetsByUserId.mockResolvedValue({ data: [] });
-
-        // Mock createBudget to return a new budget
         const newBudget = { id: 3, budgetDescription: 'New Budget', budgetAmount: 300 };
-        createBudget.mockResolvedValue({ data: newBudget });
+        createBudget.mockResolvedValue(newBudget);
+
+        render(
+            <BudgetProvider>
+                <BudgetDisplay />
+            </BudgetProvider>
+        );
 
         await act(async () => {
-            render(
-                <BudgetProvider>
-                    <BudgetDisplay />
-                </BudgetProvider>
-            );
+            // Simulate user actions or direct state manipulations here
+            await userEvent.type(screen.getByPlaceholderText('Budget Title'), 'New Budget');
+            await userEvent.type(screen.getByPlaceholderText('Budget Amount'), '300');
+            userEvent.click(screen.getByText('Add Budget'));
         });
 
-        // Find the input field for adding a new budget
-        const inputField = screen.getByPlaceholderText('Budget Title');
-
-        // Type a new budget budgetDescription and budgetAmount
-        userEvent.type(inputField, 'New Budget');
-        userEvent.type(screen.getByPlaceholderText('Budget Amount'), '300');
-
-        // Find and click the "Add Budget" button
-        userEvent.click(screen.getByText('Add Budget'));
-
-        // Wait for the "New Budget" element to be available
-        await waitFor(() => {
-            expect(screen.getByText('New Budget')).toBeInTheDocument();
-        });
+        // Await any asynchronous operations triggered by the above interactions
+        await waitFor(() => expect(screen.getByText('New Budget')).toBeInTheDocument());
     });
+
+
 });
 
 function BudgetDisplay() {
     const { budgets, addNewBudget } = useBudgetContext();
+    const [budgetDescription, setBudgetDescription] = useState('');
+    const [budgetAmount, setBudgetAmount] = useState('');
+
+    const handleAddBudget = () => {
+        addNewBudget({ budgetDescription, budgetAmount: Number(budgetAmount) });
+    };
 
     return (
         <div>
             {budgets.map((budget) => (
                 <div key={budget.id}>{budget.budgetDescription}</div>
             ))}
-            <input placeholder="Budget Title" />
-            <input placeholder="Budget Amount" />
-            <button onClick={() => addNewBudget({ budgetDescription: 'New Budget', budgetAmount: 300 })}>
-                Add Budget
-            </button>
+            <input
+                placeholder="Budget Title"
+                value={budgetDescription}
+                onChange={(e) => setBudgetDescription(e.target.value)}
+            />
+            <input
+                placeholder="Budget Amount"
+                type="number"
+                value={budgetAmount}
+                onChange={(e) => setBudgetAmount(e.target.value)}
+            />
+            <button onClick={handleAddBudget}>Add Budget</button>
         </div>
     );
 }

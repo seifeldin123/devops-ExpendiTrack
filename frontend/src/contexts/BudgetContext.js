@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createBudget, getBudgetsByUserId, getUserBudgets } from '../services/budgetService';
+import { createBudget, getBudgetsByUserId } from '../services/BudgetService';
 import { useUserContext } from "./UserContext";
 
 // Create a context for managing budget-related state and functions
-const BudgetContext = createContext();
+export const BudgetContext = createContext();
 
 // Custom hook to access the BudgetContext
 export const useBudgetContext = () => useContext(BudgetContext);
@@ -13,48 +13,63 @@ export const BudgetProvider = ({ children }) => {
     // State to hold the user-specific budgets
     const [budgets, setBudgets] = useState([]);
 
-    // Access the current user from the UserContext (assuming useUserContext returns the current user object)
+    // Access the current user from the UserContext
     const { user } = useUserContext();
+
+    const [error, setError] = useState('');
+
 
     // useEffect to fetch user-specific budgets when the user changes
     useEffect(() => {
+        // Ensure we have a valid user ID before fetching
         if (user && user.id) {
-            // Fetch budgets for the current user by their ID
             getBudgetsByUserId(user.id)
-                .then(response => setBudgets(response.data))
+                .then(response => {
+                    // Update the budgets state with fetched data
+                    setBudgets(response.data);
+                })
                 .catch(error => console.error('Error fetching user-specific budgets', error));
+        } else {
+            // Reset budgets if there is no user logged in
+            setBudgets([]);
         }
     }, [user]); // Depend on user to refetch when the user changes
 
     // Function to add a new budget
     const addNewBudget = async (budgetData) => {
         try {
-            // Check for duplicate budget titles
-            const duplicate = budgets.some(budget => budget.budgetDescription === budgetData.budgetDescription);
-            if (duplicate) {
-                throw new Error('Budget with this title already exists');
-            }
-
-            // Adjust the structure to match backend expectations
             const formattedBudgetData = {
                 budgetDescription: budgetData.budgetDescription,
                 budgetAmount: budgetData.budgetAmount,
-                user: { id: budgetData.userId }
+                user: { id: user.id },
             };
 
-            // Create the budget on the backend and update the local state
-            const response = await createBudget(formattedBudgetData);
-            setBudgets(prevBudgets => [...prevBudgets, response.data]);
+            const newBudget = await createBudget(formattedBudgetData);
+            // Update the budgets state to include the new budget
+            setBudgets(prevBudgets => [...(Array.isArray(prevBudgets) ? prevBudgets : []), newBudget]);
+            setError(''); // Reset any previous error
         } catch (error) {
-            console.error('Error adding budget', error);
-            throw error;
+            console.error('Error adding budget:', error);
+            setError(error.toString()); // Set the caught error message
         }
     };
 
+    const fetchBudgets = async (userId) => {
+        try {
+            const fetchedBudgets = await getBudgetsByUserId(userId);
+            setBudgets(fetchedBudgets); // Update budgets state with fetched data
+        } catch (error) {
+            console.error('Failed to load budgets:', error);
+            // Optionally, set an error state to display an error message
+        }
+    };
+
+
     // Provide the budgets and addNewBudget function to child components via the BudgetContext
     return (
-        <BudgetContext.Provider value={{ budgets, addNewBudget }}>
+        <BudgetContext.Provider value={{ budgets, addNewBudget, fetchBudgets ,error, resetError: () => setError('') }}>
             {children}
         </BudgetContext.Provider>
+
     );
 };

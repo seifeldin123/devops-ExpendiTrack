@@ -28,7 +28,7 @@ public class BudgetController {
             Budget createdBudget = budgetService.createBudget(budget);
             return new ResponseEntity<>(createdBudget, HttpStatus.CREATED);
         } catch (DuplicateBudgetNameException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

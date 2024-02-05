@@ -14,13 +14,13 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "budget")
+@Table(name = "budgets", uniqueConstraints = @UniqueConstraint(columnNames = {"budget_description", "user_id"}))
 public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long budgetId;
 
-    @Column(name = "budget_description", unique = true)
+    @Column(name = "budget_description")
     private String budgetDescription;
 
     @Column(name = "budget_amount")

@@ -27,17 +27,22 @@ describe('budgetService', () => {
             expect(axios.post).toHaveBeenCalledWith('http://localhost:8080/budgets', budgetData);
         });
 
-        // Test case for failing budget creation due to duplicate name
         it('fails to create a budget due to duplicate name', async () => {
-            // Define the error message for duplicate name
-            const errorMessage = 'A budget with this name already exists.';
+            // Define the error response for duplicate name
+            const errorResponse = {
+                response: {
+                    data: 'A budget with this name already exists.',
+                    status: 400, // Ensure the status code is set to 400 for Bad Request
+                },
+            };
 
-            // Mock axios.post to reject with an error containing the error message
-            axios.post.mockRejectedValue({ response: { data: { message: errorMessage } } });
+            // Mock axios.post to reject with the error response
+            axios.post.mockRejectedValue(errorResponse);
 
             // Ensure that createBudget rejects with the expected error message
-            await expect(createBudget(budgetData)).rejects.toMatch(errorMessage);
+            await expect(createBudget(budgetData)).rejects.toEqual('A budget with this name already exists.');
         });
+
     });
 
     // Describe the getBudgetsByUserId function

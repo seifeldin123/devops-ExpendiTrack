@@ -1,24 +1,22 @@
 import axios from 'axios';
 
-// Assuming the base URL for budget-related endpoints
 const API_URL = 'http://localhost:8080/budgets';
 
-// Function to create a budget by sending a POST request
 export const createBudget = (budgetData) => {
     return axios.post(API_URL, budgetData)
         .then(response => response.data)
         .catch(error => {
-            if (error.response && error.response.data && error.response.data.message) {
-                // Specific error message from server, e.g., for duplicate budget names
-                return Promise.reject(error.response.data.message);
+            if (error.response?.status === 400) {
+                // If the status is 400, return the error message from the response data
+                return Promise.reject(error.response.data);
             } else {
-                // Generic error message for other errors
+                // For other errors, return a generic error message
                 return Promise.reject('An error occurred while creating the budget. Please try again later.');
             }
         });
 };
 
-// Function to retrieve all budgets for a user by their ID using a GET request
+
 export const getBudgetsByUserId = (userId) => {
     return axios.get(`${API_URL}/user/${userId}`)
         .then(response => response.data)

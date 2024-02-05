@@ -3,14 +3,17 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8080/users';
 
 // Function to create a user by sending a POST request
-export const createUser = (userData) => axios.post(API_URL, userData).catch((error) => {
-    if (error.response && error.response.data && error.response.data.message === 'An account with these credentials already exists.') {
-        return Promise.reject('A user with these credentials already exists. Please login or use different credentials.');
-    } else {
-        return Promise.reject('An error occurred during the signup process. Please try again later.');
-    }
-});
-
+export const createUser = (userData) => axios.post(API_URL, userData)
+    .then(response => response.data)
+    .catch((error) => {
+        // Check for the specific status code and message
+        if (error.response && error.response.status === 400 && error.response.data === 'An account with these credentials already exists.') {
+            return Promise.reject('A user with these credentials already exists. Please login or use different credentials.');
+        } else {
+            // You can further refine this by checking for different error codes and messages
+            return Promise.reject('An error occurred during the signup process. Please try again later.');
+        }
+    });
 
 // Function to find a user by name and email using a GET request
 export const findUser = async (name, email) => {

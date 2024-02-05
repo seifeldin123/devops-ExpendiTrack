@@ -16,8 +16,8 @@ const SignUp = () => {
         setError('');
 
         try {
-            const response = await createUser({ name, email });
-            setUser(response.data); // Set the user in context
+            const user = await createUser({ name, email });
+            setUser(user); // Set the user in context
             navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
         } catch (error) {
             // Now, error is the message we rejected with in createUser
