@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RestController
+@RequestMapping("/expenses")
 public class ExpensesController {
     @Autowired
     ExpensesService expenseService;
@@ -35,4 +37,10 @@ public class ExpensesController {
         expenseService.deleteExpense(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/user/{userId}")
+    public List<Expenses> getExpensesByUserId(@PathVariable Long userId) {
+        return expenseService.getExpensesByUserId(userId);
+    }
+
 }
