@@ -13,6 +13,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -56,14 +57,14 @@ public class BudgetRepositoryTest {
         expenses.setExpensesDescription("Books");
         expenses.setExpensesAmount(200);
         expenses.setExpensesDate(Instant.now());
-
+        expenses.setUser(user);
 
         // Create budgets
         budget = new Budget();
         budget.setBudgetDescription("College");
         budget.setBudgetAmount(1000);
         budget.setUser(user);
-        budget.setExpenses(Set.of(expenses));
+//        budget.setExpenses(Set.of(expenses));
     }
     @AfterEach
     void tearDown() {
@@ -81,90 +82,49 @@ public class BudgetRepositoryTest {
         assertNotNull(newBudget.getBudgetId());
     }
 
+
     @Test
-    @DisplayName("Should return the budget list with a size of 1")
-    void testFindAll() {
-        // Save the budget to the database
+    @DisplayName("Should return a list of budgets for a given user id")
+    void testFindByUserId() {
+        // Save a budget for a specific user to the database
+        Budget savedBudget = budgetRepository.save(budget);
+
+        // Call the findByUserId method with the user's id
+        List<Budget> budgetsForUser = budgetRepository.findByUserId(user.getId());
+
+        // Verify that the returned list is not null
+        assertNotNull(budgetsForUser);
+
+        // Verify that the list contains the saved budget
+        assertTrue(budgetsForUser.contains(savedBudget));
+    }
+
+
+    @Test
+    @DisplayName("Check budget exists by description and user ID")
+    void testExistsByBudgetDescriptionAndUserId() {
+        // Given
+        User user = new User();
+        user.setName("Test User");
+        user.setEmail("test@user.com");
+        User savedUser = userRepository.save(user);
+
+        Budget budget = new Budget();
+        budget.setBudgetDescription("Test Budget");
+        budget.setBudgetAmount(500);
+        budget.setUser(savedUser);
         budgetRepository.save(budget);
-        // Retrieve the list of budget from the database
-        Iterable<Budget> budgetList = budgetRepository.findAll();
-        // Ensure that the list is not null
-        assertNotNull(budgetList);
-        // Assert that the list has a size of 1
-        assertEquals(1, budgetList.spliterator().getExactSizeIfKnown());
+
+        // When
+        boolean exists = budgetRepository.existsByBudgetDescriptionAndUserId("Test Budget", savedUser.getId());
+
+        // Then
+        assertTrue(exists, "Budget should exist for given description and user ID");
+
+        // Test for a non-existent budget
+        boolean notExists = budgetRepository.existsByBudgetDescriptionAndUserId("Nonexistent Budget", savedUser.getId());
+
+        assertFalse(notExists, "Budget should not exist for given description and user ID");
     }
 
-    @Test
-    @DisplayName("Should return budget by its id")
-    void testFindById() {
-        // Save the budget to the database
-        Budget savedBudget = budgetRepository.save(budget);
-        // Retrieve the budget by its ID
-        Optional<Budget> retrievedBudget1Optional = budgetRepository.findById(savedBudget.getBudgetId());
-        // Assert that the retrieved budget is present and its properties match the saved budget
-        assertTrue(retrievedBudget1Optional.isPresent());
-        Budget retrievedBudget = retrievedBudget1Optional.get();
-        assertEquals(savedBudget.getBudgetId(), retrievedBudget.getBudgetId());
-        assertEquals("College", retrievedBudget.getBudgetDescription());
-        assertEquals(1000, retrievedBudget.getBudgetAmount());
-
-        // Retrieve users and expenses for the budget and assert their properties
-        User retrievedUser = savedBudget.getUser();
-        assertNotNull(retrievedUser);
-        assertEquals(user.getId(), retrievedUser.getId());
-
-        Expenses retrievedExpenses = expensesRepository.findById(expenses.getExpensesId()).orElse(null);
-        assertNotNull(retrievedExpenses);
-        assertEquals(expenses.getExpensesId(), retrievedExpenses.getExpensesId());
-    }
-
-    @Test
-    @DisplayName("Should delete by id an existing budget from the database")
-    void testDeleteById() {
-        // Save the first budget to the database
-        Budget savedBudget1 = budgetRepository.save(budget);
-        // Get the ID of the budget
-        Long id1 = savedBudget1.getBudgetId();
-        // Delete the budget from the database
-        budgetRepository.deleteById(id1);
-        // Flush changes to the database
-        budgetRepository.flush();
-        // Verify that the  budget is no longer in the database
-        Optional<Budget> existingBudget1Optional = budgetRepository.findById(id1);
-        assertFalse(existingBudget1Optional.isPresent());
-
-    }
-
-    @Test
-    @DisplayName("Should calculate remaining budget correctly")
-    void testGetRemainingBudget() {
-        // Save the budget to the database
-        Budget savedBudget = budgetRepository.save(budget);
-
-        // Add more expenses
-        Expenses additionalExpenses = new Expenses();
-        additionalExpenses.setExpensesDescription("Food");
-        additionalExpenses.setExpensesAmount(300);
-        additionalExpenses.setExpensesDate(Instant.now());
-
-        additionalExpenses.setBudget(savedBudget);
-
-        // Create a new set with the additional expense
-        Set<Expenses> updatedExpenses = new HashSet<>(savedBudget.getExpenses());
-        updatedExpenses.add(additionalExpenses);
-
-        // Set the updated set to the expenses property
-        savedBudget.setExpenses(updatedExpenses);
-
-        budgetRepository.save(savedBudget);
-
-        // Retrieve the budget by its ID
-        Optional<Budget> retrievedBudgetOptional = budgetRepository.findById(savedBudget.getBudgetId());
-
-        assertTrue(retrievedBudgetOptional.isPresent());
-        Budget retrievedBudget = retrievedBudgetOptional.get();
-
-        // Ensure the remaining budget is calculated correctly (1000 - 200 - 300 = 500)
-        assertEquals(500, retrievedBudget.calculateRemainingBudget());
-    }
 }

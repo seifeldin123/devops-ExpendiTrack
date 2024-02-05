@@ -31,4 +31,6 @@ public class Expenses {
     @ManyToOne
     private Budget budget;
 
+    @ManyToOne
+    private User user;
 }

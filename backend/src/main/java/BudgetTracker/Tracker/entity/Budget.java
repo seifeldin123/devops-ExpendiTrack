@@ -1,4 +1,5 @@
 package BudgetTracker.Tracker.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,10 +14,10 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "budget")
+@Table(name = "budgets", uniqueConstraints = @UniqueConstraint(columnNames = {"budget_description", "user_id"}))
 public class Budget {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long budgetId;
 
     @Column(name = "budget_description")
@@ -28,14 +29,4 @@ public class Budget {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
-    private Set<Expenses> expenses = new HashSet<>();
-
-    //method to calculate remaining budget
-    @Transient
-    public int calculateRemainingBudget() {
-        int totalExpenses = expenses.stream().mapToInt(Expenses::getExpensesAmount).sum();
-        return budgetAmount - totalExpenses;
-    }
 }
