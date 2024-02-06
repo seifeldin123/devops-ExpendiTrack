@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { ExpenseProvider, useExpenseContext } from '../ExpenseContext';
 import { useUserContext } from '../UserContext';
 import { createExpense, getUserExpenses } from '../../services/expenseService';
+import axios from "axios";
 
 // Mock the UserContext
 jest.mock('../UserContext');
@@ -35,16 +36,9 @@ describe('ExpenseProvider', () => {
             );
         });
 
-        // Ensure that the expense descriptions are displayed on the screen
-        expect(screen.getByText((content, node) => {
-            const hasText = (node) => node.textContent === "Coffee - $5";
-            const nodeHasText = hasText(node);
-            // Check if the current node has the text, or some child does
-            const childrenDontHaveText = Array.from(node.children).every(
-                (child) => !hasText(child)
-            );
-            return nodeHasText && childrenDontHaveText;
-        })).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Coffee - $5')).toBeInTheDocument();
+        });
 
     });
 
@@ -72,6 +66,12 @@ describe('ExpenseProvider', () => {
         })).toBeInTheDocument());
 
     });
+
+    afterEach(() => {
+        // Clear all mocks after each test to ensure a clean slate
+        jest.clearAllMocks();
+    });
+
 });
 
 function ExpenseDisplay() {
