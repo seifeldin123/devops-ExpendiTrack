@@ -9,7 +9,7 @@ const ExpenseList = React.memo(({ expenses }) => {
         <div>
             <h2>Expenses</h2>
 
-            {expenses.map(expense => <ExpenseItem key={expense.id} expense={expense} />)}
+            {expenses.map(expense => <ExpenseItem key={expense.expensesId} expense={expense} />)}
 
         </div>
     );

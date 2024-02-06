@@ -11,7 +11,9 @@ const BudgetList = React.memo(({ budgets }) => {
         <div>
             <h2>Budgets</h2>
             {/* Map through each budget and render the BudgetItem component for each one. */}
-            {budgets.map(budget => <BudgetItem key={budget.id} budget={budget} />)}
+            {budgets.map((budget) => (
+                <BudgetItem key={budget.budgetId} budget={budget} />
+            ))}
         </div>
     );
 });
