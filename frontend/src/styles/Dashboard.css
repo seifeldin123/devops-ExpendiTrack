@@ -1,0 +1,92 @@
+/* Unique Container for Forms within Dashboard */
+.dashboard-forms-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+/* Specific Styles for Each Form */
+.dashboard-budget-form, .dashboard-expense-form {
+    flex: 1;
+    max-width: calc(50% - 10px); /* Adjusting the gap consideration */
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    /*box-shadow: 0 4px 6px rgba(0,0,0,0.1);*/
+}
+
+/* Styling for .form-section-container specifically */
+.dashboard-budget-form .form-section-container, .dashboard-expense-form .form-section-container {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Ensuring input and select elements inside the specific forms have consistent styling */
+.dashboard-budget-form .form-control, .dashboard-expense-form .form-control,
+.dashboard-budget-form .select-control, .dashboard-expense-form .select-control {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+
+
+/* Styling for labels within the specific forms for clarity */
+.dashboard-budget-form .label,
+.dashboard-expense-form .label,
+.dashboard-budget-form .control-label,
+.dashboard-expense-form .control-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: bold;
+}
+
+/* Button styling within the specific forms */
+.dashboard-budget-form .form-button,
+.dashboard-expense-form .form-button {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.dashboard-budget-form .form-button:hover,
+.dashboard-expense-form .form-button:hover {
+    background-color: #0056b3;
+}
+
+/* Error message styling */
+.dashboard-budget-form .error-message,
+.dashboard-expense-form .error-message {
+    color: #d9534f;
+    background-color: #f2dede;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+
+.custom-card-border {
+    border: 2px solid #0e59a9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 10px;
+    margin: 10px;
+}
+
+.custom-card-border:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}

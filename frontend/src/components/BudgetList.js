@@ -8,7 +8,7 @@ const BudgetList = React.memo(({ budgets }) => {
     if (!Array.isArray(budgets)) return <div>No budgets available</div>;
 
     return (
-        <div>
+        <div className="container mt-4">
             <h2>Budgets</h2>
             {/* Map through each budget and render the BudgetItem component for each one. */}
             {budgets.map((budget) => (

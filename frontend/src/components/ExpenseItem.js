@@ -1,18 +1,18 @@
 import React from 'react';
-import {formatCurrency} from '../helpers/HelperFunctions';
-
-
+import { formatCurrency } from '../helpers/HelperFunctions';
 
 const ExpenseItem = ({ expense }) => {
-
     return (
-        <div className="expense-item">
-            <h3>{expense.expensesDescription}</h3>
-            <p>Amount: {formatCurrency(expense.expensesAmount)}</p>
-            {/* Formatting the date for better readability */}
-            <p>Date: {new Date(expense.expensesDate).toLocaleDateString()}</p>
-            {/* Accessing the budgetDescription from the nested budget object */}
-            <p>Budget: {expense.budget.budgetDescription}</p>
+        <div className="col-md-6 col-lg-4 mb-4">
+            <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                    <h5 className="card-title">{expense.expensesDescription}</h5>
+                    <p className="card-text">Amount: {formatCurrency(expense.expensesAmount)}</p>
+                    <p className="card-text">Date: {new Date(expense.expensesDate).toLocaleDateString()}</p>
+                    <p className="card-text">Budget: {expense.budget.budgetDescription}</p>
+                </div>
+
+            </div>
         </div>
     );
 };
