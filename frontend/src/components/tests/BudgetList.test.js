@@ -1,52 +1,42 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route } from 'react-router-dom';
-import BudgetItem from '../BudgetItem';
-import { useUserContext } from '../../contexts/UserContext'; // Import useUserContext
+import BudgetList from '../BudgetList';
 
-// Mock the useUserContext hook
-jest.mock('../../contexts/UserContext', () => ({
-    useUserContext: jest.fn(),
-}));
+// Mock the BudgetItem component
+jest.mock('../BudgetItem', () => (props) => <div data-testid="mock-budget-item">{props.budget.budgetDescription}</div>);
 
-describe('BudgetItem', () => {
-    const mockBudget = {
-        id: 1,
-        budgetDescription: 'Test Budget',
-        budgetAmount: 1000,
-        spent: 400,
-        remaining: 600,
-    };
+describe('BudgetList', () => {
+    const mockBudgets = [
+        { budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
+        { budgetId: 2, budgetDescription: 'Utilities', budgetAmount: 150 }
+    ];
 
-    // Define mockUser outside of beforeEach for access in both test cases
-    const mockUser = { id: 123 }; // Example user ID
+    it('renders a list of budget items', () => {
+        render(<BudgetList budgets={mockBudgets} />);
 
-    beforeEach(() => {
-        // Setup mock user data before each test
-        useUserContext.mockImplementation(() => ({ user: mockUser }));
+        // Check for the "Budgets" heading
+        expect(screen.getByText('Budgets')).toBeInTheDocument();
+
+        // Check that each mocked BudgetItem is rendered
+        mockBudgets.forEach((budget) => {
+            expect(screen.getByText(budget.budgetDescription)).toBeInTheDocument();
+        });
+
+        // Alternatively, check for the presence of mocked BudgetItem components
+        const budgetItems = screen.queryAllByTestId('mock-budget-item');
+        expect(budgetItems.length).toBe(mockBudgets.length);
     });
 
-    it('renders budget information', () => {
-        render(
-            <MemoryRouter>
-                <BudgetItem budget={mockBudget} />
-            </MemoryRouter>
-        );
+    it('displays a message when no budgets are available', () => {
+        render(<BudgetList budgets={[]} />);
 
-        expect(screen.getByText(mockBudget.budgetDescription)).toBeInTheDocument();
-        expect(screen.getByText(`Budgeted: ${mockBudget.budgetAmount}`)).toBeInTheDocument();
-        expect(screen.getByText(`Spent: ${mockBudget.spent}`)).toBeInTheDocument();
-        expect(screen.getByText(`Remaining: ${mockBudget.remaining}`)).toBeInTheDocument();
+        expect(screen.getByText('No budgets available')).toBeInTheDocument();
     });
 
-    it('renders a link to view budget details with the correct user ID', () => {
-        render(
-            <MemoryRouter>
-                <BudgetItem budget={mockBudget} />
-            </MemoryRouter>
-        );
+    it('displays a message when the budgets prop is not an array', () => {
+        // @ts-ignore to simulate incorrect prop types
+        render(<BudgetList budgets={null} />);
 
-        // Ensure the link to budget details includes the mocked user ID
-        expect(screen.getByRole('link')).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
+        expect(screen.getByText('No budgets available')).toBeInTheDocument();
     });
 });

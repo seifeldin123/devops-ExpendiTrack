@@ -1,95 +1,78 @@
 import React from 'react';
 import {render, screen, fireEvent, act} from '@testing-library/react';
-import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event';
-import AddExpenseForm from '../AddExpenseForm';
-import { useExpenseContext } from '../../contexts/ExpenseContext';
+import AddExpenseForm from '../AddExpenseForm'; // Adjust the import path as necessary
+import { ExpenseContext } from '../../contexts/ExpenseContext';
+import { calculateTotalSpent } from '../../helpers/HelperFunctions';
 
-// Mock the ExpenseContext
-jest.mock('../../contexts/ExpenseContext', () => ({
-    useExpenseContext: jest.fn()
+jest.mock('../../helpers/HelperFunctions', () => ({
+    calculateTotalSpent: jest.fn(),
 }));
 
-describe('AddExpenseForm', () => {
-    // Mock data for budgets
-    const budgets = [
-        { id: 1, title: 'Daily Expenses' },
-        { id: 2, title: 'Savings' }
-    ];
+// Mock data
+const mockBudgets = [
+    { budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 500 },
+    { budgetId: 2, budgetDescription: 'Utilities', budgetAmount: 150 },
+];
 
+const mockAddNewExpense = jest.fn();
+const mockResetError = jest.fn();
+
+// Mock context provider wrapper
+const Wrapper = ({ children }) => (
+    <ExpenseContext.Provider value={{
+        addNewExpense: mockAddNewExpense,
+        expenses: [],
+        error: null,
+        resetError: mockResetError,
+    }}>
+        {children}
+    </ExpenseContext.Provider>
+);
+
+describe('AddExpenseForm', () => {
     beforeEach(() => {
-        // Mock implementation of useExpenseContext
-        useExpenseContext.mockImplementation(() => ({
-            addNewExpense: jest.fn()
-        }));
+        mockAddNewExpense.mockClear();
+        mockResetError.mockClear();
+        calculateTotalSpent.mockClear();
     });
 
     it('renders correctly with initial state', () => {
-        render(<AddExpenseForm budgets={budgets} />);
-
-        // Check for the presence and correct initial values of description and amount inputs
-        expect(screen.getByPlaceholderText('Description')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Amount')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Date')).toBeInTheDocument();
-        expect(screen.getByText('Select Budget')).toBeInTheDocument();
+        render(<AddExpenseForm budgets={mockBudgets} />, { wrapper: Wrapper });
+        expect(screen.getByPlaceholderText('e.g., Walmart')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('e.g., 150.47')).toBeInTheDocument();
+        expect(screen.getByLabelText('Budget Category')).toHaveValue('');
     });
 
+    it('updates input fields on user input', () => {
+        render(<AddExpenseForm budgets={mockBudgets} />, { wrapper: Wrapper });
+        fireEvent.change(screen.getByPlaceholderText('e.g., Walmart'), { target: { value: 'Coffee' } });
+        expect(screen.getByPlaceholderText('e.g., Walmart')).toHaveValue('Coffee');
+    });
 
-    it('allows input to be entered in the form fields', async () => {
-        render(<AddExpenseForm budgets={budgets} />);
+    it('submits the form with valid data', async () => {
+        calculateTotalSpent.mockReturnValue(100); // Assuming $100 already spent
 
-        const descriptionInput = screen.getByPlaceholderText('Description');
-        const amountInput = screen.getByPlaceholderText('Amount');
-        const dateInput = screen.getByPlaceholderText('Date');
-        const selectBudget = screen.getByRole('combobox');
+        render(<AddExpenseForm budgets={mockBudgets} />, { wrapper: Wrapper });
 
+        // Fill the form
+        fireEvent.change(screen.getByPlaceholderText('e.g., Walmart'), { target: { value: 'Coffee' } });
+        fireEvent.change(screen.getByPlaceholderText('e.g., 150.47'), { target: { value: '5' } });
+        fireEvent.change(screen.getByLabelText('Budget Category'), { target: { value: '1' } });
+        fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2024-02-06' } });
+
+        // Wrap the click event in act() and use await for any promises to resolve
         await act(async () => {
-
-            await userEvent.type(descriptionInput, 'Coffee');
-            await userEvent.type(amountInput, '5');
-            await userEvent.type(dateInput, '2024-02-06');
-            fireEvent.change(selectBudget, {target: {value: budgets[0].id.toString()}});
-
+            fireEvent.click(screen.getByText('Add Expense'));
         });
 
-        expect(descriptionInput).toHaveValue('Coffee');
-        expect(amountInput).toHaveValue(5);
-        expect(dateInput).toHaveValue('2024-02-06');
-        expect(selectBudget).toHaveValue(budgets[0].id.toString());
-    });
-
-    it('calls addNewExpense with the correct data when the form is submitted', async () => {
-        const addNewExpenseMock = jest.fn();
-        useExpenseContext.mockImplementation(() => ({
-            addNewExpense: addNewExpenseMock,
-            expenses: []
-        }));
-
-        render(<AddExpenseForm budgets={budgets} />);
-
-        const descriptionInput = screen.getByPlaceholderText('Description');
-        const amountInput = screen.getByPlaceholderText('Amount');
-        const dateInput = screen.getByPlaceholderText('Date');
-        const selectBudget = screen.getByRole('combobox');
-        const submitButton = screen.getByText('Add Expense');
-
-        await act(async () => {
-            // Simulate filling out and submitting the form
-            await userEvent.type(descriptionInput, 'Books');
-            await userEvent.type(amountInput, '15');
-            await userEvent.type(dateInput, '2024-02-07');
-            fireEvent.change(selectBudget, {target: {value: budgets[1].id.toString()}});
-            userEvent.click(submitButton);
-
-        });
-
-        // Use waitFor or findBy* queries if the submission is asynchronous
-        expect(addNewExpenseMock).toHaveBeenCalledWith({
-            description: 'Books',
-            amount: 15,
-            date: '2024-02-07T00:00:00.000Z',
-            budgetId: budgets[1].id.toString()
+        // Assertions can be made after the act block if needed
+        expect(mockAddNewExpense).toHaveBeenCalledWith({
+            description: 'Coffee',
+            amount: 5,
+            date: '2024-02-06T00:00:00.000Z',
+            budgetId: '1',
         });
     });
+
 
 });

@@ -1,24 +1,20 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import ExpenseList from '..//ExpenseList';
-
-// Mock ExpenseItem component
-jest.mock('../ExpenseItem', () => (props) => <div data-testid="expense-item">{props.expense.description}</div>);
+import ExpenseList from '../ExpenseList';
 
 describe('ExpenseList', () => {
+    const mockExpenses = [
+        { expensesId: 1, expensesDescription: 'Coffee', expensesAmount: 5, expensesDate: '2024-02-06', budget: { budgetDescription: 'Daily Expenses' }},
+        { expensesId: 2, expensesDescription: 'Books', expensesAmount: 15, expensesDate: '2024-02-07', budget: { budgetDescription: 'Education' }}
+    ];
 
     it('renders a list of expenses correctly', () => {
-        const mockExpenses = [
-            { id: 1, description: 'Coffee', amount: 5, date: '2024-02-06', budgetDescription: 'Daily Expenses' },
-            { id: 2, description: 'Books', amount: 15, date: '2024-02-07', budgetDescription: 'Education' }
-        ];
-
         render(<ExpenseList expenses={mockExpenses} />);
 
-        expect(screen.getAllByTestId('expense-item')).toHaveLength(mockExpenses.length);
-        expect(screen.getByText('Expenses')).toBeInTheDocument();
-        expect(screen.getByText('Coffee')).toBeInTheDocument();
-        expect(screen.getByText('Books')).toBeInTheDocument();
+        expect(screen.getByText('Daily Expenses')).toBeInTheDocument();
+        expect(screen.getByText('Education')).toBeInTheDocument();
+        mockExpenses.forEach(expense => {
+            expect(screen.getByText(expense.expensesDescription)).toBeInTheDocument();
+        });
     });
 });

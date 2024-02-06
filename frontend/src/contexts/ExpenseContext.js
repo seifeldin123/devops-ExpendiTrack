@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createExpense, getUserExpenses } from '../services/ExpenseService';
 import { useUserContext } from "./UserContext";
 
-const ExpenseContext = createContext();
+export const ExpenseContext = createContext();
 
 export const useExpenseContext = () => useContext(ExpenseContext);
 
