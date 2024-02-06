@@ -3,7 +3,7 @@ import { findUser } from '../services/UserService';
 import { useUserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 
-const LoginComponent = () => {
+const Login = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const { setUser } = useUserContext();
@@ -94,4 +94,4 @@ const LoginComponent = () => {
     );
 };
 
-export default LoginComponent;
+export default Login;

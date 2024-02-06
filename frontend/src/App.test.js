@@ -5,7 +5,7 @@ import { UserProvider } from './contexts/UserContext';
 import { BudgetProvider } from './contexts/BudgetContext'; // Import BudgetProvider
 
 describe('App Routing', () => {
-    it('renders LoginComponent for "/login" route', () => {
+    it('renders Login for "/login" route', () => {
         window.history.pushState({}, '', '/login');
         render(
             <UserProvider>
