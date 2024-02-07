@@ -4,12 +4,14 @@ import { UserProvider } from './contexts/UserContext';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import PageNotFound from './pages/PageNotFound';
+
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import PrivateRoute from './components/PrivateRoute';
 import Welcome from "./pages/Welcome";
 import {BudgetProvider} from "./contexts/BudgetContext";
 import {ExpenseProvider} from "./contexts/ExpenseContext";
+
 
 
 function App() {

@@ -27,6 +27,7 @@ const AddBudgetForm = () => {
 
     return (
         <div className="dashboard-budget-form ">
+
             <form onSubmit={handleSubmit}>
                 {error && <div style={{color: 'red'}}>{error}</div>}
 

@@ -6,6 +6,7 @@ import { BudgetProvider } from './contexts/BudgetContext'; // Import BudgetProvi
 
 describe('App Routing', () => {
     it('renders Login for "/login" route', () => {
+
         window.history.pushState({}, '', '/login');
         render(
             <UserProvider>
@@ -28,5 +29,4 @@ describe('App Routing', () => {
         );
         expect(screen.getByRole('heading', { name: /create account/i })).toBeInTheDocument();
     });
-
 });

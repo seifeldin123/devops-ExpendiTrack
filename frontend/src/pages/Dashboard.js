@@ -20,6 +20,7 @@ const Dashboard = () => {
         }
     }, [user, fetchBudgets, fetchExpenses]);
 
+
     return (
         <div className="container" data-testid="dashboard">
             {user && <h1>Welcome, {user.name}!</h1>}
