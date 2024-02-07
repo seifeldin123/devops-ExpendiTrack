@@ -143,5 +143,10 @@ ExpenseTracker is an ambitious project aiming to leverage the Spring Boot framew
 ## Future Changes
 
 - Deploy App (render, netlify, Azure/internally etc)
+- javadocs or swagger docs(API Testing docs) for basically everything(specially tests)
+- pipeline as github action, on each PR(sprint1 OR sprint2) and only approve if all tests pass(backend and frontend)
+- decide to separate backend and backend for CI/CD pipeline testing 
+- Document tests in excel,etc.
+- link jira to confluence for documentation(Documentation of Agile)
 
 ## Resources

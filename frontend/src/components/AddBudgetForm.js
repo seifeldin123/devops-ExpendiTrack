@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useBudgetContext } from '../contexts/BudgetContext';
 import { useUserContext } from '../contexts/UserContext';
-import '../styles/Budget.css';
 
 const AddBudgetForm = () => {
     const [budgetDescription, setBudgetDescription] = useState('');
@@ -23,14 +22,12 @@ const AddBudgetForm = () => {
             setBudgetDescription('');
             setBudgetAmount('');
             // No need to reset error here since successful submission will not set an error
-        } catch (serverError) {
-            // Error handling is now more focused on server responses
-            // `serverError` is already being set in the context, so no need to set it here
-        }
+        } catch (serverError){}
     };
 
     return (
-        <div className="budget-form">
+        <div className="dashboard-budget-form ">
+
             <form onSubmit={handleSubmit}>
                 {error && <div style={{color: 'red'}}>{error}</div>}
 
@@ -40,7 +37,7 @@ const AddBudgetForm = () => {
                         <h2 className="panel-title">Create Budget</h2>
                     </header>
 
-                    <section className="container">
+                    <div className="form-section-container">
 
                         <div className="form-group mrgn-tp-sm">
                             <div className="mrgn-tp-md">
@@ -81,7 +78,7 @@ const AddBudgetForm = () => {
                                 Create Budget <span className="glyphicon glyphicon-usd"></span>
                             </button>
                         </div>
-                    </section>
+                    </div>
                 </section>
             </form>
         </div>

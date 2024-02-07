@@ -16,7 +16,7 @@ import java.time.Instant;
 @Table(name = "expenses")
 public class Expenses {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long expensesId;
 
     @Column(name = "expenses_description")
@@ -28,9 +28,15 @@ public class Expenses {
     @Column(name = "date")
     private Instant expensesDate;
 
-    @ManyToOne
-    private Budget budget;
+//    @ManyToOne
+//    private Budget budget;
 
     @ManyToOne
-    private User user;
+    @JoinColumn(name = "budget_id", referencedColumnName = "budgetId")
+    private Budget budget;
+
+
+
+//    @ManyToOne
+//    private User user;
 }

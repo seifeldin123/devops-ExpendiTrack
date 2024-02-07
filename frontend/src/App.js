@@ -4,28 +4,33 @@ import { UserProvider } from './contexts/UserContext';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import PageNotFound from './pages/PageNotFound';
-import LoginComponent from './components/LoginComponent';
-import SignUp from './components/SignUp';
+
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
 import PrivateRoute from './components/PrivateRoute';
-import Welcome from "./components/Welcome";
+import Welcome from "./pages/Welcome";
 import {BudgetProvider} from "./contexts/BudgetContext";
+import {ExpenseProvider} from "./contexts/ExpenseContext";
+
 
 
 function App() {
     return (
         <UserProvider>
             <BudgetProvider>
-                <Router>
-                    <MainLayout>
-                        <Routes>
-                            <Route path="/" element={<Welcome />} />
-                            <Route path="/login" element={<LoginComponent />} />
-                            <Route path="/signup" element={<SignUp />} />
-                            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-                            <Route path="*" element={<PageNotFound />} />
-                        </Routes>
-                    </MainLayout>
-                </Router>
+                <ExpenseProvider>
+                    <Router>
+                        <MainLayout>
+                            <Routes>
+                                <Route path="/" element={<Welcome />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/signup" element={<SignUp />} />
+                                <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                                <Route path="*" element={<PageNotFound />} />
+                            </Routes>
+                        </MainLayout>
+                    </Router>
+                </ExpenseProvider>
             </BudgetProvider>
         </UserProvider>
     );

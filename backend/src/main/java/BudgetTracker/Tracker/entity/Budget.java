@@ -27,6 +27,6 @@ public class Budget {
     private int budgetAmount;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }

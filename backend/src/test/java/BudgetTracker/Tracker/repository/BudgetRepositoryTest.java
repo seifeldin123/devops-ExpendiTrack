@@ -57,7 +57,7 @@ public class BudgetRepositoryTest {
         expenses.setExpensesDescription("Books");
         expenses.setExpensesAmount(200);
         expenses.setExpensesDate(Instant.now());
-        expenses.setUser(user);
+//        expenses.setUser(user);
 
         // Create budgets
         budget = new Budget();

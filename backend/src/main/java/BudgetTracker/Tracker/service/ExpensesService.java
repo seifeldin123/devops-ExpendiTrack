@@ -1,5 +1,6 @@
 package BudgetTracker.Tracker.service;
 
+import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.repository.BudgetRepository;
 import BudgetTracker.Tracker.repository.ExpensesRepository;
@@ -24,9 +25,31 @@ public class ExpensesService {
         return expenseRepository.findById(id).orElse(null);
     }
 
+//    public Expenses createExpense(Expenses expense) {
+//        // Ensure that the ID is null to trigger database-generated ID
+//        expense.setExpensesId(null);
+//        return expenseRepository.save(expense);
+//    }
+
+    public List<Expenses> getExpensesByUserId(Long userId) {
+        return expenseRepository.findByBudget_User_Id(userId);
+    }
+
+
     public Expenses createExpense(Expenses expense) {
-        // Ensure that the ID is null to trigger database-generated ID
-        expense.setExpensesId(null);
+        if (expense.getBudget() != null && expense.getBudget().getBudgetId() != null) {
+            Long budgetId = expense.getBudget().getBudgetId();
+            Budget budget = budgetRepository.findById(budgetId).orElse(null);
+            if (budget != null) {
+                expense.setBudget(budget);
+            } else {
+                // Budget not found, handle accordingly
+                throw new RuntimeException("Budget not found for ID: " + budgetId);
+            }
+        } else {
+            // Budget is not set, handle accordingly
+            throw new RuntimeException("Budget is not set in the expense");
+        }
         return expenseRepository.save(expense);
     }
 
