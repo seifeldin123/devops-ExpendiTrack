@@ -2,6 +2,7 @@ package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.User;
 import BudgetTracker.Tracker.exceptions.DuplicateUserException;
+import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,12 @@ public class UserController {
         } catch (DuplicateUserException e) {
             // Specific handling for duplicate user
             return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (DataIntegrityViolationException e) {
+        } catch (InvalidInputException e) {
+            // Handling for invalid input exception
+            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+        }catch (DataIntegrityViolationException e) {
             // Fallback for other data integrity issues, including unique constraint violations not caught by DuplicateUserException
-            return ResponseEntity.badRequest().body("A user with the provided email already exists.");
+            return ResponseEntity.badRequest().body("A user with the provided name or email already exists.");
         }
     }
 
