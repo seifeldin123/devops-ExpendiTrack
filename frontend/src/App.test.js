@@ -2,16 +2,19 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 import { UserProvider } from './contexts/UserContext';
+import { BudgetProvider } from './contexts/BudgetContext'; // Import BudgetProvider
 
 describe('App Routing', () => {
-    it('renders LoginComponent for "/login" route', () => {
+    it('renders Login for "/login" route', () => {
+
         window.history.pushState({}, '', '/login');
         render(
             <UserProvider>
-                <App />
+                <BudgetProvider> {/* Included BudgetProvider */}
+                    <App />
+                </BudgetProvider>
             </UserProvider>
         );
-        // Use query that targets specific text within LoginComponent if "Login" appears multiple times
         expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
     });
 
@@ -19,10 +22,11 @@ describe('App Routing', () => {
         window.history.pushState({}, '', '/signup');
         render(
             <UserProvider>
-                <App />
+                <BudgetProvider> {/* Included BudgetProvider */}
+                    <App />
+                </BudgetProvider>
             </UserProvider>
         );
-        // Similarly, target a unique element within SignUpForm
         expect(screen.getByRole('heading', { name: /create account/i })).toBeInTheDocument();
     });
 });

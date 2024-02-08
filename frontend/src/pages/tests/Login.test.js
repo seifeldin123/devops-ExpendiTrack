@@ -1,7 +1,7 @@
 import React from 'react';
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import LoginComponent from '../LoginComponent';
+import Login from '../Login';
 import { UserProvider } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,11 +24,11 @@ describe('LoginComponent', () => {
         useNavigate.mockImplementation(() => navigateMock); // mock implementation for each test
     });
 
-    // Helper function to render the LoginComponent within Router and UserProvider
+    // Helper function to render the Login within Router and UserProvider
     const renderComponent = () => render(
         <Router>
             <UserProvider>
-                <LoginComponent />
+                <Login />
             </UserProvider>
         </Router>
     );
