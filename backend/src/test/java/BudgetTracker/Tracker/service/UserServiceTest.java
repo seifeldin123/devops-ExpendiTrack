@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -19,13 +20,12 @@ import static org.mockito.Mockito.verify;
 public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
+    @InjectMocks
     private UserService underTest;
 
     private User user;
     @BeforeEach
     void setUp() {
-        underTest = new UserService(userRepository);
-
         user = new User();
         user.setName("sanyadrian");
         user.setEmail("sanyadrian@example.com");
@@ -37,6 +37,7 @@ public class UserServiceTest {
         budgets.add(budget);
 //        user.setBudgets(budgets);
     }
+
 
     @Test
     void canUserBeFindByNameAndEmail() {

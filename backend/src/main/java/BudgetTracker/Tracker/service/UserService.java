@@ -11,13 +11,12 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
-
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private  UserRepository userRepository;
 
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
 
     public User createNewUser(User user) {
         // Validate alphanumeric name

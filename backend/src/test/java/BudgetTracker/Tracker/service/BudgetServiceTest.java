@@ -33,7 +33,8 @@ public class BudgetServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
+    @Mock
+    private UserService userService;
     @InjectMocks
     private BudgetService budgetService;
 
@@ -82,6 +83,8 @@ public class BudgetServiceTest {
     @Test
     @DisplayName("Create a budget successfully")
     void createBudget_Success() {
+        // Mocking userService.existsById method
+        when(userService.existsById(anyLong())).thenReturn(true);
         when(budgetRepository.existsByBudgetDescriptionAndUserId(budget1.getBudgetDescription(), user.getId())).thenReturn(false);
         when(budgetRepository.save(any(Budget.class))).thenReturn(budget1);
 
@@ -95,12 +98,18 @@ public class BudgetServiceTest {
     @Test
     @DisplayName("Fail to create a budget due to duplicate name")
     void createBudget_ThrowsDuplicateBudgetNameException() {
+        // Mocking userService.existsById method
+        when(userService.existsById(anyLong())).thenReturn(true);
+
+        // Mocking the behavior of existsByBudgetDescriptionAndUserId method
         when(budgetRepository.existsByBudgetDescriptionAndUserId(budget1.getBudgetDescription(), user.getId())).thenReturn(true);
 
+        // Asserting that calling createBudget method throws DuplicateBudgetNameException
         assertThatThrownBy(() -> budgetService.createBudget(budget1))
                 .isInstanceOf(DuplicateBudgetNameException.class)
                 .hasMessageContaining("already exists");
 
+        // Verify that the save method of budgetRepository was never called
         verify(budgetRepository, never()).save(any(Budget.class));
     }
 }
