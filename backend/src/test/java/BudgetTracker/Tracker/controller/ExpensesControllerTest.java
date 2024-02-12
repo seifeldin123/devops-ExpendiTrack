@@ -69,15 +69,22 @@ public class ExpensesControllerTest {
         expense2.setBudget(budget);
     }
 
-
     @Test
-    @DisplayName("Should create a new expenses to the database")
+    @DisplayName("Should create a new expense and return HTTP status 201 Created")
     void createExpenseTest() {
+        // Mock the service method to return the created expense
         when(expensesService.createExpense(expense1)).thenReturn(expense1);
 
-        Expenses createdExpense = expensesController.createExpense(expense1);
+        // Call the controller method to create the expense
+        ResponseEntity<?> responseEntity = expensesController.createExpense(expense1);
 
-        assertEquals(expense1, createdExpense);
+        // Verify that the response status is 201 Created
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+
+        // Verify that the created expense is returned in the response body
+        assertEquals(expense1, responseEntity.getBody());
+
+        // Verify that the createExpense method of the service is called with the provided expense
         verify(expensesService).createExpense(expense1);
     }
     @Test

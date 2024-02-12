@@ -1,8 +1,11 @@
 package BudgetTracker.Tracker.controller;
 
+import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
+import BudgetTracker.Tracker.exceptions.*;
 import BudgetTracker.Tracker.service.ExpensesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +17,16 @@ public class ExpensesController {
     @Autowired
     ExpensesService expenseService;
     @PostMapping
-    public Expenses createExpense(@RequestBody Expenses expense) {
-        return expenseService.createExpense(expense);
+    public ResponseEntity<?> createExpense(@RequestBody Expenses expense) {
+        try {
+            Expenses createdExpense = expenseService.createExpense(expense);
+            return new ResponseEntity<>(createdExpense, HttpStatus.CREATED);
+        } catch (DuplicateExpenseNameException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (InvalidInputException | InvalidDAteException | BudgetNotFoundException e) {
+            // Handling for invalid input exception
+            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+        }
     }
     @GetMapping
     public List<Expenses> getAllExpenses() {
