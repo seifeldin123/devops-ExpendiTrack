@@ -17,6 +17,12 @@ const AddBudgetForm = () => {
             return;
         }
 
+        // check for negatives
+        if (parseInt(budgetAmount, 10) < 0) {
+            alert('Amount cannot be negative');
+            return;
+        }
+
         try {
             await addNewBudget({ budgetDescription, budgetAmount, user: { id: user.id } });
             setBudgetDescription('');
