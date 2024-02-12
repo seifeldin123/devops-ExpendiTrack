@@ -3,6 +3,7 @@ package BudgetTracker.Tracker.controller;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
 import BudgetTracker.Tracker.exceptions.DuplicateUserException;
+import BudgetTracker.Tracker.exceptions.UserNotFoundException;
 import BudgetTracker.Tracker.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,18 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.name").value(user.getName()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()));
+    }
+
+    @Test
+    public void testUserNotFind() throws Exception {
+        given(userService.findUserByNameAndEmail("John Doe", "john.doe@example.com")).willThrow(new UserNotFoundException("User not found"));
+        mockMvc.perform(get("/users/find")
+                        .param("name", "John Doe")
+                        .param("email", "john.doe@example.com")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect((content().string("User not found")));
+
     }
 
     @Test

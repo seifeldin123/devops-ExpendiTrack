@@ -3,11 +3,13 @@ package BudgetTracker.Tracker.controller;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
 import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
+import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.service.BudgetService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(BudgetController.class)
@@ -75,5 +78,16 @@ class BudgetControllerTest {
 
         // Verify that the createBudget method was called once
         verify(budgetService).createBudget(any(Budget.class));
+
+    }
+
+    @Test
+    void createBudgetThrowsInvalidInputException() throws Exception {
+        given(budgetService.createBudget(any(Budget.class))).willThrow(new InvalidInputException("Invalid input"));
+        mockMvc.perform(post("/budgets")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"budgetDescription\":\"Holiday\",\"budgetAmount\":\"-500\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid input")));
     }
 }
