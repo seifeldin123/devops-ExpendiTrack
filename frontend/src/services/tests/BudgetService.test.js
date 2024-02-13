@@ -1,72 +1,84 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { createBudget, getBudgetsByUserId } from '../BudgetService';
+import { createBudget, getBudgetsByUserId } from '../BudgetService'; // Adjust the import path accordingly
 
 describe('BudgetService', () => {
-    let mock;
+    let mock = new MockAdapter(axios);
     const API_URL = 'http://localhost:8080/budgets';
-
-    beforeEach(() => {
-        mock = new MockAdapter(axios);
-    });
 
     afterEach(() => {
         mock.reset();
     });
 
-    describe('createBudget', () => {
-        const budgetData = { name: 'Test Budget', amount: 500, userId: 1 };
+    it('TC_UI_001: should successfully create a budget', async () => {
+        const budgetData = { userId: 1, budgetDescription: "MonthlySavings", budgetAmount: 500 };
+        const response = { message: "New budget is created successfully." };
 
-        // Verify Successful Budget Creation
-        it('successfully creates a budget', async () => {
-            mock.onPost(API_URL).reply(200, { message: 'Budget created successfully' });
+        mock.onPost(API_URL, budgetData).reply(200, response);
 
-            const response = await createBudget(budgetData);
-            expect(response.message).toBe('Budget created successfully');
-        });
-
-        // Verify Budget Creation Failure due to Duplicate Budgets
-        it('handles duplicate budgets for a user', async () => {
-            const budgetData = { budgetDescription: "New Year Party", budgetAmount: 500, userId: 1 };
-            // Assume the API returns a specific status code or message for duplicate budgets
-            mock.onPost(`${API_URL}`, budgetData).reply(400, 'A budget with the name "New Year Party" already exists for this user.');
-
-            await expect(createBudget(budgetData)).rejects.toEqual('A budget with the name "New Year Party" already exists for this user.');
-        });
-
-        // Verify Budget Creation Failure due to Server Error
-        it('fails to create a budget due to server error', async () => {
-            mock.onPost(API_URL).networkError();
-
-            await expect(createBudget(budgetData)).rejects.toEqual('An error occurred while creating the budget. Please try again later.');
-        });
+        await expect(createBudget(budgetData)).resolves.toEqual(response);
     });
 
-    describe('getBudgetsByUserId', () => {
+    it('TC_UI_002: should handle failure due to duplicate budget name', async () => {
+        const budgetData = { userId: 1, budgetDescription: "ExistingBudget", budgetAmount: 300 };
+        const errorMessage = "Error message indicates a duplicate budget name.";
+
+        mock.onPost(API_URL, budgetData).reply(400, errorMessage);
+
+        await expect(createBudget(budgetData)).rejects.toMatch(errorMessage);
+    });
+
+    it('TC_UI_003: should handle failure due to nonexistent user', async () => {
+        const budgetData = { userId: 999, budgetDescription: "NewBudget", budgetAmount: 200 };
+        const errorMessage = "Error message indicates user does not exist.";
+
+        mock.onPost(API_URL, budgetData).reply(400, errorMessage);
+
+        await expect(createBudget(budgetData)).rejects.toMatch(errorMessage);
+    });
+
+    it('TC_UI_004: should handle failure due to invalid budget amount', async () => {
+        const budgetData = { userId: 1, budgetDescription: "InvalidBudget", budgetAmount: -100 };
+        const errorMessage = "Error message indicates budget amount cannot be negative.";
+
+        mock.onPost(API_URL, budgetData).reply(400, errorMessage);
+
+        await expect(createBudget(budgetData)).rejects.toMatch(errorMessage);
+    });
+
+    it('TC_UI_005: should successfully retrieve budgets by user ID', async () => {
         const userId = 1;
+        const response = [{ budgetDescription: "MonthlySavings", budgetAmount: 500 }];
 
-        // Verify Successful Budget Retrieval
-        it('successfully retrieves budgets', async () => {
-            const budgets = [{ id: 1, name: 'Test Budget', amount: 500 }];
-            mock.onGet(`${API_URL}/user/${userId}`).reply(200, budgets);
+        mock.onGet(`${API_URL}/user/${userId}`).reply(200, response);
 
-            const response = await getBudgetsByUserId(userId);
-            expect(response).toEqual(budgets);
-        });
+        await expect(getBudgetsByUserId(userId)).resolves.toEqual(response);
+    });
 
-        // Verify Budget Retrieval Failure due to Server Error
-        it('fails to retrieve budgets due to server error', async () => {
-            mock.onGet(`${API_URL}/user/${userId}`).networkError();
+    it('TC_UI_006: should handle failure to retrieve budgets due to server error', async () => {
+        const userId = 1;
+        const errorMessage = "Error message indicates server error occurred.";
 
-            await expect(getBudgetsByUserId(userId)).rejects.toEqual('Failed to load budgets. Please refresh the page to try again.');
-        });
+        mock.onGet(`${API_URL}/user/${userId}`).reply(500, errorMessage);
 
-        // Verify Budget Retrieval Failure due to Nonexistent User
-        it('fails to retrieve budgets due to nonexistent user', async () => {
-            const invalidUserId = 9999;
-            mock.onGet(`${API_URL}/user/${invalidUserId}`).reply(404, 'User does not exist');
+        await expect(getBudgetsByUserId(userId)).rejects.toMatch('Failed to load budgets. Please refresh the page to try again.');
+    });
 
-            await expect(getBudgetsByUserId(invalidUserId)).rejects.toEqual('Failed to load budgets. Please refresh the page to try again.'); // Adjusted expected behavior for consistency
-        });
+    it('TC_UI_007: should handle failure to retrieve budgets due to nonexistent user', async () => {
+        const userId = 999;
+        const errorMessage = "Error message indicates user does not exist.";
+
+        mock.onGet(`${API_URL}/user/${userId}`).reply(400, errorMessage);
+
+        await expect(getBudgetsByUserId(userId)).rejects.toMatch('Failed to load budgets. Please refresh the page to try again.');
+    });
+
+    it('TC_UI_008: should handle failure due to invalid budget name', async () => {
+        const budgetData = { userId: 1, budgetDescription: "!@#$%", budgetAmount: 200 };
+        const errorMessage = "Error message indicates BudgetDescription must be alphanumeric.";
+
+        mock.onPost(API_URL, budgetData).reply(400, errorMessage);
+
+        await expect(createBudget(budgetData)).rejects.toMatch(errorMessage);
     });
 });

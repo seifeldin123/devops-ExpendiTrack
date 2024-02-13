@@ -1,69 +1,145 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { getUserExpenses, createExpense } from '../ExpenseService';
+import { createExpense, getUserExpenses } from '../ExpenseService'; // Adjust the import path accordingly
 
 describe('ExpenseService', () => {
-    let mock;
+    let mock = new MockAdapter(axios);
     const API_URL = 'http://localhost:8080/expenses';
-
-    beforeEach(() => {
-        mock = new MockAdapter(axios);
-    });
 
     afterEach(() => {
         mock.reset();
     });
 
-    describe('getUserExpenses', () => {
-        const userId = 1;
-
-        it('successfully retrieves expenses', async () => {
-            const expenses = [{ id: 1, description: 'Coffee', amount: 5, date: '2024-02-06T10:00:00Z', budgetId: 1 }];
-            mock.onGet(`${API_URL}/user/${userId}`).reply(200, expenses);
-
-            const response = await getUserExpenses(userId);
-            expect(response.data).toEqual(expenses);
-        });
-
-        it('fails to retrieve expenses due to server error', async () => {
-            mock.onGet(`${API_URL}/user/${userId}`).networkError();
-
-            await expect(getUserExpenses(userId)).rejects.toThrow('Network Error');
-        });
-
-        it('fails to retrieve expenses due to nonexistent user', async () => {
-            const invalidUserId = 9999;
-            mock.onGet(`${API_URL}/user/${invalidUserId}`).reply(404, 'User does not exist');
-
-            await expect(getUserExpenses(invalidUserId)).rejects.toThrow('Request failed with status code 404');
-        });
-    });
-
-    describe('createExpense', () => {
+    it('TC_UI_001: should successfully create an expense', async () => {
         const expenseData = {
-            description: 'Lunch',
-            amount: 15,
-            date: '2024-02-06T12:00:00Z',
+            description: "Office Supplies",
+            amount: 100,
+            date: "2024-02-14T10:00:00Z",
             budgetId: 1
         };
+        const response = { message: "New expense is created successfully." };
 
-        it('successfully creates an expense', async () => {
-            mock.onPost(API_URL).reply(200, { message: 'Expense added successfully' });
+        mock.onPost(API_URL, {
+            expensesDescription: expenseData.description,
+            expensesAmount: expenseData.amount,
+            expensesDate: expenseData.date,
+            budget: { budgetId: expenseData.budgetId }
+        }).reply(200, response);
 
-            const response = await createExpense(expenseData);
-            expect(response.data.message).toBe('Expense added successfully');
-        });
-
-        it('fails to create an expense due to invalid data', async () => {
-            mock.onPost(API_URL).reply(400, 'Invalid expense data');
-
-            await expect(createExpense({ ...expenseData, amount: -10 })).rejects.toThrow('Request failed with status code 400');
-        });
-
-        it('fails to create an expense due to server error', async () => {
-            mock.onPost(API_URL).networkError();
-
-            await expect(createExpense(expenseData)).rejects.toThrow('Network Error');
-        });
+        await expect(createExpense(expenseData)).resolves.toEqual(response);
     });
+
+    it('TC_UI_002: should handle failure due to non-existent budget', async () => {
+        const expenseData = {
+            description: "Travel Expenses",
+            amount: 300,
+            date: "2024-03-10T10:00:00Z",
+            budgetId: 9999
+        };
+        const errorMessage = "Error message indicates budget not found.";
+
+        mock.onPost(API_URL, {
+            expensesDescription: expenseData.description,
+            expensesAmount: expenseData.amount,
+            expensesDate: expenseData.date,
+            budget: { budgetId: expenseData.budgetId }
+        }).reply(400, errorMessage);
+
+        await expect(createExpense(expenseData)).rejects.toMatch(errorMessage);
+    });
+
+    it('TC_UI_003: should handle failure due to negative expense amount', async () => {
+        const expenseData = {
+            description: "Negative Test",
+            amount: -100,
+            date: "2024-04-01T10:00:00Z",
+            budgetId: 2
+        };
+        const errorMessage = "Error message indicates expenses amount cannot be negative.";
+
+        mock.onPost(API_URL, {
+            expensesDescription: expenseData.description,
+            expensesAmount: expenseData.amount,
+            expensesDate: expenseData.date,
+            budget: { budgetId: expenseData.budgetId }
+        }).reply(400, errorMessage);
+
+        await expect(createExpense(expenseData)).rejects.toMatch(errorMessage);
+    });
+
+    it('TC_UI_004: should handle failure due to exceeding budget amount', async () => {
+        const expenseData = {
+            description: "Over Budget",
+            amount: 2000,
+            date: "2024-05-20T10:00:00Z",
+            budgetId: 1
+        };
+        const errorMessage = "Error message indicates expenses amount exceeds budget.";
+
+        mock.onPost(API_URL, {
+            expensesDescription: expenseData.description,
+            expensesAmount: expenseData.amount,
+            expensesDate: expenseData.date,
+            budget: { budgetId: expenseData.budgetId }
+        }).reply(400, errorMessage);
+
+        await expect(createExpense(expenseData)).rejects.toMatch(errorMessage);
+    });
+
+    it('TC_UI_005: should successfully retrieve expenses by user ID', async () => {
+        const userId = 1;
+        const response = [{ description: "Office Supplies", amount: 100, date: "2024-02-14T10:00:00Z", budgetId: 1 }];
+
+        mock.onGet(`${API_URL}/user/${userId}`).reply(200, response);
+
+        await expect(getUserExpenses(userId)).resolves.toEqual(response);
+    });
+
+    it('TC_UI_006: should handle failure due to nonexistent user', async () => {
+        const userId = 9999;
+        const errorMessage = "Error message indicates user does not exist.";
+
+        mock.onGet(`${API_URL}/user/${userId}`).reply(404, errorMessage);
+
+        await expect(getUserExpenses(userId)).rejects.toMatch('Failed to load budgets. Please refresh the page to try again.');
+    });
+
+    it('TC_UI_007: should handle failure due to invalid expense description', async () => {
+        const expenseData = {
+            description: "!!!***",
+            amount: 50,
+            date: "2024-06-15T10:00:00Z",
+            budgetId: 2
+        };
+        const errorMessage = "Error message indicates ExpensesDescription must be alphanumeric.";
+
+        mock.onPost(API_URL, {
+            expensesDescription: expenseData.description,
+            expensesAmount: expenseData.amount,
+            expensesDate: expenseData.date,
+            budget: { budgetId: expenseData.budgetId }
+        }).reply(400, errorMessage);
+
+        await expect(createExpense(expenseData)).rejects.toMatch(errorMessage);
+    });
+
+    it('TC_UI_008: should handle failure due to duplicate expense name', async () => {
+        const expenseData = {
+            description: "Office Supplies",
+            amount: 150,
+            date: "2024-07-22T10:00:00Z",
+            budgetId: 1
+        };
+        const errorMessage = "Error message indicates duplicate expense name.";
+
+        mock.onPost(API_URL, {
+            expensesDescription: expenseData.description,
+            expensesAmount: expenseData.amount,
+            expensesDate: expenseData.date,
+            budget: { budgetId: expenseData.budgetId }
+        }).reply(400, errorMessage);
+
+        await expect(createExpense(expenseData)).rejects.toMatch(errorMessage);
+    });
+
 });
