@@ -12,18 +12,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-
+/**
+ * Controller class for handling HTTP requests related to users.
+ * Provides endpoints for creating users and finding users by name and email.
+ */
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
-    private final UserService userService;
-
+    /**
+     * Constructor for UserController.
+     *
+     * @param userService The UserService instance to be used for user-related operations.
+     */
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private  UserService userService;
 
+
+    /**
+     * Endpoint for creating a new user.
+     *
+     * @param user The user object to be created. Must be provided in the request body.
+     * @return ResponseEntity containing the created user if successful, or an error message with a
+     * bad request status if the user already exists or if input is invalid.
+     */
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
@@ -41,7 +52,14 @@ public class UserController {
         }
     }
 
-
+    /**
+     * Endpoint for finding a user by name and email.
+     *
+     * @param name  The name of the user to find.
+     * @param email The email of the user to find.
+     * @return ResponseEntity containing the found user if present, or a custom message with a
+     * status indicating that the user was not found.
+     */
     @GetMapping("/find")
     public ResponseEntity<?> findUser(@RequestParam String name, @RequestParam String email) {
         Optional<User> userOpt = userService.findUserByNameAndEmail(name, email);
