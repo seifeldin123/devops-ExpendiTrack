@@ -52,4 +52,16 @@ describe('BudgetList', () => {
     //     // A more applicable approach might involve using a spy or a specific mock function behavior that tracks calls
     //     // However, this requires a setup that allows tracking re-renders of mocked components, which is beyond RTL's direct capabilities
     // });
+
+    // it('updates display when props change', () => {
+    //     const initialProps = [{ budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 100 }];
+    //     const { getByText, rerender } = render(<BudgetList budgets={initialProps} />);
+    //     expect(getByText('Groceries')).toBeInTheDocument();
+    //
+    //     const updatedProps = [{ budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 200 }];
+    //     rerender(<BudgetList budgets={updatedProps} />);
+    //
+    //     expect(getByText('Groceries - 200')).toBeInTheDocument();
+    // });
+
 });
