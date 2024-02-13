@@ -2,6 +2,8 @@ package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
+import BudgetTracker.Tracker.exceptions.InvalidInputException;
+import BudgetTracker.Tracker.exceptions.UserNotFoundException;
 import BudgetTracker.Tracker.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +31,15 @@ public class BudgetController {
             return new ResponseEntity<>(createdBudget, HttpStatus.CREATED);
         } catch (DuplicateBudgetNameException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (InvalidInputException e) {
+            // Handling for invalid input exception
+            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+        } catch (UserNotFoundException e) {
+            // Handling for invalid input exception
+            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
         }
-    }
 
+    }
 
 
 }

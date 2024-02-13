@@ -8,4 +8,7 @@ import java.util.List;
 public interface ExpensesRepository extends JpaRepository<Expenses,Long> {
     List<Expenses> findByBudget_User_Id(Long userId); // Custom query method
 
+    boolean existsByExpensesDescriptionAndBudget_User_Id(String description, Long userId);
+
+
 }
