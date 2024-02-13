@@ -41,7 +41,7 @@ public class UserService {
 
     // Method to validate alphanumeric name
     private boolean isValidAlphanumeric(String name) {
-        return name.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9]+$");
+        return name!=null && name.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9]+$");
     }
 
     // Method to validate email format

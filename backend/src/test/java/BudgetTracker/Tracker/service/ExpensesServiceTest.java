@@ -150,7 +150,7 @@ public class ExpensesServiceTest{
         expense.setExpensesDescription("ValidDescription");
         expense.setExpensesAmount(100);
         Budget budget = new Budget();
-        budget.setBudgetId(999L); // Assuming this ID does not exist
+        budget.setBudgetId(999L);
         expense.setBudget(budget);
 
         when(budgetRepository.findById(999L)).thenReturn(Optional.empty());

@@ -1,8 +1,11 @@
 package BudgetTracker.Tracker.service;
 
 import BudgetTracker.Tracker.entity.Budget;
+import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.entity.User;
 import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
+import BudgetTracker.Tracker.exceptions.InvalidInputException;
+import BudgetTracker.Tracker.exceptions.UserNotFoundException;
 import BudgetTracker.Tracker.repository.BudgetRepository;
 import BudgetTracker.Tracker.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -112,4 +116,27 @@ public class BudgetServiceTest {
         // Verify that the save method of budgetRepository was never called
         verify(budgetRepository, never()).save(any(Budget.class));
     }
+
+    @Test
+    void createBudgetThrowsUserNotFoundException() {
+        lenient().when(userRepository.findById(user.getId()))
+                .thenReturn(Optional.empty());;
+        assertThrows(UserNotFoundException.class, () -> budgetService.createBudget(budget1),
+                "User with ID " + budget1.getUser().getId() + " not found.");
+    }
+
+    @Test
+    void createBudgetThrowsInvalidInputException() {
+        Budget budget = new Budget();
+        budget.setBudgetDescription("");
+        budget.setBudgetAmount(500);
+        User user = new User();
+        user.setId(1L);
+        budget.setUser(user);
+        when(userService.existsById(1L)).thenReturn(true);
+        assertThrows(InvalidInputException.class, () -> budgetService.createBudget(budget),
+                "Budget Description must be alphanumeric and non-empty");
+    }
+
+
 }

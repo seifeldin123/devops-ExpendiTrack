@@ -2,6 +2,8 @@ package BudgetTracker.Tracker.service;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.DuplicateUserException;
+import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +14,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
     @Mock
@@ -56,5 +62,35 @@ public class UserServiceTest {
         verify(userRepository).save(userArgumentCaptor.capture());
         User capturedUser = userArgumentCaptor.getValue();
         assertThat(capturedUser).isEqualTo(user);
+    }
+
+    @Test
+    void createNewUserInvalidInputExceptions() {
+        User user = new User();
+        user.setName("");
+        user.setEmail("sanyadrian@ukr.net");
+        assertThrows(InvalidInputException.class, ()-> underTest.createNewUser(user),
+        "name should be alphanumeric");
+
+    }
+
+    @Test
+    void createNewUserInvalidEmailFormatException () {
+        User user = new User();
+        user.setName("Sasha");
+        user.setEmail("sany");
+        assertThrows(InvalidInputException.class, ()-> underTest.createNewUser(user),
+                "Incorrect email format");
+    }
+
+    @Test
+    void createNewUserDuplicateUserException () {
+        User user = new User();
+        user.setName("Sasha");
+        user.setEmail("sanyadrian@ukr.net");
+        when(userRepository.findByNameAndEmail("Sasha", "sanyadrian@ukr.net"))
+                .thenReturn(Optional.of(new User()));
+        assertThrows(DuplicateUserException.class, ()-> underTest.createNewUser(user),
+                "A user with the given name and email exists");
     }
 }
