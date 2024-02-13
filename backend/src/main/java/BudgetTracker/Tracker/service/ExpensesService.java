@@ -64,7 +64,7 @@ public class ExpensesService {
     }
 
     private boolean isAlphanumeric(String str) {
-        return str.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9 ]+$");
+        return str.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9]+$");
     }
 
 
