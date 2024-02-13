@@ -38,6 +38,7 @@ public class ExpensesService {
         if (expense.getBudget() == null || expense.getBudget().getBudgetId() == null) {
             throw new InvalidInputException("Budget is not set in the expense");
         }
+
         // Validate expenses description to be alphanumeric
         if (!isAlphanumeric(expense.getExpensesDescription())) {
             throw new InvalidInputException("ExpensesDescription must be alphanumeric");
@@ -64,7 +65,7 @@ public class ExpensesService {
     }
 
     private boolean isAlphanumeric(String str) {
-        return str.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9]+$");
+        return str !=null && str.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9]+$");
     }
 
 

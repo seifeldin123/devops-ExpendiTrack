@@ -2,6 +2,9 @@ package BudgetTracker.Tracker.service;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
+import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
+import BudgetTracker.Tracker.exceptions.InvalidInputException;
+import BudgetTracker.Tracker.repository.BudgetRepository;
 import BudgetTracker.Tracker.repository.ExpensesRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,24 +12,26 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ExpensesServiceTest extends ExpensesService{
+public class ExpensesServiceTest{
 
     @Mock
     private ExpensesRepository expensesRepository;
+    @InjectMocks
     private ExpensesService underTest;
+
+    @Mock
+    private BudgetRepository budgetRepository;
 
     private Budget budget;
     private Expenses expense;
@@ -116,5 +121,42 @@ public class ExpensesServiceTest extends ExpensesService{
         verify(expensesRepository, times(1)).deleteById(expenseId);
     }
 
+    @Test
+    void createExpenseThrowsExceptionAlphanumeric() {
+        Expenses expense = new Expenses();
+        expense.setExpensesDescription("89");
+        expense.setExpensesAmount(1000);
+        expense.setBudget(new Budget());
+        expense.getBudget().setBudgetId(1L);
+        assertThrows(InvalidInputException.class, () -> underTest.createExpense(expense),
+                "Expenses Description must be alphanumeric");
+    }
+
+    @Test
+    void whenCreateExpenseWithNegativeAmount_thenThrowInvalidInputException() {
+        Expenses expense = new Expenses();
+        expense.setExpensesDescription("ValidDescription");
+        expense.setExpensesAmount(-100);
+        expense.setBudget(new Budget());
+        expense.getBudget().setBudgetId(1L);
+
+        assertThrows(InvalidInputException.class, () -> underTest.createExpense(expense),
+                "expenses amount cannot be negative.");
+    }
+
+    @Test
+    void whenCreateExpenseForNonexistentBudget_thenThrowBudgetNotFoundException() {
+        Expenses expense = new Expenses();
+        expense.setExpensesDescription("ValidDescription");
+        expense.setExpensesAmount(100);
+        Budget budget = new Budget();
+        budget.setBudgetId(999L); // Assuming this ID does not exist
+        expense.setBudget(budget);
+
+        when(budgetRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(BudgetNotFoundException.class, () -> underTest.createExpense(expense),
+                "Budget with ID " + expense.getBudget().getBudgetId() + " not found");
+    }
 
 }
