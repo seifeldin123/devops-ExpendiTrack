@@ -118,7 +118,7 @@ public class ExpensesServiceTest{
     void canDeleteExpense() {
         Long expenseId = expense.getExpensesId();
         underTest.deleteExpense(expenseId);
-        verify(expensesRepository, times(2)).deleteById(expenseId);
+        verify(expensesRepository, times(20)).deleteById(expenseId);
     }
 
     @Test
