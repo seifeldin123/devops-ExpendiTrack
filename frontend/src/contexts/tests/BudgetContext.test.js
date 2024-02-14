@@ -3,14 +3,14 @@ import {render, act, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BudgetProvider, useBudgetContext } from '../BudgetContext';
 import { useUserContext } from '../UserContext';
-import {createBudget, getBudgetsByUserId} from '../../services/budgetService';
+import {createBudget, getBudgetsByUserId} from '../../services/BudgetService';
 
 
 // Mock the UserContext
 jest.mock('../UserContext');
 
 // Mock the budgetService functions
-jest.mock('../../services/budgetService');
+jest.mock('../../services/BudgetService');
 
 describe('BudgetProvider', () => {
     const mockUser = { id: 1, name: 'Test User' };
