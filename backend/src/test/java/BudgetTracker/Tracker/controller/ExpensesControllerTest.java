@@ -3,6 +3,9 @@ package BudgetTracker.Tracker.controller;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
+import BudgetTracker.Tracker.exceptions.InvalidDAteException;
+import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.service.ExpensesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,22 +13,36 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(ExpensesController.class)
 public class ExpensesControllerTest {
 
-    @Mock
+    @MockBean
     private ExpensesService expensesService;
 
+    @Autowired
+    private MockMvc mockMvc;
     @InjectMocks
     private ExpensesController expensesController;
 
@@ -69,15 +86,22 @@ public class ExpensesControllerTest {
         expense2.setBudget(budget);
     }
 
-
     @Test
-    @DisplayName("Should create a new expenses to the database")
+    @DisplayName("Should create a new expense and return HTTP status 201 Created")
     void createExpenseTest() {
+        // Mock the service method to return the created expense
         when(expensesService.createExpense(expense1)).thenReturn(expense1);
 
-        Expenses createdExpense = expensesController.createExpense(expense1);
+        // Call the controller method to create the expense
+        ResponseEntity<?> responseEntity = expensesController.createExpense(expense1);
 
-        assertEquals(expense1, createdExpense);
+        // Verify that the response status is 201 Created
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+
+        // Verify that the created expense is returned in the response body
+        assertEquals(expense1, responseEntity.getBody());
+
+        // Verify that the createExpense method of the service is called with the provided expense
         verify(expensesService).createExpense(expense1);
     }
     @Test
@@ -133,6 +157,40 @@ public class ExpensesControllerTest {
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(expensesService).deleteExpense(expenseId);
+    }
+
+    @Test
+    void createExpensesThrowsInvalidInputExceptions() throws Exception {
+        given(expensesService.createExpense(any(Expenses.class))).willThrow(new InvalidInputException("Invalid input"));
+        mockMvc.perform(post("/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"expensesDescription\":\"Walmart\",\"expensesAmount\":\"-500\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid input")));
+    }
+
+    @Test
+    void createExpensesThrowsInvalidDAteException() throws Exception {
+        given(expensesService.createExpense(any(Expenses.class))).willThrow(new InvalidDAteException("Invalid Date input"));
+        mockMvc.perform(post("/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"expensesDescription\":\"Walmart\",\"expensesAmount\":\"-500\"," +
+                                " \"expensesDate\": \"2020-01-01T00:00:00Z\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid Date input")));
+    }
+
+    @Test
+    void createExpensesThrowsBudgetNotFoundException() throws Exception {
+        given(expensesService.createExpense(any(Expenses.class)))
+                .willThrow(new BudgetNotFoundException("Budget not found"));
+
+        mockMvc.perform(post("/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"expensesDescription\":\"Walmart\",\"expensesAmount\":\"-500\"," +
+                                " \"expensesDate\": \"2020-01-01T00:00:00Z\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid input: Budget not found")));
     }
     }
 
