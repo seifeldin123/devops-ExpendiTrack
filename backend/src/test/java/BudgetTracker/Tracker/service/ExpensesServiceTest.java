@@ -64,7 +64,7 @@ public class ExpensesServiceTest{
         underTest.getAllExpenses();
 
         verify(expensesRepository).findAll();
-        assertEquals(1, expensesList.size());
+        assertEquals(4, expensesList.size());
     }
 
     @Test
