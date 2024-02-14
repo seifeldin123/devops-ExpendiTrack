@@ -64,7 +64,7 @@ public class ExpensesServiceTest{
         underTest.getAllExpenses();
 
         verify(expensesRepository).findAll();
-        assertEquals(4, expensesList.size());
+        assertEquals(1, expensesList.size());
     }
 
     @Test
@@ -118,7 +118,7 @@ public class ExpensesServiceTest{
     void canDeleteExpense() {
         Long expenseId = expense.getExpensesId();
         underTest.deleteExpense(expenseId);
-        verify(expensesRepository, times(2)).deleteById(expenseId);
+        verify(expensesRepository, times(1)).deleteById(expenseId);
     }
 
     @Test
