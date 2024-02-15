@@ -8,7 +8,7 @@ const Footer = () => {
             {/* Main Footer Section */}
             <div className="gc-main-footer">
                 <div className="container">
-                    <nav>
+                    <nav aria-label="Government of Canada Information">
                         <h3>Government of Canada</h3>
                         {/* List of links for Government of Canada */}
                         <ul className="list-col-xs-1 list-col-sm-2 list-col-md-3">
@@ -54,7 +54,7 @@ const Footer = () => {
             {/* Sub Footer Section */}
             <div className="gc-sub-footer">
                 <div className="container d-flex align-items-center">
-                    <nav>
+                    <nav aria-label="Themes and Topics">
                         <h3 className="wb-inv">Government of Canada Corporate</h3>
                         {/* List of links for Government of Canada Corporate */}
                         <ul>

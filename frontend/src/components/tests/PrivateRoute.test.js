@@ -10,6 +10,8 @@ const LoginMock = () => <div>Login Page</div>;
 
 // Describe block for the PrivateRoute component test suite
 describe('PrivateRoute', () => {
+
+    // Render Children when Authenticated
     it('renders the child component when the user is authenticated', () => {
         render(
             <Router>
@@ -25,6 +27,7 @@ describe('PrivateRoute', () => {
         expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
 
+    // Redirect to Login when Not Authenticated
     it('redirects to the login page when the user is not authenticated', () => {
         render(
             <Router>

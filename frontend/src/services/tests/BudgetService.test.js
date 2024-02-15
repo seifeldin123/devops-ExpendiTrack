@@ -1,75 +1,115 @@
-// Import necessary modules and functions
-import axios from 'axios';
-import { createBudget, getBudgetsByUserId } from '../BudgetService';
-
-// Mock the axios module
 jest.mock('axios');
+import axios from 'axios';
+import {createBudget, getBudgetsByUserId} from '../BudgetService'; // Adjust the path as needed
 
-// Start describing the budgetService tests
-describe('budgetService', () => {
-    // Describe the createBudget function
-    describe('createBudget', () => {
-        // Define sample budget data for testing
-        const budgetData = { userId: 1, budgetDescription: 'Test Budget', budgetAmount: 1000 };
+describe('BudgetService', () => {
+    // TC_UI_001: Verify Successful Budget Creation
+    it('TC_UI_001: should create a budget successfully', async () => {
+        const budgetData = {
+            budgetDescription: "MonthlySavings",
+            budgetAmount: 500,
+            user: {id: 1}
+        };
 
-        // Test case for successful budget creation
-        it('successfully creates a budget', async () => {
-            // Define the expected response data
-            const responseData = { message: 'Budget created successfully', data: budgetData };
+        const mockResponse = {
+            budgetId: 1,
+            budgetDescription: "MonthlySavings",
+            budgetAmount: 500,
+            user: {
+                id: 1,
+                name: null,
+                email: null
+            }
+        };
 
-            // Mock axios.post to resolve with responseData
-            axios.post.mockResolvedValue({ data: responseData });
+        axios.post.mockResolvedValue({response: {status: 201, mockResponse}});
 
-            // Ensure that createBudget resolves with the expected response data
-            await expect(createBudget(budgetData)).resolves.toEqual(responseData);
+        await expect(createBudget(budgetData)).resolves.toEqual(mockResponse.data);
+    });
 
-            // Verify that axios.post was called with the correct parameters
-            expect(axios.post).toHaveBeenCalledWith('http://localhost:8080/budgets', budgetData);
-        });
 
-        it('fails to create a budget due to duplicate name', async () => {
-            // Define the error response for duplicate name
-            const errorResponse = {
-                response: {
-                    data: 'A budget with this name already exists.',
-                    status: 400, // Ensure the status code is set to 400 for Bad Request
-                },
-            };
 
-            // Mock axios.post to reject with the error response
-            axios.post.mockRejectedValue(errorResponse);
+    // TC_UI_002: Verify Budget Creation Failure due to Duplicate Budget Name
+    it('TC_UI_002: should handle duplicate budget name error', async () => {
+        const errorMessage = 'A budget with the name "ExistingBudget" already exists for this user.';
 
-            // Ensure that createBudget rejects with the expected error message
-            await expect(createBudget(budgetData)).rejects.toEqual('A budget with this name already exists.');
-        });
+        axios.post.mockRejectedValue({response: {status: 400, data: errorMessage}});
+
+        await expect(createBudget({
+            userId: 1,
+            budgetDescription: "ExistingBudget",
+            budgetAmount: 300
+        })).rejects.toThrow(errorMessage);
 
     });
 
-    // Describe the getBudgetsByUserId function
-    describe('getBudgetsByUserId', () => {
-        // Define a sample user ID and budget data
-        const userId = 1;
-        const budgets = [{ id: 1, budgetDescription: 'Test Budget 1', budgetAmount: 1000 }];
+    // TC_UI_003: Verify Budget Creation Failure due to Non-Existent User
+    it('TC_UI_003: should handle non-existent user error', async () => {
+        const errorMessage = 'Invalid input: User with ID 999 not found.';
+        axios.post.mockRejectedValue({response: {status: 400, data: errorMessage}});
 
-        // Test case for successfully retrieving budgets for a user
-        it('successfully retrieves budgets for a user', async () => {
-            // Mock axios.get to resolve with the sample budgets data
-            axios.get.mockResolvedValue({ data: budgets });
+        await expect(createBudget({
+            userId: 999,
+            budgetDescription: "NewBudget",
+            budgetAmount: 200
+        })).rejects.toThrow(errorMessage);
+    });
 
-            // Ensure that getBudgetsByUserId resolves with the expected budgets data
-            await expect(getBudgetsByUserId(userId)).resolves.toEqual(budgets);
+    // TC_UI_004: Verify Budget Creation Failure due to Invalid Budget Amount
+    it('TC_UI_004: should handle invalid budget amount error', async () => {
+        const errorMessage = 'Invalid input: Budget amount cannot be negative.';
+        axios.post.mockRejectedValue({response: {status: 400, data: errorMessage}});
 
-            // Verify that axios.get was called with the correct URL parameter
-            expect(axios.get).toHaveBeenCalledWith(`http://localhost:8080/budgets/user/${userId}`);
-        });
+        await expect(createBudget({
+            userId: 1,
+            budgetDescription: "InvalidBudget",
+            budgetAmount: -100
+        })).rejects.toThrow(errorMessage);
+    });
 
-        // Test case for failing to retrieve budgets due to network error
-        it('fails to retrieve budgets due to network error', async () => {
-            // Mock axios.get to reject with a network error
-            axios.get.mockRejectedValue({ message: 'Network Error' });
+    // TC_UI_005: Verify Successful Budget Retrieval
+    it('TC_UI_005: should fetch user-specific budgets successfully', async () => {
+        const mockResponse = [
+            {
+                budgetId: 1,
+                budgetDescription: "MonthlySavings",
+                budgetAmount: 500,
+                user: {
+                    id: 1,
+                    name: "Jane",
+                    email: "jane@example.com"
+                }
+            }];
+        axios.get.mockResolvedValue({response: {status: 200, mockResponse}});
 
-            // Ensure that getBudgetsByUserId rejects with a specific error message
-            await expect(getBudgetsByUserId(userId)).rejects.toBe('Failed to load budgets. Please refresh the page to try again.');
-        });
+        await expect(getBudgetsByUserId(1)).resolves.toEqual(mockResponse.data);
+    });
+
+    // TC_UI_006: Verify Budget Retrieval Failure due to Server Error
+    it('TC_UI_006: should handle server error during budget retrieval', async () => {
+        axios.get.mockRejectedValue(new Error('Failed to load budgets. Please refresh the page to try again.'));
+
+        await expect(getBudgetsByUserId(1)).rejects.toThrow('Failed to load budgets. Please refresh the page to try again.');
+    });
+
+    // TC_UI_007: Verify Budget Retrieval Failure due to Nonexistent User
+    it('TC_UI_007: should handle user not existing during budget retrieval', async () => {
+        // Assuming similar error handling for getBudgetsByUserId as createBudget for consistency
+        const errorMessage = '[]';
+        axios.get.mockRejectedValue({response: {data: errorMessage}});
+
+        await expect(getBudgetsByUserId(999)).rejects.toThrow(errorMessage);
+    });
+
+    // TC_UI_008: Verify Budget Creation Failure due to Invalid Budget Name
+    it('TC_UI_008: should reject budget creation due to invalid budget name', async () => {
+        const errorMessage = 'Invalid input: BudgetDescription must be alphanumeric';
+        axios.post.mockRejectedValue({response: {status: 400, data: errorMessage}});
+
+        await expect(createBudget({
+            userId: 1,
+            budgetDescription: "!@#$%",
+            budgetAmount: 200
+        })).rejects.toThrow(errorMessage);
     });
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
-import MainLayout from './layouts/MainLayout';
+import MainLayout from './components/MainLayout';
 import Dashboard from './pages/Dashboard';
 import PageNotFound from './pages/PageNotFound';
 

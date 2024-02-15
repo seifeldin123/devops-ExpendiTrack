@@ -21,19 +21,20 @@ export const BudgetProvider = ({ children }) => {
 
     // useEffect to fetch user-specific budgets when the user changes
     useEffect(() => {
-        // Ensure we have a valid user ID before fetching
         if (user && user.id) {
             getBudgetsByUserId(user.id)
                 .then(response => {
-                    // Update the budgets state with fetched data
                     setBudgets(response.data);
+                    setError(''); // Clear any existing error upon successful fetch
                 })
-                .catch(error => console.error('Error fetching user-specific budgets', error));
+                .catch(error => {
+                    console.error('Error fetching user-specific budgets', error);
+                    setError('Failed to fetch budgets'); // Set a specific error message upon failure
+                });
         } else {
-            // Reset budgets if there is no user logged in
-            setBudgets([]);
+            setBudgets([]); // Reset budgets if no user is present
         }
-    }, [user]); // Depend on user to refetch when the user changes
+    }, [user]);
 
     // Function to add a new budget
     const addNewBudget = async (budgetData) => {

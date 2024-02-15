@@ -4,6 +4,8 @@ import MainLayout from '../MainLayout';
 import {UserProvider} from "../../contexts/UserContext";
 
 describe('MainLayout Component', () => {
+
+    // Render MainLayout with Children Components
     it('renders the main content', () => {
         render(
             <UserProvider>
