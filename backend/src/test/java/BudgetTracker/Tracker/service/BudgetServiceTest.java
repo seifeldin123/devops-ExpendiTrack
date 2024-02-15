@@ -151,12 +151,48 @@ public class BudgetServiceTest {
         assertThat(updatedBudget.getBudgetAmount()).isEqualTo(500);
     }
 
-    @Disabled
     @Test
     void deleteBudgetSuccess() {
         willDoNothing().given(budgetRepository).deleteById(budget1.getBudgetId());
         budgetService.deleteBudget(budget1.getBudgetId());
         verify(budgetRepository, times(1)).deleteById(budget1.getBudgetId());
     }
+
+    @Test
+    void updateBudgetThrowsDuplicateBudgetNameException () {
+        when(userService.existsById(anyLong())).thenReturn(true);
+        when(budgetRepository.existsByBudgetDescriptionAndUserId(budget1.getBudgetDescription(), user.getId())).thenReturn(true);
+        assertThatThrownBy(() -> budgetService.updateBudget(budget1))
+                .isInstanceOf(DuplicateBudgetNameException.class)
+                .hasMessageContaining("already exists");
+        verify(budgetRepository, never()).save(any(Budget.class));
+    }
+
+    @Test
+    void updateBudgetThrowsUserNotFoundException() {
+        lenient().when(userRepository.findById(user.getId()))
+                .thenReturn(Optional.empty());;
+        assertThrows(UserNotFoundException.class, () -> budgetService.updateBudget(budget1),
+                "User with ID " + budget1.getUser().getId() + " not found.");
+    }
+
+    @Test
+    void updateBudgetThrowsInvalidInputException() {
+        budget1.setBudgetDescription("");
+        budget1.setUser(user);
+        when(userService.existsById(1L)).thenReturn(true);
+        assertThrows(InvalidInputException.class, () -> budgetService.updateBudget(budget1),
+                "Budget Description must be alphanumeric and non-empty");
+    }
+
+    @Test
+    void updateBudgetAmountThrowsInvalidInputException() {
+        budget1.setBudgetDescription("-500");
+        budget1.setUser(user);
+        when(userService.existsById(1L)).thenReturn(true);
+        assertThrows(InvalidInputException.class, () -> budgetService.updateBudget(budget1),
+                "Budget Description must be alphanumeric and non-empty");
+    }
+
 
 }
