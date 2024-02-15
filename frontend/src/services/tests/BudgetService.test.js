@@ -1,6 +1,6 @@
 // Import necessary modules and functions
 import axios from 'axios';
-import { createBudget, getBudgetsByUserId } from '../budgetService';
+import { createBudget, getBudgetsByUserId } from '../BudgetService';
 
 // Mock the axios module
 jest.mock('axios');
