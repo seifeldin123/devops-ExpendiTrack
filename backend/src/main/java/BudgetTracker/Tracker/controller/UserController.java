@@ -5,6 +5,10 @@ import BudgetTracker.Tracker.exceptions.DuplicateUserException;
 import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -36,6 +40,11 @@ public class UserController {
      * bad request status if the user already exists or if input is invalid.
      */
     @PostMapping
+    @Operation(summary = "Create a new user", responses = {
+            @ApiResponse(description = "User created successfully", responseCode = "201",
+                    content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(description = "Bad Request", responseCode = "400")
+    })
     public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
             User createdUser = userService.createNewUser(user);
@@ -61,6 +70,10 @@ public class UserController {
      * status indicating that the user was not found.
      */
     @GetMapping("/find")
+    @Operation(summary = "Find a user by name and email", responses = {
+            @ApiResponse(description = "User found", responseCode = "200"),
+            @ApiResponse(description = "User not found", responseCode = "200")
+    })
     public ResponseEntity<?> findUser(@RequestParam String name, @RequestParam String email) {
         Optional<User> userOpt = userService.findUserByNameAndEmail(name, email);
         if (userOpt.isPresent()) {

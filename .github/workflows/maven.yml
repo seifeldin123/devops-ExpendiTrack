@@ -10,9 +10,9 @@ name: project Ci/CD
 
 on:
   push:
-    branches: [ "sprint-1" ]
+    branches: [ "seifeldin123-patch-1" ]
   pull_request:
-    branches: [ "sprint-1" ]
+    branches: [ "seifeldin123-patch-1" ]
 
 jobs:
   build:
