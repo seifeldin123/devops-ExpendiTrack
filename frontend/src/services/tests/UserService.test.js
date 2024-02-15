@@ -1,6 +1,6 @@
 jest.mock('axios');
 import axios from 'axios';
-import {createUser, findUser} from '../userService'; // Adjust the path as needed
+import {createUser, findUser} from '../UserService';
 
 describe('UserService Tests', () => {
     // TC_UI_001: Verify Successful User Creation
