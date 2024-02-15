@@ -77,10 +77,6 @@ public class ExpensesService {
         Budget budget = budgetRepository.findById(expense.getBudget().getBudgetId())
                 .orElseThrow(() -> new BudgetNotFoundException("Budget with ID " + expense.getBudget().getBudgetId() + " not found"));
 
-        // Validate that the expenses amount is not greater than the budget amount
-        if (expense.getExpensesAmount() > budget.getBudgetAmount()) {
-            throw new InvalidInputException("Expenses amount cannot be greater than budget amount");
-        }
         // Check if the expense with the same description already exists for this budget
         boolean exists = expenseRepository.existsByExpensesDescriptionAndBudget_User_Id(expense.getExpensesDescription(), expense.getBudget().getBudgetId());
         if (exists) {
