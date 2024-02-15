@@ -28,6 +28,7 @@ describe('BudgetService', () => {
     });
 
 
+
     // TC_UI_002: Verify Budget Creation Failure due to Duplicate Budget Name
     it('TC_UI_002: should handle duplicate budget name error', async () => {
         const errorMessage = 'A budget with the name "ExistingBudget" already exists for this user.';

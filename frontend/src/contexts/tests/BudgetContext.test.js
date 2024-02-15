@@ -16,6 +16,7 @@ describe('BudgetContext Integration Tests', () => {
     const initialBudgets = [
         { id: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
         { id: 2, budgetDescription: 'Utilities', budgetAmount: 150 },
+
     ];
     const newBudget = { id: 3, budgetDescription: 'Entertainment', budgetAmount: 250 };
 

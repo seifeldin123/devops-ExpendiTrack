@@ -3,11 +3,11 @@ import { render, act, waitFor, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ExpenseProvider, useExpenseContext } from '../ExpenseContext';
 import { useUserContext } from '../UserContext';
+
 import * as ExpenseService from '../../services/ExpenseService';
 
 jest.mock('../UserContext');
 jest.mock('../../services/ExpenseService');
-
 
 describe('ExpenseContext Integration Tests', () => {
     const mockUser = { id: 1, name: 'John Doe' };

@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+/**
+ * Service class for handling business logic related to budgets.
+ */
 @Service
 public class BudgetService {
     @Autowired
@@ -21,12 +23,25 @@ public class BudgetService {
 
     @Autowired
     private UserService userService;
-
+    /**
+     * Retrieves budgets associated with a specific user.
+     *
+     * @param userId The ID of the user whose budgets to retrieve.
+     * @return List of budgets associated with the specified user.
+     */
     public List<Budget> getBudgetsByUserId(Long userId) {
 
         return budgetRepository.findByUserId(userId);
     }
-
+    /**
+     * Creates a new budget.
+     *
+     * @param budget The budget object to be created.
+     * @return The created budget.
+     * @throws UserNotFoundException       If the user associated with the budget does not exist.
+     * @throws DuplicateBudgetNameException If a budget with the same name already exists for the user.
+     * @throws InvalidInputException       If the budget description is not alphanumeric or if the budget amount is negative.
+     */
     public Budget createBudget(Budget budget) {
 
         // Check if the user exists in the database
@@ -50,7 +65,13 @@ public class BudgetService {
 
         return budgetRepository.save(budget);
     }
+    /**
+     * Checks if a string contains only alphanumeric characters.
+     *
+     * @param name The string to be checked.
+     * @return True if the string contains only alphanumeric characters or spaces, false otherwise.
+     */
     private boolean isValidAlphanumeric(String name) {
-        return name!=null && name.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9]+$");
+        return name.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9 ]+$");
     }
 }
