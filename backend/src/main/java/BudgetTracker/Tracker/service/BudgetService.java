@@ -77,10 +77,26 @@ public class BudgetService {
     }
 
     public Budget updateBudget(Budget budget) {
+        boolean userExist = userService.existsById(budget.getUser().getId());
+        if(!userExist) {
+            throw new UserNotFoundException("User with ID" + budget.getUser().getId() + "not found");
+        }
+        boolean exists = budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(budget.getBudgetDescription(), budget.getUser().getId(), budget.getBudgetId());
+        if(exists) {
+            throw new DuplicateBudgetNameException("A budget with the name \"" + budget.getBudgetDescription() + "\" already exists for this user.");
+        }
+        if (!isValidAlphanumeric(budget.getBudgetDescription())) {
+            throw new InvalidInputException("BudgetDescription must be alphanumeric");
+        }
+        if (budget.getBudgetAmount() < 0) {
+            throw new InvalidInputException("Budget amount cannot be negative.");
+        }
+
         return budgetRepository.save(budget);
     }
 
     public void deleteBudget(Long Id) {
         budgetRepository.deleteById(Id);
     }
+
 }

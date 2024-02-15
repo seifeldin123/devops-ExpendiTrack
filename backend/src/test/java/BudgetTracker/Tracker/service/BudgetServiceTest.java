@@ -143,12 +143,13 @@ public class BudgetServiceTest {
 
     @Test
     void updateBudgetSuccess() {
+        given(userService.existsById(budget1.getUser().getId())).willReturn(true);
+        given(budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(
+                budget1.getBudgetDescription(), budget1.getUser().getId(), budget1.getBudgetId())).willReturn(false);
         given(budgetRepository.save(budget1)).willReturn(budget1);
-        budget1.setBudgetDescription("School fees");
-        budget1.setBudgetAmount(500);
         Budget updatedBudget = budgetService.updateBudget(budget1);
-        assertThat(updatedBudget.getBudgetDescription()).isEqualTo("School fees");
-        assertThat(updatedBudget.getBudgetAmount()).isEqualTo(500);
+        assertThat(updatedBudget.getBudgetDescription()).isEqualTo("Vacation");
+        assertThat(updatedBudget.getBudgetAmount()).isEqualTo(1000);
     }
 
     @Test
@@ -161,7 +162,7 @@ public class BudgetServiceTest {
     @Test
     void updateBudgetThrowsDuplicateBudgetNameException () {
         when(userService.existsById(anyLong())).thenReturn(true);
-        when(budgetRepository.existsByBudgetDescriptionAndUserId(budget1.getBudgetDescription(), user.getId())).thenReturn(true);
+        when(budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(budget1.getBudgetDescription(), user.getId(), budget1.getBudgetId())).thenReturn(true);
         assertThatThrownBy(() -> budgetService.updateBudget(budget1))
                 .isInstanceOf(DuplicateBudgetNameException.class)
                 .hasMessageContaining("already exists");
