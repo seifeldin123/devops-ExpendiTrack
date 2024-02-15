@@ -1,4 +1,4 @@
-import {getBudgetsByUserId} from "../BudgetService";
+import {createBudget, getBudgetsByUserId} from "../BudgetService";
 
 jest.mock('axios');
 import axios from 'axios';
@@ -122,4 +122,21 @@ describe('ExpenseService', () => {
         await expect(createExpense(expenseData)).rejects.toThrow(errorMessage);
     });
 
+    // TC_UI_008: Verify Expense Creation Failure due to Duplicate Expense Name
+    it('TC_UI_008: should handle failure due to duplicate expense name', async () => {
+
+        const expenseData = {
+            expensesDescription: "Office Supplies",
+            expensesAmount: 100,
+            expensesDate: "2024-02-14T10:00:00Z",
+            budget: {
+                budgetId: 1
+            }
+        };
+
+        const errorMessage = 'An expense with the name "Office Supplies" already exists for this user.';
+        axios.post.mockRejectedValue({ response: { status: 400, data: errorMessage } });
+
+        await expect(createExpense(expenseData)).rejects.toThrow(errorMessage);
+    });
 });
