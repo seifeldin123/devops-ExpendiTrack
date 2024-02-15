@@ -15,6 +15,7 @@ import java.util.List;
  */
 @Service
 public class BudgetService {
+
     @Autowired
     private  BudgetRepository budgetRepository;
 
@@ -73,5 +74,13 @@ public class BudgetService {
      */
     private boolean isValidAlphanumeric(String name) {
         return name.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9 ]+$");
+    }
+
+    public Budget updateBudget(Budget budget) {
+        return budgetRepository.save(budget);
+    }
+
+    public void deleteBudget(Long Id) {
+        budgetRepository.deleteById(Id);
     }
 }

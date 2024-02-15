@@ -68,5 +68,16 @@ public class BudgetController {
 
     }
 
+    @PutMapping
+    public ResponseEntity<?> updateBudget(@RequestBody Budget budget) {
+        Budget updateBudget = budgetService.updateBudget(budget);
+        return new ResponseEntity<>(updateBudget, HttpStatus.OK);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteBudget(@PathVariable("id") long id) {
+        budgetService.deleteBudget(id);
+        return new ResponseEntity<>("Budget deleted successfully!", HttpStatus.OK);
+    }
 
 }

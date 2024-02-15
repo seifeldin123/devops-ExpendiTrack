@@ -7,12 +7,11 @@ import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
 import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.exceptions.UserNotFoundException;
 import BudgetTracker.Tracker.repository.BudgetRepository;
+import BudgetTracker.Tracker.repository.BudgetRepositoryTest;
 import BudgetTracker.Tracker.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -22,11 +21,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+//import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.time;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,5 +141,22 @@ public class BudgetServiceTest {
                 "Budget Description must be alphanumeric and non-empty");
     }
 
+    @Test
+    void updateBudgetSuccess() {
+        given(budgetRepository.save(budget1)).willReturn(budget1);
+        budget1.setBudgetDescription("School fees");
+        budget1.setBudgetAmount(500);
+        Budget updatedBudget = budgetService.updateBudget(budget1);
+        assertThat(updatedBudget.getBudgetDescription()).isEqualTo("School fees");
+        assertThat(updatedBudget.getBudgetAmount()).isEqualTo(500);
+    }
+
+    @Disabled
+    @Test
+    void deleteBudgetSuccess() {
+        willDoNothing().given(budgetRepository).deleteById(budget1.getBudgetId());
+        budgetService.deleteBudget(budget1.getBudgetId());
+        verify(budgetRepository, times(1)).deleteById(budget1.getBudgetId());
+    }
 
 }

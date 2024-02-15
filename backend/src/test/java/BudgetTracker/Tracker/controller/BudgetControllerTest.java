@@ -17,11 +17,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.BDDMockito.given;
@@ -90,4 +93,22 @@ class BudgetControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Invalid input")));
     }
-}
+
+    @Test
+    void updateBudgetSuccess () throws Exception{
+        when(budgetService.updateBudget(any(Budget.class))).thenReturn(budget);
+        mockMvc.perform(put("/budgets")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(budget)))
+                .andExpect(status().isOk());
+        verify(budgetService).updateBudget(any(Budget.class));
+    }
+
+    @Test
+    void deleteBudgetSuccess () throws Exception {
+        Long budgetId = 1L;
+        willDoNothing().given(budgetService).deleteBudget(budgetId);
+        ResultActions response = mockMvc.perform(delete("/budgets/{id}", budgetId));
+        response.andExpect(status().isOk()).andDo(print());
+    }
+ }
