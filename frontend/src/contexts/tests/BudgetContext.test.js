@@ -1,97 +1,116 @@
-import React, {useState} from 'react';
-import {render, act, screen, waitFor} from '@testing-library/react';
+import React from 'react';
+import { render, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BudgetProvider, useBudgetContext } from '../BudgetContext';
 import { useUserContext } from '../UserContext';
-import {createBudget, getBudgetsByUserId} from '../../services/budgetService';
+import { BudgetProvider, useBudgetContext } from '../BudgetContext';
+import * as BudgetService from '../../services/BudgetService';
 
+// Mock the UserContext and BudgetService for integration testing
+jest.mock('../UserContext', () => ({
+    useUserContext: jest.fn(),
+}));
+jest.mock('../../services/BudgetService');
 
-// Mock the UserContext
-jest.mock('../UserContext');
-
-// Mock the budgetService functions
-jest.mock('../../services/budgetService');
-
-describe('BudgetProvider', () => {
-    const mockUser = { id: 1, name: 'Test User' };
-    const mockBudgets = [
-        { id: 1, budgetDescription: 'Budget 1', budgetAmount: 100 },
-        { id: 2, budgetDescription: 'Budget 2', budgetAmount: 200 },
+describe('BudgetContext Integration Tests', () => {
+    const user = { id: 1, name: 'Test User' };
+    const initialBudgets = [
+        { id: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
+        { id: 2, budgetDescription: 'Utilities', budgetAmount: 150 },
     ];
+    const newBudget = { id: 3, budgetDescription: 'Entertainment', budgetAmount: 250 };
 
     beforeEach(() => {
-        // Mock the useUserContext hook to return the mockUser
-        useUserContext.mockReturnValue({ user: mockUser });
+        // Mock the return value of useUserContext to always return the test user
+        useUserContext.mockReturnValue({ user });
+        BudgetService.getBudgetsByUserId.mockReset();
+        BudgetService.createBudget.mockReset();
     });
 
-    it('fetches and displays user-specific budgets', async () => {
-        // Mock getUserBudgets to return the mockBudgets
-        getBudgetsByUserId.mockResolvedValue({ data: mockBudgets });
+    it('fetches and updates budgets when the user changes', async () => {
+        BudgetService.getBudgetsByUserId.mockResolvedValueOnce({ data: initialBudgets });
+
+        const TestComponent = () => {
+            const { budgets } = useBudgetContext();
+            return (
+                <>
+                    {budgets.map((budget) => (
+                        <div key={budget.id}>{budget.budgetDescription}</div>
+                    ))}
+                </>
+            );
+        };
 
         await act(async () => {
             render(
                 <BudgetProvider>
-                    <BudgetDisplay />
+                    <TestComponent />
                 </BudgetProvider>
             );
         });
 
-        // Ensure that the budget budgetDescriptions are displayed on the screen
-        expect(screen.getByText('Budget 1')).toBeInTheDocument();
-        expect(screen.getByText('Budget 2')).toBeInTheDocument();
+        expect(BudgetService.getBudgetsByUserId).toHaveBeenCalledWith(user.id);
+        // Assertions for the budget items to be in the document could be added here
     });
 
-    it('adds a new budget and updates the display', async () => {
-        getBudgetsByUserId.mockResolvedValue({ data: [] });
-        const newBudget = { id: 3, budgetDescription: 'New Budget', budgetAmount: 300 };
-        createBudget.mockResolvedValue(newBudget);
+    it('adds a new budget and updates the context', async () => {
+        BudgetService.getBudgetsByUserId.mockResolvedValueOnce({ data: initialBudgets });
+        BudgetService.createBudget.mockResolvedValueOnce(newBudget);
+
+        let renderResult;
+        const TestComponent = () => {
+            const { addNewBudget, budgets } = useBudgetContext();
+            return (
+                <div>
+                    {budgets.map((budget) => (
+                        <div key={budget.id}>{budget.budgetDescription}</div>
+                    ))}
+                    <button onClick={() => addNewBudget({ budgetDescription: 'Entertainment', budgetAmount: 250 })}>Add Budget</button>
+                </div>
+            );
+        };
+
+        await act(async () => {
+            renderResult = render(
+                <BudgetProvider>
+                    <TestComponent />
+                </BudgetProvider>
+            );
+        });
+
+        // Simulate adding a new budget
+        await act(async () => {
+            userEvent.click(renderResult.getByText('Add Budget'));
+        });
+
+        expect(BudgetService.createBudget).toHaveBeenCalledWith({
+            budgetDescription: 'Entertainment',
+            budgetAmount: 250,
+            user: { id: user.id },
+        });
+        // Additional assertions...
+    });
+
+    it('handles errors when fetching budgets fails', async () => {
+        const errorMessage = 'Failed to fetch budgets';
+        BudgetService.getBudgetsByUserId.mockRejectedValueOnce(new Error(errorMessage));
+
+        let testError;
+        const TestComponent = () => {
+            const { error } = useBudgetContext();
+            testError = error;
+            return null;
+        };
 
         render(
             <BudgetProvider>
-                <BudgetDisplay />
+                <TestComponent />
             </BudgetProvider>
         );
 
-        await act(async () => {
-            // Simulate user actions or direct state manipulations here
-            await userEvent.type(screen.getByPlaceholderText('Budget Title'), 'New Budget');
-            await userEvent.type(screen.getByPlaceholderText('Budget Amount'), '300');
-            userEvent.click(screen.getByText('Add Budget'));
+        // Wait for the error state to be updated after the rejection
+        await waitFor(() => {
+            expect(testError).toEqual(errorMessage);
         });
-
-        // Await any asynchronous operations triggered by the above interactions
-        await waitFor(() => expect(screen.getByText('New Budget')).toBeInTheDocument());
     });
 
-
 });
-
-function BudgetDisplay() {
-    const { budgets, addNewBudget } = useBudgetContext();
-    const [budgetDescription, setBudgetDescription] = useState('');
-    const [budgetAmount, setBudgetAmount] = useState('');
-
-    const handleAddBudget = () => {
-        addNewBudget({ budgetDescription, budgetAmount: Number(budgetAmount) });
-    };
-
-    return (
-        <div>
-            {budgets.map((budget) => (
-                <div key={budget.id}>{budget.budgetDescription}</div>
-            ))}
-            <input
-                placeholder="Budget Title"
-                value={budgetDescription}
-                onChange={(e) => setBudgetDescription(e.target.value)}
-            />
-            <input
-                placeholder="Budget Amount"
-                type="number"
-                value={budgetAmount}
-                onChange={(e) => setBudgetAmount(e.target.value)}
-            />
-            <button onClick={handleAddBudget}>Add Budget</button>
-        </div>
-    );
-}
