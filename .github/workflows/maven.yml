@@ -18,6 +18,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
     - name: Building backend using Maven
       run: mvn clean install
       working-directory: backend
