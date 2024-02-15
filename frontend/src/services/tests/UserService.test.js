@@ -20,7 +20,7 @@ describe('UserService Tests', () => {
         axios.post.mockRejectedValue({
             response: {
                 status: 400, // Including the status to reflect a bad request
-                data: 'An account with these credentials already exist' // Ensuring the message matches exactly
+                data: 'An account with these credentials already exists.' // Ensuring the message matches exactly
             }
         });
 
