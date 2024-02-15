@@ -1,11 +1,12 @@
-
-name: Budget Frontend CI/CD with Testing
+name: Budget Application CI/CD with Testing
 
 on:
+
   pull_request:
     branches: [ "main" ]
 
 jobs:
+ 
 
   frontend-test:
 
