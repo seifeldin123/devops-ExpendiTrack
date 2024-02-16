@@ -12,6 +12,9 @@ jest.mock('../UserContext', () => ({
 jest.mock('../../services/BudgetService');
 
 describe('BudgetContext Integration Tests', () => {
+
+    let originalConsoleError;
+
     const user = { id: 1, name: 'Test User' };
     const initialBudgets = [
         { id: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
@@ -25,6 +28,12 @@ describe('BudgetContext Integration Tests', () => {
         useUserContext.mockReturnValue({ user });
         BudgetService.getBudgetsByUserId.mockReset();
         BudgetService.createBudget.mockReset();
+        originalConsoleError = console.error;
+        console.error = jest.fn(); // Mock console.error
+    });
+
+    afterEach(() => {
+        console.error = originalConsoleError; // Restore original console.error
     });
 
     it('fetches and updates budgets when the user changes', async () => {

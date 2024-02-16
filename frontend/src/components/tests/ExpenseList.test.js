@@ -25,4 +25,14 @@ describe('ExpenseList', () => {
         expect(screen.getByText('No expenses available')).toBeInTheDocument();
     });
 
+    it('renders consistently with the same props', () => {
+        const { container: firstRender } = render(<ExpenseList expenses={mockExpenses} />);
+        const firstRenderOutput = firstRender.innerHTML;
+
+        const { container: secondRender } = render(<ExpenseList expenses={mockExpenses} />);
+        const secondRenderOutput = secondRender.innerHTML;
+
+        expect(firstRenderOutput).toEqual(secondRenderOutput);
+    });
+
 });

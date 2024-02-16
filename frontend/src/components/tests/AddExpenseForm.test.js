@@ -30,10 +30,19 @@ const Wrapper = ({ children }) => (
 );
 
 describe('AddExpenseForm', () => {
+
+    let originalConsoleError;
+
     beforeEach(() => {
         mockAddNewExpense.mockClear();
         mockResetError.mockClear();
         calculateTotalSpent.mockClear();
+        originalConsoleError = console.error;
+        console.error = jest.fn(); // Mock console.error
+    });
+
+    afterEach(() => {
+        console.error = originalConsoleError; // Restore original console.error
     });
 
     // Create Budget with Valid Inputs
