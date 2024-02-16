@@ -3,6 +3,7 @@ package BudgetTracker.Tracker.service;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
 import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
 import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.exceptions.UserNotFoundException;
@@ -143,57 +144,83 @@ public class BudgetServiceTest {
 
     @Test
     void updateBudgetSuccess() {
+        Long budgetId = budget1.getBudgetId();
         given(userService.existsById(budget1.getUser().getId())).willReturn(true);
+        given(budgetRepository.findById(budgetId)).willReturn(Optional.of(budget1));
         given(budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(
-                budget1.getBudgetDescription(), budget1.getUser().getId(), budget1.getBudgetId())).willReturn(false);
-        given(budgetRepository.save(budget1)).willReturn(budget1);
-        Budget updatedBudget = budgetService.updateBudget(budget1);
+                budget1.getBudgetDescription(), budget1.getUser().getId(), budgetId)).willReturn(false);
+        given(budgetRepository.save(any(Budget.class))).willReturn(budget1);
+
+        Budget updatedBudget = budgetService.updateBudget(budgetId, budget1);
+
         assertThat(updatedBudget.getBudgetDescription()).isEqualTo("Vacation");
         assertThat(updatedBudget.getBudgetAmount()).isEqualTo(1000);
     }
 
     @Test
     void deleteBudgetSuccess() {
+        given(budgetRepository.existsById(budget1.getBudgetId())).willReturn(true);
         willDoNothing().given(budgetRepository).deleteById(budget1.getBudgetId());
         budgetService.deleteBudget(budget1.getBudgetId());
         verify(budgetRepository, times(1)).deleteById(budget1.getBudgetId());
     }
 
     @Test
-    void updateBudgetThrowsDuplicateBudgetNameException () {
-        when(userService.existsById(anyLong())).thenReturn(true);
-        when(budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(budget1.getBudgetDescription(), user.getId(), budget1.getBudgetId())).thenReturn(true);
-        assertThatThrownBy(() -> budgetService.updateBudget(budget1))
+    void updateBudgetThrowsDuplicateBudgetNameException() {
+        Long budgetId = budget1.getBudgetId();
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(true);
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(
+                budget1.getBudgetDescription(), budget1.getUser().getId(), budgetId)).thenReturn(true);
+        assertThatThrownBy(() -> budgetService.updateBudget(budgetId, budget1))
                 .isInstanceOf(DuplicateBudgetNameException.class)
                 .hasMessageContaining("already exists");
         verify(budgetRepository, never()).save(any(Budget.class));
     }
 
+
+
     @Test
     void updateBudgetThrowsUserNotFoundException() {
-        lenient().when(userRepository.findById(user.getId()))
-                .thenReturn(Optional.empty());;
-        assertThrows(UserNotFoundException.class, () -> budgetService.updateBudget(budget1),
-                "User with ID " + budget1.getUser().getId() + " not found.");
+        Long budgetId = budget1.getBudgetId();
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(false);
+        Exception exception = assertThrows(UserNotFoundException.class,
+                () -> budgetService.updateBudget(budgetId, budget1));
+        assertTrue(exception.getMessage().contains("User with ID " + budget1.getUser().getId() + " not found"));
+        verify(budgetRepository, never()).save(any(Budget.class));
     }
 
+
     @Test
-    void updateBudgetThrowsInvalidInputException() {
+    void updateBudgetThrowsInvalidInputExceptionForDescription() {
+        Long budgetId = budget1.getBudgetId();
         budget1.setBudgetDescription("");
-        budget1.setUser(user);
-        when(userService.existsById(1L)).thenReturn(true);
-        assertThrows(InvalidInputException.class, () -> budgetService.updateBudget(budget1),
-                "Budget Description must be alphanumeric and non-empty");
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(true);
+        Exception exception = assertThrows(InvalidInputException.class,
+                () -> budgetService.updateBudget(budgetId, budget1));
+        assertTrue(exception.getMessage().contains("BudgetDescription must be alphanumeric"));
+    }
+
+
+    @Test
+    void updateBudgetThrowsInvalidInputExceptionForAmount() {
+        Long budgetId = budget1.getBudgetId();
+        budget1.setBudgetAmount(-500);
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(true);
+        Exception exception = assertThrows(InvalidInputException.class,
+                () -> budgetService.updateBudget(budgetId, budget1));
+        assertTrue(exception.getMessage().contains("Budget amount cannot be negative"));
     }
 
     @Test
-    void updateBudgetAmountThrowsInvalidInputException() {
-        budget1.setBudgetDescription("-500");
-        budget1.setUser(user);
-        when(userService.existsById(1L)).thenReturn(true);
-        assertThrows(InvalidInputException.class, () -> budgetService.updateBudget(budget1),
-                "Budget Description must be alphanumeric and non-empty");
+    void deleteBudgetThrowsInvalidIdExceptionForNonExistentBudget() {
+        Long invalidBudgetId = 999L;
+        when(budgetRepository.existsById(invalidBudgetId)).thenReturn(false);
+        assertThrows(BudgetNotFoundException.class, () -> budgetService.deleteBudget(invalidBudgetId),
+                "Expected deleteBudget to throw, but it didn't");
     }
-
 
 }

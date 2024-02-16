@@ -17,6 +17,8 @@ public interface BudgetRepository extends JpaRepository<Budget,Long> {
 
     // Method to check if a budget with the specified name exists for a given user ID
     boolean existsByBudgetDescriptionAndUserId(String budgetDescription, Long budgetId);
+
+    // Method to exclude the id of budget which is about to be updated for updateBudget
     @Query("SELECT COUNT(b) > 0 FROM Budget b WHERE b.budgetDescription = :description AND b.user.id = :userId AND b.budgetId <> :excludedId")
     boolean existsByBudgetDescriptionAndUserIdExcludingId(@Param("description") String description, @Param("userId") Long userId, @Param("excludedId") Long excludedId);
 

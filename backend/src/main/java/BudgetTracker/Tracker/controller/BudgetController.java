@@ -2,6 +2,7 @@ package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
 import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
 import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.exceptions.UserNotFoundException;
@@ -68,16 +69,28 @@ public class BudgetController {
 
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateBudget(@RequestBody Budget budget) {
-        Budget updateBudget = budgetService.updateBudget(budget);
-        return new ResponseEntity<>(updateBudget, HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Budget budget) {
+        try {
+            Budget updatedBudget = budgetService.updateBudget(id, budget);
+            return new ResponseEntity<>(updatedBudget, HttpStatus.OK);
+        } catch (DuplicateBudgetNameException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (InvalidInputException e) {
+            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteBudget(@PathVariable("id") long id) {
-        budgetService.deleteBudget(id);
-        return new ResponseEntity<>("Budget deleted successfully!", HttpStatus.OK);
+        try {
+            budgetService.deleteBudget(id);
+            return new ResponseEntity<>("Budget deleted successfully!", HttpStatus.OK);
+        } catch (BudgetNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid input: " + e.getMessage());
+        }
     }
 
 }

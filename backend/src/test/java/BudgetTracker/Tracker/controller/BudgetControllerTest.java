@@ -2,9 +2,7 @@ package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
-import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
-import BudgetTracker.Tracker.exceptions.InvalidInputException;
-import BudgetTracker.Tracker.exceptions.UserNotFoundException;
+import BudgetTracker.Tracker.exceptions.*;
 import BudgetTracker.Tracker.service.BudgetService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,13 +104,16 @@ class BudgetControllerTest {
     }
 
     @Test
-    void updateBudgetSuccess () throws Exception{
-        when(budgetService.updateBudget(any(Budget.class))).thenReturn(budget);
-        mockMvc.perform(put("/budgets")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(budget)))
+    void updateBudgetSuccess() throws Exception {
+        Long budgetId = 1L;
+        when(budgetService.updateBudget(eq(budgetId), any(Budget.class))).thenReturn(budget);
+
+        mockMvc.perform(put("/budgets/{id}", budgetId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(budget)))
                 .andExpect(status().isOk());
-        verify(budgetService).updateBudget(any(Budget.class));
+
+        verify(budgetService).updateBudget(eq(budgetId), any(Budget.class));
     }
 
     @Test
@@ -124,21 +125,26 @@ class BudgetControllerTest {
     }
 
     @Test
-    void updateBudgetThrowsDuplicateBudgetNameException () throws Exception {
-        doThrow(new DuplicateBudgetNameException("Budget with name 'Holiday' already exists")).when(budgetService).updateBudget(any(Budget.class));
+    void updateBudgetThrowsDuplicateBudgetNameException() throws Exception {
+        Long budgetId = 1L; // Example ID
+        doThrow(new DuplicateBudgetNameException("Budget with name 'Holiday' already exists"))
+                .when(budgetService).updateBudget(eq(budgetId), any(Budget.class));
 
-        mockMvc.perform(post("/budgets")
+        mockMvc.perform(put("/budgets/{id}", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(budget)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Budget with name 'Holiday' already exists")));
-        verify(budgetService).createBudget(any(Budget.class));
+
+        verify(budgetService).updateBudget(eq(budgetId), any(Budget.class));
     }
 
     @Test
-    void updateBudgetAmountThrowsInvalidInputException () throws Exception {
-        given(budgetService.updateBudget(any(Budget.class))).willThrow(new InvalidInputException("Invalid input"));
-        mockMvc.perform(post("/budgets")
+    void updateBudgetAmountThrowsInvalidInputException() throws Exception {
+        Long budgetId = 1L;
+        given(budgetService.updateBudget(eq(budgetId), any(Budget.class))).willThrow(new InvalidInputException("Invalid input"));
+
+        mockMvc.perform(put("/budgets/{id}", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"budgetDescription\":\"Holiday\",\"budgetAmount\":\"-500\"}"))
                 .andExpect(status().isBadRequest())
@@ -146,9 +152,11 @@ class BudgetControllerTest {
     }
 
     @Test
-    void updateBudgetDescriptionThrowsInvalidInputException () throws Exception {
-        given(budgetService.updateBudget(any(Budget.class))).willThrow(new InvalidInputException("Invalid input"));
-        mockMvc.perform(post("/budgets")
+    void updateBudgetDescriptionThrowsInvalidInputException() throws Exception {
+        Long budgetId = 1L;
+        given(budgetService.updateBudget(eq(budgetId), any(Budget.class))).willThrow(new InvalidInputException("Invalid description"));
+
+        mockMvc.perform(put("/budgets/{id}", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"budgetDescription\":\"\",\"budgetAmount\":\"500\"}"))
                 .andExpect(status().isBadRequest())
@@ -157,12 +165,24 @@ class BudgetControllerTest {
 
     @Test
     void updateBudgetThrowsUserNotFoundException() throws Exception {
-        given(budgetService.updateBudget(any(Budget.class))).willThrow(new UserNotFoundException("User not found"));
-        mockMvc.perform(post("/budgets")
+        Long budgetId = 1L;
+        given(budgetService.updateBudget(eq(budgetId), any(Budget.class))).willThrow(new UserNotFoundException("User not found"));
+
+        mockMvc.perform(put("/budgets/{id}", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(budget)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("User not found")));
+    }
+
+    @Test
+    void deleteBudgetThrowsInvalidIdException() throws Exception {
+        Long invalidBudgetId = 999L;
+        doThrow(new BudgetNotFoundException("Budget with ID " + invalidBudgetId + " not found."))
+                .when(budgetService).deleteBudget(invalidBudgetId);
+        mockMvc.perform(delete("/budgets/{id}", invalidBudgetId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
  }
