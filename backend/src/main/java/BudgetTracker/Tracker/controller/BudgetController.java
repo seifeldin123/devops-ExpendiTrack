@@ -63,7 +63,7 @@ public class BudgetController {
             return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
         } catch (UserNotFoundException e) {
             // Handling for invalid input exception
-            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid input: " + e.getMessage());
         }
 
     }
