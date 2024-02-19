@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatCurrency } from '../helpers/HelperFunctions';
+import {formatCurrency, formatDate} from '../helpers/HelperFunctions';
 
 const ExpenseList = React.memo(({ expenses }) => {
     if (!Array.isArray(expenses) || expenses.length === 0) {
@@ -24,7 +24,7 @@ const ExpenseList = React.memo(({ expenses }) => {
                         <tr key={expense?.expensesId || index}>
                             <td>{expense?.expensesDescription || 'No Description'}</td>
                             <td>{formatCurrency(expense?.expensesAmount || 0)}</td>
-                            <td>{expense?.expensesDate ? new Date(expense.expensesDate).toLocaleDateString() : 'No Date'}</td>
+                            <td>{expense?.expensesDate ? formatDate(expense.expensesDate) : 'No Date'}</td>
                             <td>{expense?.budget?.budgetDescription || 'No Budget'}</td>
                         </tr>
                     ))}

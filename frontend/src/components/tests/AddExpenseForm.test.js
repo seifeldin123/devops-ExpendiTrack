@@ -3,9 +3,14 @@ import {render, screen, fireEvent, act} from '@testing-library/react';
 import AddExpenseForm from '../AddExpenseForm'; // Adjust the import path as necessary
 import { ExpenseContext } from '../../contexts/ExpenseContext';
 import { calculateTotalSpent } from '../../helpers/HelperFunctions';
+import {useUserContext} from "../../contexts/UserContext";
 
 jest.mock('../../helpers/HelperFunctions', () => ({
     calculateTotalSpent: jest.fn(),
+}));
+
+jest.mock('../../contexts/UserContext', () => ({
+    useUserContext: jest.fn(),
 }));
 
 // Mock data
@@ -39,6 +44,10 @@ describe('AddExpenseForm', () => {
         calculateTotalSpent.mockClear();
         originalConsoleError = console.error;
         console.error = jest.fn(); // Mock console.error
+        useUserContext.mockReturnValue({
+            user: { id: 'user1', name: 'Test User' },
+        });
+        jest.clearAllMocks();
     });
 
     afterEach(() => {

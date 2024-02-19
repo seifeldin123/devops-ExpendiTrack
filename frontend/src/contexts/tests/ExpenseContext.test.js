@@ -70,7 +70,7 @@ describe('ExpenseContext Integration Tests', () => {
             userId: mockUser.id,
         };
 
-        ExpenseService.createExpense.mockResolvedValueOnce({ data: newExpense });
+        ExpenseService.createExpense.mockResolvedValueOnce(newExpense);
 
         const TestComponent = () => {
             const { addNewExpense, expenses } = useExpenseContext();

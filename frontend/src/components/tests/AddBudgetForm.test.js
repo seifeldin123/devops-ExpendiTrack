@@ -137,9 +137,12 @@ describe('AddBudgetForm', () => {
             userEvent.click(screen.getByRole('button', {name: 'Create Budget'}));
         });
 
-        // Check if input fields are reset
+        await waitFor(() => {
+            // Check if input fields are reset
         expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('');
         expect(screen.getByPlaceholderText('e.g., 500').value).toBe('');
+        });
+
     });
 
     // Display Context Error

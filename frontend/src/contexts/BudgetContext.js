@@ -15,13 +15,19 @@ export const BudgetProvider = ({ children }) => {
     const fetchBudgets = useCallback(async (userId) => {
         try {
             const response = await getBudgetsByUserId(userId);
-            console.log("fetch budgets" + response);
-            setBudgets(response);
+            console.log("fetch budgets", response);
+            if (Array.isArray(response)) {
+                setBudgets(response);
+            } else {
+                console.error('Expected an array but got:', typeof response);
+                setError('Failed to fetch budgets correctly');
+            }
         } catch (error) {
             console.error('Failed to load budgets:', error);
             setError('Failed to fetch budgets');
         }
     }, []);
+
 
     useEffect(() => {
         if (userId) {

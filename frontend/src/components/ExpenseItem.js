@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatCurrency } from '../helpers/HelperFunctions';
+import {formatCurrency, formatDate} from '../helpers/HelperFunctions';
 
 const ExpenseItem = ({ expense }) => {
     return (
@@ -8,7 +8,7 @@ const ExpenseItem = ({ expense }) => {
                 <div className="card-body">
                     <h5 className="card-title">{expense.expensesDescription}</h5>
                     <p className="card-text">Amount: {formatCurrency(expense.expensesAmount)}</p>
-                    <p className="card-text">Date: {new Date(expense.expensesDate).toLocaleDateString()}</p>
+                    <p className="card-text">Date: {formatDate(expense.expensesDate)}</p>
                     <p className="card-text">Budget: {expense?.budget?.budgetDescription || 'No Budget'}</p>
                 </div>
             </div>

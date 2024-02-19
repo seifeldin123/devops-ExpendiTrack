@@ -131,7 +131,7 @@ const AddExpenseForm = ({ budgets }) => {
                                     onChange={(e) => setSelectedBudgetId(e.target.value)}
                                     id="budget-category"
                                     required="required">
-                                    <option selected value="">Select Budget</option>
+                                    <option defaultValue value="">Select Budget</option>
                                     {budgets.map(budget => (
                                         <option key={budget.budgetId}
                                                 value={budget.budgetId}>{budget.budgetDescription}</option>

@@ -25,9 +25,9 @@ const AddBudgetForm = () => {
 
         try {
             await addNewBudget({ budgetDescription, budgetAmount, user: { id: user.id } });
-            fetchBudgets(user.id);
             setBudgetDescription('');
             setBudgetAmount('');
+            fetchBudgets(user.id);
             // No need to reset error here since successful submission will not set an error
         } catch (serverError){}
     };

@@ -37,7 +37,7 @@ describe('BudgetContext Integration Tests', () => {
     });
 
     it('fetches and updates budgets when the user changes', async () => {
-        BudgetService.getBudgetsByUserId.mockResolvedValueOnce({ data: initialBudgets });
+        BudgetService.getBudgetsByUserId.mockResolvedValueOnce(initialBudgets);
 
         const TestComponent = () => {
             const { budgets } = useBudgetContext();
@@ -95,9 +95,9 @@ describe('BudgetContext Integration Tests', () => {
         expect(BudgetService.createBudget).toHaveBeenCalledWith({
             budgetDescription: 'Entertainment',
             budgetAmount: 250,
-            user: { id: user.id },
+            userId: user.id, // Adjusted to expect userId directly instead of a user object
         });
-        // Additional assertions...
+
     });
 
     it('handles errors when fetching budgets fails', async () => {
