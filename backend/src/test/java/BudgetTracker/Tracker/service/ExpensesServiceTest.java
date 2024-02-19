@@ -3,22 +3,25 @@ package BudgetTracker.Tracker.service;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
+import BudgetTracker.Tracker.exceptions.ExpenseNotFoundException;
 import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.repository.BudgetRepository;
 import BudgetTracker.Tracker.repository.ExpensesRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.MockitoJUnit;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,21 +31,20 @@ public class ExpensesServiceTest{
     @Mock
     private ExpensesRepository expensesRepository;
     @InjectMocks
-    private ExpensesService underTest;
+    private ExpensesService expensesService;
 
     @Mock
     private BudgetRepository budgetRepository;
-
     private Budget budget;
     private Expenses expense;
 
     @BeforeEach
     void setUp() {
-        underTest = new ExpensesService();
+        expensesService = new ExpensesService();
         MockitoAnnotations.openMocks(this);
 
         // Inject the mocked ExpensesRepository into your service
-        ReflectionTestUtils.setField(underTest, "expenseRepository", expensesRepository);
+        ReflectionTestUtils.setField(expensesService, "expenseRepository", expensesRepository);
 
         expense = new Expenses();
         expense.setExpensesDescription("tuition fees");
@@ -53,7 +55,6 @@ public class ExpensesServiceTest{
         budget.setBudgetDescription("study");
         budget.setBudgetAmount(1000);
 
-//        expense.setBudget(budget);
     }
 
     @Test
@@ -61,7 +62,7 @@ public class ExpensesServiceTest{
         List<Expenses> expensesList = Collections.singletonList(expense);
         when(expensesRepository.findAll()).thenReturn(expensesList);
 
-        underTest.getAllExpenses();
+        expensesService.getAllExpenses();
 
         verify(expensesRepository).findAll();
         assertEquals(1, expensesList.size());
@@ -71,54 +72,54 @@ public class ExpensesServiceTest{
     void canGetExpenseById() {
         Long expenseId = expense.getExpensesId();
         when(expensesRepository.findById(expenseId)).thenReturn(Optional.of(expense));
-        Expenses result = underTest.getExpenseById(expenseId);
+        Expenses result = expensesService.getExpenseById(expenseId);
         // Verify that findById was called with the correct ID
         verify(expensesRepository).findById(expenseId);
         assertEquals(expense.getExpensesId(), result.getExpensesId());
 
     }
-//
-//    @Test
-//    void canCreateNewExpense(){
-//        underTest.createExpense(expense);
-//        ArgumentCaptor<Expenses> expensesArgumentCaptor = ArgumentCaptor.forClass(Expenses.class);
-//
-//        verify(expensesRepository).save(expensesArgumentCaptor.capture());
-//
-//        Expenses capturedExpense = expensesArgumentCaptor.getValue();
-//
-//        assertEquals(capturedExpense, expense);
-//
-//    }
-//
-//    @Test
-//    void canUpdateExpense() {
-//        underTest.createExpense(expense);
-//        Long expenseId = 100L;
-//        Expenses updatedExpense = new Expenses();
-//        updatedExpense.setExpensesAmount(500);
-//        updatedExpense.setExpensesDescription("Credit");
-//
-//        when(expensesRepository.findById(expenseId)).thenReturn(Optional.of(expense));
-//
-//        underTest.updateExpense(expenseId, updatedExpense);
-//
-//        ArgumentCaptor<Expenses> expensesArgumentCaptor = ArgumentCaptor.forClass(Expenses.class);
-//        //Due to number of Invocations, I need to verify that we expect 3 invocations
-//        verify(expensesRepository, times(3)).save(expensesArgumentCaptor.capture());
-//
-//        Expenses savedExpense = expensesArgumentCaptor.getValue();
-//
-//        assertNotNull(savedExpense);
-//        assertEquals("Credit", savedExpense.getExpensesDescription());
-//        assertEquals(500, savedExpense.getExpensesAmount());
-//    }
 
     @Test
-    void canDeleteExpense() {
-        Long expenseId = expense.getExpensesId();
-        underTest.deleteExpense(expenseId);
-        verify(expensesRepository, times(1)).deleteById(expenseId);
+    void updateExpenseValidInput() {
+        Long expenseId = 1L;
+        Expenses expenseToUpdate = new Expenses();
+        expenseToUpdate.setExpensesDescription("Updated Expense Description");
+        expenseToUpdate.setExpensesAmount(100);
+
+        Budget budget = new Budget();
+        budget.setBudgetId(1L);
+        expenseToUpdate.setBudget(budget);
+
+        // Stubbing repository methods
+        when(expensesRepository.findById(expenseId)).thenReturn(Optional.of(expenseToUpdate));
+        when(budgetRepository.findById(any(Long.class))).thenReturn(Optional.of(budget));
+        when(expensesRepository.existsByExpensesDescriptionAndBudget_User_Id(any(String.class), any(Long.class))).thenReturn(false);
+        when(expensesRepository.save(any(Expenses.class))).thenReturn(expenseToUpdate);
+
+        // Call the service method
+        Expenses updatedExpense = expensesService.updateExpense(expenseId, expenseToUpdate);
+
+        // Verify that the service method is called with the correct parameters
+        verify(expensesRepository).findById(expenseId);
+        verify(budgetRepository).findById(expenseToUpdate.getBudget().getBudgetId());
+        verify(expensesRepository).existsByExpensesDescriptionAndBudget_User_Id(expenseToUpdate.getExpensesDescription(), expenseToUpdate.getBudget().getBudgetId());
+        verify(expensesRepository).save(expenseToUpdate);
+
+        assertNotNull(updatedExpense);
+        assertEquals(expenseToUpdate.getExpensesDescription(), updatedExpense.getExpensesDescription());
+        assertEquals(expenseToUpdate.getExpensesAmount(), updatedExpense.getExpensesAmount());
+    }
+    @Test
+    void deleteExpense_ExistingExpense() {
+        // Given
+        Long expenseId = 1L;
+        when(expensesRepository.existsById(expenseId)).thenReturn(true);
+
+        // When
+        expensesService.deleteExpense(expenseId);
+
+        // Then
+        verify(expensesRepository).deleteById(expenseId);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class ExpensesServiceTest{
         expense.setExpensesAmount(1000);
         expense.setBudget(new Budget());
         expense.getBudget().setBudgetId(1L);
-        assertThrows(InvalidInputException.class, () -> underTest.createExpense(expense),
+        assertThrows(InvalidInputException.class, () -> expensesService.createExpense(expense),
                 "Expenses Description must be alphanumeric");
     }
 
@@ -140,7 +141,7 @@ public class ExpensesServiceTest{
         expense.setBudget(new Budget());
         expense.getBudget().setBudgetId(1L);
 
-        assertThrows(InvalidInputException.class, () -> underTest.createExpense(expense),
+        assertThrows(InvalidInputException.class, () -> expensesService.createExpense(expense),
                 "expenses amount cannot be negative.");
     }
 
@@ -155,8 +156,90 @@ public class ExpensesServiceTest{
 
         when(budgetRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(BudgetNotFoundException.class, () -> underTest.createExpense(expense),
+        assertThrows(BudgetNotFoundException.class, () -> expensesService.createExpense(expense),
                 "Budget with ID " + expense.getBudget().getBudgetId() + " not found");
     }
+    @Test
+    void updateExpenseNonexistentExpense() {
+        // Prepare test data
+        Long expenseId = 1L;
+        Expenses expenseToUpdate = new Expenses();
+        expenseToUpdate.setExpensesDescription("Updated Expense Description");
+        expenseToUpdate.setExpensesAmount(100);
+        Budget budget = new Budget();
+        budget.setBudgetId(1L);
+        expenseToUpdate.setBudget(budget);
+
+        // Stubbing repository methods
+        when(expensesRepository.findById(expenseId)).thenReturn(Optional.empty());
+
+        // Call the service method and expect an exception
+        assertThrows(ExpenseNotFoundException.class, () -> expensesService.updateExpense(expenseId, expenseToUpdate));
+    }
+
+    @Test
+    void updateExpense_InvalidInput_NegativeAmount() {
+        // Given
+        Long expenseId = 1L;
+        Expenses existingExpense = new Expenses();
+        existingExpense.setExpensesId(expenseId);
+        existingExpense.setExpensesDescription("Existing Expense Description");
+        existingExpense.setExpensesAmount(100); // Positive amount
+
+        Expenses expenseToUpdate = new Expenses();
+        expenseToUpdate.setExpensesId(expenseId);
+        expenseToUpdate.setExpensesDescription("Updated Expense Description");
+        expenseToUpdate.setExpensesAmount(-50); // Negative amount
+
+        Budget budget = new Budget();
+        budget.setBudgetId(1L);
+
+        when(expensesRepository.findById(expenseId)).thenReturn(java.util.Optional.of(existingExpense));
+
+        // When/Then
+        assertThrows(InvalidInputException.class, () -> expensesService.updateExpense(expenseId, expenseToUpdate));
+    }
+
+    @Test
+    void updateExpenseNonexistentBudget() {
+        // Prepare test data
+        Long expenseId = 1L;
+        Expenses expenseToUpdate = new Expenses();
+        expenseToUpdate.setExpensesDescription("Updated Expense Description");
+        expenseToUpdate.setExpensesAmount(100);
+        Budget budget = new Budget();
+        budget.setBudgetId(1L);
+        expenseToUpdate.setBudget(budget);
+
+        // Stubbing repository methods
+        when(expensesRepository.findById(expenseId)).thenReturn(Optional.of(new Expenses()));
+        when(budgetRepository.findById(budget.getBudgetId())).thenReturn(Optional.empty());
+
+        // Call the service method and expect an exception
+        assertThrows(BudgetNotFoundException.class, () -> expensesService.updateExpense(expenseId, expenseToUpdate));
+    }
+
+    @Test
+    void deleteExpense_NonExistingExpense() {
+        // Given
+        Long expenseId = 1L;
+        when(expensesRepository.existsById(expenseId)).thenReturn(false);
+
+        // When/Then
+        assertThrows(ExpenseNotFoundException.class, () -> expensesService.deleteExpense(expenseId));
+        verify(expensesRepository, never()).deleteById(expenseId);
+    }
+
+    @Test
+    void deleteExpense_ExceptionDuringDeletion() {
+        // Given
+        Long expenseId = 1L;
+        when(expensesRepository.existsById(expenseId)).thenReturn(true);
+        doThrow(RuntimeException.class).when(expensesRepository).deleteById(expenseId);
+
+        // When/Then
+        assertThrows(RuntimeException.class, () -> expensesService.deleteExpense(expenseId));
+    }
+
 
 }

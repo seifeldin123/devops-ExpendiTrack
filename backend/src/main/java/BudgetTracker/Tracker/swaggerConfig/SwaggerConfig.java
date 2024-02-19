@@ -1,4 +1,4 @@
-package BudgetTracker.Tracker;
+package BudgetTracker.Tracker.swaggerConfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

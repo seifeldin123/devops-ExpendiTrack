@@ -127,4 +127,7 @@ public class BudgetRepositoryTest {
         assertFalse(notExists, "Budget should not exist for given description and user ID");
     }
 
+
+
+
 }

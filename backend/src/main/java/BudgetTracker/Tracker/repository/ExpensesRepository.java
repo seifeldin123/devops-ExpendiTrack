@@ -15,5 +15,4 @@ public interface ExpensesRepository extends JpaRepository<Expenses,Long> {
 
     boolean existsByExpensesDescriptionAndBudget_User_Id(String description, Long userId);
 
-
 }
