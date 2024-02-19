@@ -65,7 +65,14 @@ public class BudgetController {
         }
 
     }
-
+    /**
+     * Endpoint for Updating a budget by its ID.
+     *
+     * @param id     the ID of the budget to be updated
+     * @param budget the details of the budget to update
+     * @return a ResponseEntity with the updated budget if the update is successful,
+     *         or an error message if the update fails due to duplicate name, invalid input, or user not found
+     */
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing budget", description = "Updates the budget identified by its ID with new values provided in the request body.", responses = {
             @ApiResponse(description = "Budget updated successfully", responseCode = "200",
@@ -85,7 +92,13 @@ public class BudgetController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
-
+    /**
+     * Endpoint for deleting an budget by its ID.
+     *
+     * @param id the ID of the budget to be deleted
+     * @return a ResponseEntity with a success message if the budget is deleted successfully,
+     *         or an error message if the budget is not found
+     */
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a budget", description = "Deletes the budget identified by its ID.", responses = {
             @ApiResponse(description = "Budget deleted successfully", responseCode = "200",

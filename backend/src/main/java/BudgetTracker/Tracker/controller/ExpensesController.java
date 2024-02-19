@@ -118,11 +118,8 @@ public class ExpensesController {
      * Endpoint for deleting an expense by its ID.
      *
      * @param id The ID of the expense to be deleted.
-     * @return A ResponseEntity indicating the outcome of the deletion operation. If the deletion
-     *         was successful, returns a 200 OK response with a success message. If the expense was
-     *         not found, returns a 404 Not Found response with an appropriate error message. If an
-     *         unexpected error occurs during the deletion process, returns a 500 Internal Server Error
-     *         response with a generic error message.
+     * @return a ResponseEntity with a success message if the expense is deleted successfully,
+     *         or an error message if the expense is not found
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an expense",
