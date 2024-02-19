@@ -35,7 +35,12 @@ public class ExpensesController {
      * bad request status if the expense name is duplicate or if input is invalid.
      */
     @PostMapping
-
+    @Operation(summary = "Create a new expense", responses = {
+            @ApiResponse(description = "Expense Created successfully", responseCode = "201",
+                    content = @Content(schema = @Schema(implementation = Expenses.class))),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = String.class)))
+    })
     public ResponseEntity<?> createExpense(@RequestBody Expenses expense) {
         try {
             Expenses createdExpense = expenseService.createExpense(expense);
@@ -96,7 +101,7 @@ public class ExpensesController {
                     required = true, content = @Content(
                             schema = @Schema(implementation = Expenses.class))),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Expense updated successfully", content = @Content(schema = @Schema(implementation = Expenses.class))),
+                    @ApiResponse(responseCode = "200", description = "Expense updated successfully"),
                     @ApiResponse(responseCode = "404", description = "Expense not found"),
                     @ApiResponse(responseCode = "400", description = "Invalid input")
             })

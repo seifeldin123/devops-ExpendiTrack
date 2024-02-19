@@ -70,8 +70,8 @@ public class BudgetController {
     @Operation(summary = "Update an existing budget", description = "Updates the budget identified by its ID with new values provided in the request body.", responses = {
             @ApiResponse(description = "Budget updated successfully", responseCode = "200",
                     content = @Content(schema = @Schema(implementation = Budget.class))),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = ErrorDetails.class))),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+            @ApiResponse(description = "Bad Request", responseCode = "400"),
+            @ApiResponse(description = "Not Found", responseCode = "404")
     })
     public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Budget budget) {
         try {
@@ -90,7 +90,7 @@ public class BudgetController {
     @Operation(summary = "Delete a budget", description = "Deletes the budget identified by its ID.", responses = {
             @ApiResponse(description = "Budget deleted successfully", responseCode = "200",
                     content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+            @ApiResponse(description = "Not Found", responseCode = "404")
     })
     public ResponseEntity<?> deleteBudget(@PathVariable("id") long id) {
         try {
