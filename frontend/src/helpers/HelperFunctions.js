@@ -2,12 +2,15 @@
 
 
 // Calculating total spent on a budget
-// Adjusted to use expensesAmount and match budgetId within the nested budget object
+// Adjusted to use optional chaining and provide a fallback value
 export const calculateTotalSpent = (expenses, budgetId) => {
+    if (!Array.isArray(expenses)) return 0;
     return expenses
-        .filter(expense => expense.budget.budgetId === budgetId) // Adjusting to match the nested budgetId
-        .reduce((total, expense) => total + parseFloat(expense.expensesAmount), 0); // Using expensesAmount
+        .filter(expense => expense?.budget?.budgetId === budgetId)
+        .reduce((total, expense) => total + parseFloat(expense.expensesAmount || 0), 0);
 };
+
+
 
 
 // Formatting Currency

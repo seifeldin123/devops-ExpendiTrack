@@ -9,12 +9,12 @@ const ExpenseItem = ({ expense }) => {
                     <h5 className="card-title">{expense.expensesDescription}</h5>
                     <p className="card-text">Amount: {formatCurrency(expense.expensesAmount)}</p>
                     <p className="card-text">Date: {new Date(expense.expensesDate).toLocaleDateString()}</p>
-                    <p className="card-text">Budget: {expense.budget.budgetDescription}</p>
+                    <p className="card-text">Budget: {expense?.budget?.budgetDescription || 'No Budget'}</p>
                 </div>
-
             </div>
         </div>
     );
 };
 
 export default ExpenseItem;
+

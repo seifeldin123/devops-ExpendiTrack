@@ -6,10 +6,10 @@ export const getUserExpenses = (userId) => {
     return axios.get(`${API_URL}/user/${userId}`)
         .then(response => response.data)
         .catch(error => {
-            // Throw an error directly for consistency with createBudget
-            throw new Error(error.response?.data || 'Failed to load expenses. Please refresh the page to try again.');
+            console.error("Error fetching expenses:", error.toJSON());
+            throw new Error(error.response?.data?.message || 'Failed to load expenses. Please refresh the page to try again.');
         });
-}; // Method to fetch expenses for a specific user
+};
 
 
 export const createExpense = (expenseData) => {

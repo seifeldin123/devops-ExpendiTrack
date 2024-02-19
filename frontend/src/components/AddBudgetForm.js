@@ -5,7 +5,7 @@ import { useUserContext } from '../contexts/UserContext';
 const AddBudgetForm = () => {
     const [budgetDescription, setBudgetDescription] = useState('');
     const [budgetAmount, setBudgetAmount] = useState('');
-    const { addNewBudget, error, resetError } = useBudgetContext(); // Use error from context
+    const { addNewBudget, fetchBudgets, error, resetError } = useBudgetContext(); // Use error from context
     const { user } = useUserContext(); // Get the current user
 
     const handleSubmit = async (e) => {
@@ -25,6 +25,7 @@ const AddBudgetForm = () => {
 
         try {
             await addNewBudget({ budgetDescription, budgetAmount, user: { id: user.id } });
+            fetchBudgets(user.id);
             setBudgetDescription('');
             setBudgetAmount('');
             // No need to reset error here since successful submission will not set an error

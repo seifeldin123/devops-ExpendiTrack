@@ -32,7 +32,7 @@ describe('ExpenseContext Integration Tests', () => {
     });
 
     it('fetches and displays user-specific expenses upon user change', async () => {
-        ExpenseService.getUserExpenses.mockResolvedValueOnce({ data: initialExpenses });
+        ExpenseService.getUserExpenses.mockResolvedValueOnce(initialExpenses);
 
         const TestComponent = () => {
             const { expenses } = useExpenseContext();

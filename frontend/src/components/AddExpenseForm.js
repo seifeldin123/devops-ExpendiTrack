@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useExpenseContext } from '../contexts/ExpenseContext';
 import { calculateTotalSpent} from '../helpers/HelperFunctions';
-
+import { useUserContext } from '../contexts/UserContext';
 
 const AddExpenseForm = ({ budgets }) => {
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState('');
     const [selectedBudgetId, setSelectedBudgetId] = useState(budgets.length > 0 ? budgets[0].id : '');
-    const { addNewExpense, expenses, error, resetError } = useExpenseContext();
+    const { addNewExpense, fetchExpenses, expenses, error, resetError } = useExpenseContext();
+    const { user } = useUserContext(); // Get the current user
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -44,6 +45,8 @@ const AddExpenseForm = ({ budgets }) => {
             setDescription('');
             setAmount('');
             setDate('');
+            setSelectedBudgetId(budgets.length > 0 ? budgets[0].id : '');
+            fetchExpenses(user.id);
         } catch (error) {
             console.error('Error adding expense', error);
             alert("Failed to add expense. Please try again.");
@@ -128,7 +131,7 @@ const AddExpenseForm = ({ budgets }) => {
                                     onChange={(e) => setSelectedBudgetId(e.target.value)}
                                     id="budget-category"
                                     required="required">
-                                    <option value="">Select Budget</option>
+                                    <option selected value="">Select Budget</option>
                                     {budgets.map(budget => (
                                         <option key={budget.budgetId}
                                                 value={budget.budgetId}>{budget.budgetDescription}</option>

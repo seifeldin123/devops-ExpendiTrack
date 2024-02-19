@@ -20,12 +20,12 @@ const ExpenseList = React.memo(({ expenses }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {expenses.map(expense => (
-                        <tr key={expense.expensesId}>
-                            <td>{expense.expensesDescription}</td>
-                            <td>{formatCurrency(expense.expensesAmount)}</td>
-                            <td>{new Date(expense.expensesDate).toLocaleDateString()}</td>
-                            <td>{expense.budget.budgetDescription}</td>
+                    {expenses.map((expense, index) => (
+                        <tr key={expense?.expensesId || index}>
+                            <td>{expense?.expensesDescription || 'No Description'}</td>
+                            <td>{formatCurrency(expense?.expensesAmount || 0)}</td>
+                            <td>{expense?.expensesDate ? new Date(expense.expensesDate).toLocaleDateString() : 'No Date'}</td>
+                            <td>{expense?.budget?.budgetDescription || 'No Budget'}</td>
                         </tr>
                     ))}
                     </tbody>
@@ -34,5 +34,6 @@ const ExpenseList = React.memo(({ expenses }) => {
         </>
     );
 });
+
 
 export default ExpenseList;
