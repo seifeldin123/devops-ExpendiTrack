@@ -2,9 +2,7 @@ package BudgetTracker.Tracker.controller;
 
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.User;
-import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
-import BudgetTracker.Tracker.exceptions.InvalidInputException;
-import BudgetTracker.Tracker.exceptions.UserNotFoundException;
+import BudgetTracker.Tracker.exceptions.*;
 import BudgetTracker.Tracker.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,10 +61,44 @@ public class BudgetController {
             return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
         } catch (UserNotFoundException e) {
             // Handling for invalid input exception
-            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid input: " + e.getMessage());
         }
 
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Update an existing budget", description = "Updates the budget identified by its ID with new values provided in the request body.", responses = {
+            @ApiResponse(description = "Budget updated successfully", responseCode = "200",
+                    content = @Content(schema = @Schema(implementation = Budget.class))),
+            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = ErrorDetails.class))),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+    })
+    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Budget budget) {
+        try {
+            Budget updatedBudget = budgetService.updateBudget(id, budget);
+            return new ResponseEntity<>(updatedBudget, HttpStatus.OK);
+        } catch (DuplicateBudgetNameException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (InvalidInputException e) {
+            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a budget", description = "Deletes the budget identified by its ID.", responses = {
+            @ApiResponse(description = "Budget deleted successfully", responseCode = "200",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+    })
+    public ResponseEntity<?> deleteBudget(@PathVariable("id") long id) {
+        try {
+            budgetService.deleteBudget(id);
+            return new ResponseEntity<>("Budget deleted successfully!", HttpStatus.OK);
+        } catch (BudgetNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid input: " + e.getMessage());
+        }
+    }
 
 }
