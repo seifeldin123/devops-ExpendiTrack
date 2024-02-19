@@ -1,6 +1,5 @@
 package BudgetTracker.Tracker.controller;
 
-import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.exceptions.*;
 import BudgetTracker.Tracker.service.ExpensesService;
@@ -78,11 +77,13 @@ public class ExpensesController {
         return expenseService.getExpenseById(id);
     }
     /**
-     * Endpoint for updating an existing expense.
+     * Endpoint for Updating an expense by its ID.
      *
-     * @param id             The ID of the expense to update.
-     * @param expenseDetails The updated expense details. Must be provided in the request body.
-     * @return The updated expense.
+     * @param id              The ID of the expense to be updated.
+     * @param expenseDetails The details of the expense to be updated.
+     * @return A ResponseEntity containing the updated expense if the update was successful,
+     *         or an appropriate error response if the expense was not found or if there were
+     *         validation errors.
      */
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing expense",
@@ -99,14 +100,29 @@ public class ExpensesController {
                     @ApiResponse(responseCode = "404", description = "Expense not found"),
                     @ApiResponse(responseCode = "400", description = "Invalid input")
             })
-    public Expenses updateExpense(@PathVariable Long id, @RequestBody Expenses expenseDetails) {
-        return expenseService.updateExpense(id, expenseDetails);
+    public ResponseEntity<?> updateExpense(@PathVariable Long id, @RequestBody Expenses expenseDetails) {
+        try {
+            Expenses updatedExpense = expenseService.updateExpense(id, expenseDetails);
+            // Return the updated expense with expensesId field in the response
+            return ResponseEntity.ok(updatedExpense);
+        } catch (ExpenseNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("An expense with ID = " + id + " is not found");
+        } catch (InvalidInputException | BudgetNotFoundException e) {
+            return ResponseEntity.badRequest().body("Invalid input: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred. Please try again later.");
+        }
     }
+
     /**
      * Endpoint for deleting an expense by its ID.
      *
-     * @param id The ID of the expense to delete.
-     * @return ResponseEntity with a status of OK if the deletion was successful.
+     * @param id The ID of the expense to be deleted.
+     * @return A ResponseEntity indicating the outcome of the deletion operation. If the deletion
+     *         was successful, returns a 200 OK response with a success message. If the expense was
+     *         not found, returns a 404 Not Found response with an appropriate error message. If an
+     *         unexpected error occurs during the deletion process, returns a 500 Internal Server Error
+     *         response with a generic error message.
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an expense",
@@ -118,10 +134,19 @@ public class ExpensesController {
                     @ApiResponse(responseCode = "200", description = "Expense deleted successfully"),
                     @ApiResponse(responseCode = "404", description = "Expense not found")
             })
-    public ResponseEntity<Expenses> deleteExpense(@PathVariable Long id) {
-        expenseService.deleteExpense(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteExpense(@PathVariable Long id) {
+        try {
+            expenseService.deleteExpense(id);
+            return ResponseEntity.ok().body("Expense with ID " + id + " deleted successfully");
+        } catch (ExpenseNotFoundException e) {
+            String errorMessage = "Expense with ID " + id + " not found";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the expense");
+        }
     }
+
     /**
      * Endpoint for retrieving expenses by user ID.
      *
