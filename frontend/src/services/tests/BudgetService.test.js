@@ -1,6 +1,7 @@
+
 jest.mock('axios');
 import axios from 'axios';
-import {createBudget, getBudgetsByUserId} from '../BudgetService'; // Adjust the path as needed
+import {createBudget, deleteBudget, getBudgetsByUserId, updateBudget} from '../BudgetService';
 
 describe('BudgetService', () => {
     // TC_UI_001: Verify Successful Budget Creation
@@ -112,4 +113,113 @@ describe('BudgetService', () => {
             budgetAmount: 200
         })).rejects.toThrow(errorMessage);
     });
+
+    // Verify successful budget update
+    it('TC_UI_009: should update a budget successfully', async () => {
+        const budgetId = 1;
+        const budgetUpdateData = {
+            budgetDescription: "Updated MonthlySavings",
+            budgetAmount: 600,
+        };
+        const mockResponse = {
+            budgetId: 1,
+            ...budgetUpdateData,
+        };
+
+        axios.put.mockResolvedValue({ data: mockResponse });
+
+        await expect(updateBudget(budgetId, budgetUpdateData)).resolves.toEqual(mockResponse);
+    });
+
+    // Verify failure on updating a non-existent budget
+    it('TC_UI_010: should handle error when updating a non-existent budget', async () => {
+        const budgetId = 999; // Assuming this ID does not exist
+        const budgetUpdateData = { budgetDescription: "NonExistent", budgetAmount: 300 };
+        const errorMessage = 'Budget not found';
+
+        axios.put.mockRejectedValue({ response: { data: errorMessage } });
+
+        await expect(updateBudget(budgetId, budgetUpdateData)).rejects.toThrow(errorMessage);
+    });
+
+    // Verify failure on server error during budget update
+    it('TC_UI_011: should handle server error during budget update', async () => {
+        const budgetId = 2;
+        const budgetUpdateData = { budgetDescription: "Update Fail", budgetAmount: 400 };
+        const errorMessage = 'An error occurred while updating the budget. Please try again later.';
+
+        axios.put.mockRejectedValue(new Error(errorMessage));
+
+        await expect(updateBudget(budgetId, budgetUpdateData)).rejects.toThrow(errorMessage);
+    });
+
+    // Verify successful budget deletion
+    it('TC_UI_012: should delete a budget successfully', async () => {
+        const budgetId = 1;
+        const mockResponse = { message: "Budget deleted successfully" };
+
+        axios.delete.mockResolvedValue({ data: mockResponse });
+
+        await expect(deleteBudget(budgetId)).resolves.toEqual(mockResponse);
+    });
+
+    // Verify failure on deleting a non-existent budget
+    it('TC_UI_013: should handle error when deleting a non-existent budget', async () => {
+        const budgetId = 999; // Assuming this ID does not exist
+        const errorMessage = 'Budget not found';
+
+        axios.delete.mockRejectedValue({ response: { data: errorMessage } });
+
+        await expect(deleteBudget(budgetId)).rejects.toThrow(errorMessage);
+    });
+
+    // Verify failure on server error during budget deletion
+    it('TC_UI_014: should handle server error during budget deletion', async () => {
+        const budgetId = 2;
+        const errorMessage = 'An error occurred while deleting the budget. Please try again later.';
+
+        axios.delete.mockRejectedValue(new Error(errorMessage));
+
+        await expect(deleteBudget(budgetId)).rejects.toThrow(errorMessage);
+    });
+
+    it('TC_UI_015: should handle duplicate budget name error on update', async () => {
+        const budgetId = 2; // Assuming this ID exists
+        const budgetUpdateData = {
+            budgetDescription: "ExistingBudgetName",
+            budgetAmount: 300
+        };
+        const errorMessage = 'A budget with the name "ExistingBudgetName" already exists for this user.';
+
+        axios.put.mockRejectedValue({ response: { data: errorMessage } });
+
+        await expect(updateBudget(budgetId, budgetUpdateData)).rejects.toThrow(errorMessage);
+    });
+
+    it('TC_UI_016: should handle non-existent user error on budget update', async () => {
+        const budgetId = 3; // Assuming this ID exists
+        const errorMessage = 'User with ID 999 not found.';
+        const budgetUpdateData = {
+            budgetDescription: "SomeBudget",
+            budgetAmount: 500,
+            user: { id: 999 } // Non-existent user ID
+        };
+
+        axios.put.mockRejectedValue({ response: { data: errorMessage } });
+
+        await expect(updateBudget(budgetId, budgetUpdateData)).rejects.toThrow(errorMessage);
+    });
+
+    it('TC_UI_017: should prevent budget deletion when linked expenses exist', async () => {
+        const budgetId = 4; // Assuming this ID exists and has linked expenses
+        const errorMessage = 'Budget cannot be deleted as it has linked expenses.';
+
+        axios.delete.mockRejectedValue({ response: { data: errorMessage } });
+
+        await expect(deleteBudget(budgetId)).rejects.toThrow(errorMessage);
+    });
+
 });
+
+
+

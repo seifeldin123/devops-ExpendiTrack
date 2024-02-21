@@ -19,3 +19,21 @@ export const getBudgetsByUserId = (userId) => {
             throw new Error(error.response?.data || 'Failed to load budgets. Please refresh the page to try again.');
         });
 };
+
+// Update an existing budget
+export const updateBudget = (budgetId, budgetData) => {
+    return axios.put(`${API_URL}/${budgetId}`, budgetData)
+        .then(response => response.data)
+        .catch(error => {
+            throw new Error(error.response?.data || 'An error occurred while updating the budget. Please try again later.');
+        });
+};
+
+// Delete an existing budget
+export const deleteBudget = (budgetId) => {
+    return axios.delete(`${API_URL}/${budgetId}`)
+        .then(response => response.data)
+        .catch(error => {
+            throw new Error(error.response?.data || 'An error occurred while deleting the budget. Please try again later.');
+        });
+};

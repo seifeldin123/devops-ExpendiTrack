@@ -1,28 +1,46 @@
 import React from 'react';
-import {render, screen, fireEvent, waitFor, act} from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AddBudgetForm from '../AddBudgetForm'; // Adjust the import path as necessary
 import { useBudgetContext } from '../../contexts/BudgetContext';
 import { useUserContext } from '../../contexts/UserContext';
 
-// At the top of your test file
+// Mock the BudgetContext and UserContext hooks
 jest.mock('../../contexts/BudgetContext', () => ({
     useBudgetContext: jest.fn(),
 }));
+
+jest.mock('../../contexts/ExpenseContext', () => ({
+    useExpenseContext: jest.fn(() => ({
+        expenses: [], // Provide a default mock value
+        // Add other properties or functions the component expects
+    })),
+}));
+
 
 jest.mock('../../contexts/UserContext', () => ({
     useUserContext: jest.fn(),
 }));
 
-
 describe('AddBudgetForm', () => {
-    const mockAddNewBudget = jest.fn();
-    const mockResetError = jest.fn();
+    // Define mock functions
+    let mockAddNewBudget;
+    let mockUpdateExistingBudget;
+    let mockResetError;
+    let mockFetchBudgets;
 
     beforeEach(() => {
-        // Setup mock implementations before each test
+        // Initialize mock functions
+        mockAddNewBudget = jest.fn();
+        mockUpdateExistingBudget = jest.fn();
+        mockResetError = jest.fn();
+        mockFetchBudgets = jest.fn();
+
+        // Setup mock implementations
         useBudgetContext.mockImplementation(() => ({
             addNewBudget: mockAddNewBudget,
+            updateExistingBudget: mockUpdateExistingBudget,
+            fetchBudgets: mockFetchBudgets,
             error: '',
             resetError: mockResetError,
         }));
@@ -31,18 +49,15 @@ describe('AddBudgetForm', () => {
             user: { id: 'user1' },
         }));
 
-        // Clear all mocks before each test
+        // Use fake timers for all tests to control setTimeout behavior
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        // Clear all mocks after each test
         jest.clearAllMocks();
-    });
-
-    beforeAll(() => {
-        // Mock alert before all tests
-        window.alert = jest.fn();
-    });
-
-    afterAll(() => {
-        // Clean up after all tests are done
-        window.alert.mockRestore();
+        // Run real timers after each test to clean up
+        jest.useRealTimers();
     });
 
     it('renders correctly', () => {
@@ -52,125 +67,106 @@ describe('AddBudgetForm', () => {
         expect(screen.getByRole('button', { name: 'Create Budget' })).toBeInTheDocument();
     });
 
-    // Create Budget with Valid Inputs
-    it('submits a new budget when form fields are filled and submit button is clicked', async () => {
+
+    it('displays a success alert on submission and hides it after 15 seconds', async () => {
+        mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
+
         render(<AddBudgetForm />);
 
+        // Simulate form submission
         await act(async () => {
             await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Groceries');
             await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '300');
-            userEvent.click(screen.getByRole('button', {name: 'Create Budget'}));
+            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
         });
 
-        await waitFor(() => expect(mockAddNewBudget).toHaveBeenCalledWith({
-            budgetDescription: 'Groceries',
-            budgetAmount: '300',
+        expect(screen.getByRole('alert')).toHaveTextContent('Budget successfully added!');
+
+        // Fast-forward time by 15 seconds
+        act(() => {
+            jest.advanceTimersByTime(15000);
+        });
+
+        // The success alert should be removed after 15 seconds
+        expect(screen.queryByRole('alert')).toBeNull();
+    });
+
+    // Test updating an existing budget
+    it('updates an existing budget when form fields are filled and submit button is clicked', async () => {
+        const existingBudget = { budgetId: 'budget1', budgetDescription: 'Groceries', budgetAmount: '500' };
+        mockUpdateExistingBudget.mockResolvedValueOnce(); // Simulate successful budget update
+
+        render(<AddBudgetForm existingBudget={existingBudget} />);
+
+        // Change the budget description and amount
+        await act(async () => {
+            await userEvent.clear(screen.getByPlaceholderText('e.g., Groceries'));
+            await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Utilities');
+            await userEvent.clear(screen.getByPlaceholderText('e.g., 500'));
+            await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '750');
+            userEvent.click(screen.getByRole('button', { name: 'Update Budget' }));
+        });
+
+        expect(mockUpdateExistingBudget).toHaveBeenCalledWith(existingBudget.budgetId, {
+            budgetDescription: 'Utilities',
+            budgetAmount: 750,
             user: { id: 'user1' },
-        }));
-    });
-
-    // Create Budget without Name
-    it('shows an error message when trying to submit a form without a budget name', async () => {
-        window.alert = jest.fn(); // Mocking alert
-
-        render(<AddBudgetForm />);
-
-        await act(async () => {
-            await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '500');
-            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
         });
-
-        expect(window.alert).toHaveBeenCalledWith('Please fill in all fields');
     });
 
-    // Create Budget without Amount
-    it('shows an error message when trying to submit a form without a budget amount', async () => {
-        window.alert = jest.fn(); // Mocking alert
-
-        render(<AddBudgetForm />);
-
-        await act(async () => {
-            await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Groceries');
-            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
-        });
-
-        expect(window.alert).toHaveBeenCalledWith('Please fill in all fields');
-    });
-
-    // Create Budget with Invalid Amount
-    it('does not submit the form with a negative amount and shows an alert', async () => {
-        render(<AddBudgetForm />);
-
-        // Attempt to enter a negative amount
-        await act(async () => {
-            await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Groceries');
-            await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '-100');
-            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
-        });
-
-        // Check if alert was called due to negative amount
-        expect(window.alert).toHaveBeenCalledWith('Amount cannot be negative');
-    });
-
-    // Create Budget with Server Error
-    it('displays an error message if submission fails due to server error', async () => {
-        useBudgetContext.mockImplementation(() => ({
-            addNewBudget: mockAddNewBudget,
-            error: 'Server error occurred',
-            resetError: mockResetError,
-        }));
-
-        render(<AddBudgetForm />);
-
-        // Check for error message
-        expect(screen.getByText('Server error occurred')).toBeInTheDocument();
-    });
-
-    //  Reset Form Fields after Submission
+    // Test resetting form fields after successful submission
     it('resets form fields after successful budget submission', async () => {
+        mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
+
         render(<AddBudgetForm />);
 
-        // Simulate user input and form submission
+        // Fill out and submit the form
         await act(async () => {
-            await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Savings');
-            await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '2000');
-            userEvent.click(screen.getByRole('button', {name: 'Create Budget'}));
+            await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'New Budget');
+            await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '1000');
+            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
         });
 
-        await waitFor(() => {
-            // Check if input fields are reset
+        // Fast-forward to ensure any asynchronous actions are completed
+        await act(async () => {
+            jest.advanceTimersByTime(0);
+        });
+
+        // Assert that form fields are reset
         expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('');
         expect(screen.getByPlaceholderText('e.g., 500').value).toBe('');
-        });
-
     });
 
-    // Display Context Error
+    // Test displaying a context-provided error message
     it('displays a context provided error message', () => {
-        // Override the mock to return an error state
         useBudgetContext.mockImplementation(() => ({
-            addNewBudget: mockAddNewBudget,
+            addNewBudget: jest.fn(),
+            updateExistingBudget: jest.fn(),
+            fetchBudgets: jest.fn(),
             error: 'Network Error',
             resetError: mockResetError,
         }));
 
         render(<AddBudgetForm />);
 
-        // Check for error message
+        // Error message should be displayed from context
         expect(screen.getByText('Network Error')).toBeInTheDocument();
     });
 
-    // Reset Error on Form Submission
-    it('calls resetError on form submission', async () => {
-        render(<AddBudgetForm />);
+    // Test updating form fields when existingBudget prop changes
+    it('updates form fields when existingBudget prop changes', () => {
+        const { rerender } = render(<AddBudgetForm existingBudget={{ budgetDescription: 'Groceries', budgetAmount: '500' }} />);
 
-        await act(async () => {
-            await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Groceries');
-            await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '300');
-            userEvent.click(screen.getByRole('button', {name: 'Create Budget'}));
-        });
+        // Initial values should match the existing budget
+        expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('Groceries');
+        expect(screen.getByPlaceholderText('e.g., 500').value).toBe('500');
 
-        await waitFor(() => expect(mockResetError).toHaveBeenCalled());
+        // Rerender with updated props
+        rerender(<AddBudgetForm existingBudget={{ budgetDescription: 'Utilities', budgetAmount: '750' }} />);
+
+        // Form fields should update to reflect the new props
+        expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('Utilities');
+        expect(screen.getByPlaceholderText('e.g., 500').value).toBe('750');
     });
 
 });

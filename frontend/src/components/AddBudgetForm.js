@@ -1,95 +1,175 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBudgetContext } from '../contexts/BudgetContext';
 import { useUserContext } from '../contexts/UserContext';
+import {calculateTotalSpent, formatCurrency} from "../helpers/HelperFunctions";
+import { useExpenseContext } from '../contexts/ExpenseContext';
+import BasicModal from "./Modal";
 
-const AddBudgetForm = () => {
+
+const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetDescription, setBudgetDescription] = useState('');
     const [budgetAmount, setBudgetAmount] = useState('');
-    const { addNewBudget, fetchBudgets, error, resetError } = useBudgetContext(); // Use error from context
-    const { user } = useUserContext(); // Get the current user
+    const { addNewBudget, updateExistingBudget, fetchBudgets, error, resetError } = useBudgetContext();
+    const { user } = useUserContext();
+    const { expenses } = useExpenseContext() || { expenses: [] }; // Fallback to default if context is undefined
+
+    const [showWarningModal, setShowWarningModal] = useState(false);
+
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+
+    // Populate form when existingBudget is provided
+    useEffect(() => {
+        if (existingBudget) {
+            setBudgetDescription(existingBudget.budgetDescription);
+            setBudgetAmount(existingBudget.budgetAmount);
+        }
+    }, [existingBudget, onClose]);
+
+    const handleWarningClose = async (proceed) => {
+        setShowWarningModal(false);
+        if (proceed) {
+            await submitBudget();
+        }
+    };
+
+    const submitBudget = async () => {
+        const budgetData = { budgetDescription, budgetAmount: parseFloat(budgetAmount), user: { id: user.id } };
+        try {
+            if (existingBudget) {
+                await updateExistingBudget(existingBudget.budgetId, budgetData);
+            } else {
+                await addNewBudget(budgetData);
+            }
+            setShowSuccessAlert(true);
+            setTimeout(() => setShowSuccessAlert(false), 5000); // Adjust duration as needed
+            fetchBudgets(user.id); // Refresh budget list
+            setBudgetDescription('');
+            setBudgetAmount('');
+        } catch (serverError) {
+            setShowSuccessAlert(false);
+            error(serverError.message);
+            resetError();
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        resetError(); // Reset any previous error from context
-        if (!budgetDescription || !budgetAmount) {
-            // Use local setError for form validation errors
-            alert('Please fill in all fields');
+        resetError();
+
+        if (!budgetDescription || isNaN(parseFloat(budgetAmount))) {
+            alert("Please fill in all fields.");
             return;
         }
 
-        // check for negatives
-        if (parseInt(budgetAmount, 10) < 0) {
-            alert('Amount cannot be negative');
-            return;
+        if (existingBudget) {
+            const totalSpent = calculateTotalSpent(expenses, existingBudget.budgetId);
+            if (parseFloat(budgetAmount) < totalSpent) {
+                setShowWarningModal(true);
+                return;
+            }
         }
 
-        try {
-            await addNewBudget({ budgetDescription, budgetAmount, user: { id: user.id } });
-            setBudgetDescription('');
-            setBudgetAmount('');
-            fetchBudgets(user.id);
-            // No need to reset error here since successful submission will not set an error
-        } catch (serverError){}
+        await submitBudget();
     };
 
     return (
         <div className="dashboard-budget-form ">
-
             <form onSubmit={handleSubmit}>
-                {error && <div style={{color: 'red'}}>{error}</div>}
-
-                <section className="panel panel-info">
-
+                <section className="panel panel-primary">
                     <header className="panel-heading">
-                        <h2 className="panel-title">Create Budget</h2>
+                        <h2 className="panel-title">{existingBudget ? 'Edit Budget' : 'Create Budget'}</h2>
                     </header>
-
                     <div className="form-section-container">
-
                         <div className="form-group mrgn-tp-sm">
-                            <div className="mrgn-tp-md">
-                                <label htmlFor="budget-description" className="control-label">Budget Name </label>
-                            </div>
-                            <div>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={budgetDescription}
-                                    onChange={(e) => setBudgetDescription(e.target.value)}
-                                    placeholder="e.g., Groceries"
-                                    id="budget-description"
-                                    required="required"
-                                />
-                            </div>
-                        </div>
 
+                            <label htmlFor="budget-description">
+                                <span className="field-name">Budget Name</span> <strong
+                                className="required">(required)</strong>
+                            </label>
+
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={budgetDescription}
+                                onChange={(e) => setBudgetDescription(e.target.value)}
+                                placeholder="e.g., Groceries"
+                                id="budget-description"
+                                data-testid="budget-description-input"
+                                required
+                            />
+                        </div>
                         <div className="form-group">
-                            <div>
-                                <label htmlFor="budget-amount" className="control-label">Amount</label>
-                            </div>
-                            <div>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    value={budgetAmount}
-                                    onChange={(e) => setBudgetAmount(e.target.value)}
-                                    placeholder="e.g., 500"
-                                    id="budget-amount"
-                                    required="required"
-                                />
-                            </div>
-                        </div>
 
-                        <div className="mrgn-bttm-md">
-                            <button type="submit" className="btn-lg btn-primary">
-                                Create Budget <span className="glyphicon glyphicon-usd"></span>
-                            </button>
+                            <label htmlFor="budget-amount">
+                                <span className="field-name">Amount</span> <strong
+                                className="required">(required)</strong>
+                            </label>
+
+                            <input
+                                type="number"
+                                className="form-control"
+                                value={budgetAmount}
+                                onChange={(e) => setBudgetAmount(e.target.value)}
+                                placeholder="e.g., 500"
+                                id="budget-amount"
+                                data-testid="budget-amount-input"
+                                required
+                            />
                         </div>
+                        {existingBudget ? (
+                            <button type="submit" className="btn-lg btn-success">
+                                <span className="glyphicon glyphicon-floppy-save"></span>
+                                &nbsp; Update Budget
+                            </button>
+                        ) : (
+                            <div className="mrgn-bttm-md">
+                                <button type="submit" className="btn-lg btn-default">
+                                    <span className="glyphicon glyphicon-plus"></span>
+                                    &nbsp;Create Budget
+                                </button>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="alert alert-danger" role="alert">
+                                <h4>The form could not be submitted because these errors were found:</h4>
+                                <ul>
+                                    <li>{error}</li>
+                                </ul>
+                            </div>
+                        )}
+                        {
+                            showSuccessAlert && !error && (
+                                <div className="alert alert-success" role="alert">
+                                    <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={() => setShowSuccessAlert(false)}>
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <p>Budget successfully {existingBudget ? 'updated' : 'added'}! </p>
+                                </div>
+                            )
+                        }
+
+                        <BasicModal
+                            show={showWarningModal}
+                            handleClose={() => handleWarningClose(false)}
+                            title="Warning"
+                        >
+                            <p><strong>{`Updating this budget to ${formatCurrency(parseFloat(budgetAmount))} is less than the total expenses of ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. Do you want to proceed?`}</strong></p>
+                            <div>
+                                <button onClick={() => handleWarningClose(true)} className="btn btn-danger mrgn-rght-lg">Proceed
+                                </button>
+                                <button onClick={() => handleWarningClose(false)} className="btn btn-default">Cancel
+                                </button>
+                            </div>
+
+                        </BasicModal>
+
                     </div>
                 </section>
             </form>
         </div>
-);
+    );
 };
 
 export default AddBudgetForm;

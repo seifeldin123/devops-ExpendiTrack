@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { getBudgetsByUserId, createBudget } from '../services/BudgetService';
+import {getBudgetsByUserId, createBudget, deleteBudget, updateBudget} from '../services/BudgetService';
 import { useUserContext } from "./UserContext";
 
 export const BudgetContext = createContext();
@@ -15,16 +15,14 @@ export const BudgetProvider = ({ children }) => {
     const fetchBudgets = useCallback(async (userId) => {
         try {
             const response = await getBudgetsByUserId(userId);
-            console.log("fetch budgets", response);
             if (Array.isArray(response)) {
                 setBudgets(response);
             } else {
-                console.error('Expected an array but got:', typeof response);
                 setError('Failed to fetch budgets correctly');
             }
         } catch (error) {
-            console.error('Failed to load budgets:', error);
-            setError('Failed to fetch budgets');
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
         }
     }, []);
 
@@ -42,23 +40,57 @@ export const BudgetProvider = ({ children }) => {
                 userId: userId,
             });
             setBudgets(prevBudgets => [...prevBudgets, response]);
-            console.log("added budgets" + response);
+            setError('');
+
+        } catch (error) {
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
+        }
+
+    }, [userId]); // Corrected dependency
+
+    const updateExistingBudget = useCallback(async (budgetId, budgetData) => {
+        if (!budgetId) {
+            // console.error('budgetId is undefined');
+            setError('Failed to update budget: Missing budget ID');
+            return;
+        }
+        try {
+            const updatedBudget = await updateBudget(budgetId, budgetData);
+            setBudgets((prevBudgets) =>
+                prevBudgets.map((budget) => budget.budgetId === budgetId ? { ...budget, ...updatedBudget } : budget)
+            );
             setError('');
         } catch (error) {
-            console.error('Error adding budget:', error);
-            setError('Failed to add budget');
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
         }
-    }, [userId]); // Corrected dependency
+    }, [setBudgets, setError]);
+
+    const removeBudget = useCallback(async (budgetId) => {
+        try {
+            await deleteBudget(budgetId);
+            setBudgets(prevBudgets => prevBudgets.filter(budget => budget.budgetId !== budgetId));
+            setError('');
+        } catch (error) {
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
+        }
+    }, [setBudgets, setError]);
+
+
 
     const resetError = useCallback(() => setError(''), []);
 
     const providerValue = useMemo(() => ({
         budgets,
         addNewBudget,
+        updateExistingBudget,
+        removeBudget,
         fetchBudgets,
         error,
         resetError,
-    }), [budgets, addNewBudget, fetchBudgets, error, resetError]); // Corrected dependencies
+    }), [budgets, addNewBudget, updateExistingBudget, removeBudget, fetchBudgets, error, resetError]);
 
     return (
         <BudgetContext.Provider value={providerValue}>

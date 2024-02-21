@@ -30,9 +30,10 @@ const Dashboard = () => {
                 {Array.isArray(budgets) && budgets.length > 0 && <AddExpenseForm budgets={budgets}/>}
             </div>
 
-            <div className="container mt-4">
+            <div>
                 <BudgetList budgets={budgets}/>
-                <ExpenseList expenses={expenses}/>
+                <ExpenseList expenses={expenses} budgets={budgets} />
+
             </div>
         </div>
     );

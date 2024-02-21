@@ -1,15 +1,29 @@
 import React from 'react';
-import { render, act, waitFor } from '@testing-library/react';
+import {
+    render,
+    act,
+    waitFor,
+    screen, getByTestId,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useUserContext } from '../UserContext';
 import { BudgetProvider, useBudgetContext } from '../BudgetContext';
 import * as BudgetService from '../../services/BudgetService';
+import BudgetList from "../../components/BudgetList";
+import {BrowserRouter} from "react-router-dom";
 
-// Mock the UserContext and BudgetService for integration testing
-jest.mock('../UserContext', () => ({
-    useUserContext: jest.fn(),
+jest.mock('../../contexts/UserContext', () => ({
+    useUserContext: () => ({ user: { id: 1, name: 'Test User' } }),
 }));
+
 jest.mock('../../services/BudgetService');
+
+jest.mock('../../contexts/ExpenseContext', () => ({
+    useExpenseContext: () => ({
+        expenses: [], // Provide a default value for expenses
+        // Add any other functions or properties that are used from the context
+    }),
+}));
+
 
 describe('BudgetContext Integration Tests', () => {
 
@@ -24,16 +38,20 @@ describe('BudgetContext Integration Tests', () => {
     const newBudget = { id: 3, budgetDescription: 'Entertainment', budgetAmount: 250 };
 
     beforeEach(() => {
-        // Mock the return value of useUserContext to always return the test user
-        useUserContext.mockReturnValue({ user });
-        BudgetService.getBudgetsByUserId.mockReset();
-        BudgetService.createBudget.mockReset();
-        originalConsoleError = console.error;
-        console.error = jest.fn(); // Mock console.error
+        // Mock the service calls with default implementations
+        BudgetService.getBudgetsByUserId.mockResolvedValue(initialBudgets);
+        BudgetService.createBudget.mockImplementation((newBudget) =>
+            Promise.resolve({ ...newBudget, id: Math.random() }) // Simulate adding an ID to the new budget
+        );
+        BudgetService.updateBudget.mockImplementation((id, updatedBudget) =>
+            Promise.resolve({ ...updatedBudget, id }) // Return the updated budget with its ID
+        );
+        BudgetService.deleteBudget.mockResolvedValue({}); // Simulate successful deletion
     });
 
     afterEach(() => {
-        console.error = originalConsoleError; // Restore original console.error
+        // Reset mocks after each test
+        jest.resetAllMocks();
     });
 
     it('fetches and updates budgets when the user changes', async () => {
@@ -121,6 +139,98 @@ describe('BudgetContext Integration Tests', () => {
         await waitFor(() => {
             expect(testError).toEqual(errorMessage);
         });
+    })
+
+    it('updates an existing budget correctly', async () => {
+        // Initial mock budgets to be fetched
+        const initialBudgets = [
+            { budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
+        ];
+
+        // Mock the updated budget
+        const updatedBudget = {
+            budgetDescription: 'Updated Groceries',
+            budgetAmount: 350,
+            user: {
+                id: 1
+            } };
+
+        // Mock the API calls
+        BudgetService.getBudgetsByUserId.mockResolvedValue(initialBudgets);
+        BudgetService.updateBudget.mockResolvedValue(updatedBudget);
+
+        // Render the BudgetList (and indirectly, BudgetItem components) inside the BudgetProvider
+        const { getByText, getByLabelText, queryByText } = render(
+            <BrowserRouter>
+                <BudgetProvider>
+                    <BudgetList budgets={initialBudgets}  />
+                </BudgetProvider>
+            </BrowserRouter>
+        );
+
+        // Wait for the budgets to be fetched and displayed
+        await waitFor(() => expect(getByText('Budget Name: ' + 'Groceries')).toBeInTheDocument());
+
+        // Simulate clicking the edit button for the first budget item
+        userEvent.click(getByText('Edit Budget'));
+
+        // Wait for the modal to open and the form to be populated
+        await waitFor(() => expect(getByText('Budget Name: ' + 'Groceries')));
+
+        // Update the budget amount in the form
+        userEvent.type(screen.getByTestId('budget-amount-input'), "350");
+        userEvent.type(screen.getByTestId('budget-description-input'), 'Updated Groceries');
+
+        // Submit the updated budget
+        userEvent.click(getByText('Update Budget'));
+
+        // Expect the updateBudget API to have been called with the updated budget data
+        expect(BudgetService.updateBudget).toHaveBeenCalledWith(1, updatedBudget);
+
+
+        // Optionally, wait for the success message to appear
+        await waitFor(() => expect(queryByText('Budget successfully updated!')).toBeInTheDocument());
     });
 
+    it('deletes an existing budget and updates the context', async () => {
+        const initialBudgets = [
+            { id: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
+            { id: 2, budgetDescription: 'Utilities', budgetAmount: 150 },
+        ];
+        BudgetService.getBudgetsByUserId.mockResolvedValue(initialBudgets);
+
+        const budgetIdToDelete = 2;
+
+        const TestComponent = () => {
+            const { removeBudget, budgets } = useBudgetContext();
+            return (
+                <>
+                    {budgets.map((budget) => (
+                        <div key={budget.id}>{budget.budgetDescription}</div>
+                    ))}
+                    <button onClick={() => removeBudget(budgetIdToDelete)}>Delete Budget</button>
+                </>
+            );
+        };
+
+        await act(async () => {
+            render(
+                <BudgetProvider>
+                    <TestComponent />
+                </BudgetProvider>
+            );
+        });
+
+        // Simulate deleting a budget
+        await act(async () => {
+            userEvent.click(screen.getByText('Delete Budget'));
+        });
+
+        expect(BudgetService.deleteBudget).toHaveBeenCalledWith(budgetIdToDelete);
+
+        await waitFor(() => {
+            const deletedBudgetText = screen.queryByText('Utilities: 150');
+            expect(deletedBudgetText).not.toBeInTheDocument();
+        });
+    });
 });
