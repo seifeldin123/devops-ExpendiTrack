@@ -5,6 +5,7 @@ import BudgetTracker.Tracker.exceptions.*;
 import BudgetTracker.Tracker.service.ExpensesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,12 +36,16 @@ public class ExpensesController {
      * bad request status if the expense name is duplicate or if input is invalid.
      */
     @PostMapping
-    @Operation(summary = "Create a new expense", responses = {
-            @ApiResponse(description = "Expense Created successfully", responseCode = "201",
-                    content = @Content(schema = @Schema(implementation = Expenses.class))),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = String.class)))
-    })
+    @Operation(summary = "Create a new expense",
+            description = "Create a new expense with provided Expense description, Expense Amount, Budget Id and User Id",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Expense Created successfully",
+                            content = @Content(schema = @Schema(implementation = Expenses.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad Request due to invalid input or duplicate expense name",
+                            content = @Content(schema = @Schema(implementation = String.class))),
+                    @ApiResponse(responseCode = "404", description = "Budget not found for the expense",
+                            content = @Content(schema = @Schema(implementation = String.class)))
+            })
     public ResponseEntity<?> createExpense(@RequestBody Expenses expense) {
         try {
             Expenses createdExpense = expenseService.createExpense(expense);
@@ -58,7 +63,8 @@ public class ExpensesController {
      * @return List of all expenses.
      */
     @GetMapping
-    @Operation(summary = "Get All expenses", responses = {
+    @Operation(summary = "Get All expenses", description = "Get All Expenses",
+            responses = {
             @ApiResponse(description = "Expenses found", responseCode = "200"),
             @ApiResponse(description = "Expenses not found", responseCode = "200")
     })
@@ -73,11 +79,11 @@ public class ExpensesController {
      * @return The expense corresponding to the provided ID.
      */
     @GetMapping("/{id}")
-    @Operation(summary = "Get Expense By Id", responses = {
+    @Operation(summary = "Get Expense by Id", description = "Provide Expense id to get information",responses = {
             @ApiResponse(description = "Expense found", responseCode = "200"),
             @ApiResponse(description = "Expense not found", responseCode = "200")
     })
-    public Expenses getExpenseById(@PathVariable Long id) {
+    public Expenses getExpenseById(@Parameter(name="id", description = "Provide Expense id", example="1")@PathVariable Long id) {
 
         return expenseService.getExpenseById(id);
     }
@@ -105,7 +111,7 @@ public class ExpensesController {
                     @ApiResponse(responseCode = "404", description = "Expense not found"),
                     @ApiResponse(responseCode = "400", description = "Invalid input")
             })
-    public ResponseEntity<?> updateExpense(@PathVariable Long id, @RequestBody Expenses expenseDetails) {
+    public ResponseEntity<?> updateExpense(@Parameter(name="id", description = "Provide Expense id to update the expense", example="1")@PathVariable Long id, @RequestBody Expenses expenseDetails) {
         try {
             Expenses updatedExpense = expenseService.updateExpense(id, expenseDetails);
             // Return the updated expense with expensesId field in the response
@@ -139,7 +145,7 @@ public class ExpensesController {
                     @ApiResponse(responseCode = "200", description = "Expense deleted successfully"),
                     @ApiResponse(responseCode = "404", description = "Expense not found")
             })
-    public ResponseEntity<?> deleteExpense(@PathVariable Long id) {
+    public ResponseEntity<?> deleteExpense(@Parameter(name="id", description = "Provide expense id to delete the expense", example = "1")@PathVariable Long id) {
         try {
             expenseService.deleteExpense(id);
             return ResponseEntity.ok().body("Expense with ID " + id + " deleted successfully");
@@ -159,11 +165,15 @@ public class ExpensesController {
      * @return List of expenses belonging to the specified user.
      */
     @GetMapping("/user/{userId}")
-    @Operation(summary = "Get Expenses By User", responses = {
-            @ApiResponse(description = "Expenses found", responseCode = "200"),
-            @ApiResponse(description = "Expenses not found", responseCode = "200")
-    })
-    public List<Expenses> getExpensesByUserId(@PathVariable Long userId) {
+    @Operation(summary = "Get Expenses By User",
+            description = "Provide an user Id to find the user Expenses",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Expenses retrieved successfully. Returns an empty list if no expenses are found.",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Expenses.class)))),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content)
+            })
+    public List<Expenses> getExpensesByUserId(@Parameter(name="userId", description = "Provide User Id", example = "1")@PathVariable Long userId) {
         return expenseService.getExpensesByUserId(userId);
     }
 
