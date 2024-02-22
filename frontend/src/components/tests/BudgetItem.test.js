@@ -80,7 +80,6 @@ describe('BudgetItem', () => {
         expect(screen.getByText(`Budgeted Amount: $${mockBudget.budgetAmount}.00`)).toBeInTheDocument();
         expect(screen.getByText(`Spent: $5.00`)).toBeInTheDocument();
         expect(screen.getByText(/Remaining:/)).toBeInTheDocument();
-        expect(screen.getByText('1.00%')).toBeInTheDocument(); // Assuming the percentSpent calculation is correct
         expect(screen.getByRole('link')).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
     });
 
@@ -90,7 +89,6 @@ describe('BudgetItem', () => {
         renderWithProviders(<BudgetItem budget={mockBudget} />, { expenses: overspentExpenses });
 
         expect(screen.getByText('Overspent: $100.00')).toBeInTheDocument();
-        expect(screen.getByText('100.00%')).toBeInTheDocument(); // Corrected to 100.00%
         expect(screen.getByText('Overspent: $100.00').className).toContain('text-danger');
     });
 
@@ -100,7 +98,6 @@ describe('BudgetItem', () => {
         renderWithProviders(<BudgetItem budget={mockBudget} />); // Using mockExpenses which are less than budget
 
         expect(screen.getByText(/Remaining: \$495.00/)).toBeInTheDocument();
-        expect(screen.getByText('1.00%')).toBeInTheDocument(); // Assuming correct percentage calculation
         expect(screen.getByText(/Remaining: \$495.00/).className).toContain('text-success');
     });
 
@@ -110,7 +107,6 @@ describe('BudgetItem', () => {
 
         const progressBar = screen.getByRole('progressbar');
         expect(progressBar).toHaveStyle('width: 1%');
-        expect(progressBar.textContent).toEqual('1.00%');
     });
 
     // Navigate to Budget Details

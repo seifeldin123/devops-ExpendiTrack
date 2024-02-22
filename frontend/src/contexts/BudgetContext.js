@@ -51,7 +51,6 @@ export const BudgetProvider = ({ children }) => {
 
     const updateExistingBudget = useCallback(async (budgetId, budgetData) => {
         if (!budgetId) {
-            // console.error('budgetId is undefined');
             setError('Failed to update budget: Missing budget ID');
             return;
         }

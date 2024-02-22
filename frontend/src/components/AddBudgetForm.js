@@ -11,11 +11,20 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetAmount, setBudgetAmount] = useState('');
     const { addNewBudget, updateExistingBudget, fetchBudgets, error, resetError } = useBudgetContext();
     const { user } = useUserContext();
-    const { expenses } = useExpenseContext() || { expenses: [] }; // Fallback to default if context is undefined
+    const { expenses, fetchExpenses } = useExpenseContext() || { expenses: [] }; // Fallback to default if context is undefined
 
     const [showWarningModal, setShowWarningModal] = useState(false);
 
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+    // Adjusted to include resetError call on close
+    const enhancedOnClose = () => {
+        error("");
+        resetError(); // Clear any existing errors
+        if (typeof onClose === 'function') {
+            onClose(); // Call the original onClose prop if it's a function
+        }
+    };
 
 
     // Populate form when existingBudget is provided
@@ -28,30 +37,38 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
     const handleWarningClose = async (proceed) => {
         setShowWarningModal(false);
+        resetError(); // Also reset errors when closing the warning modal
         if (proceed) {
             await submitBudget();
         }
     };
 
     const submitBudget = async () => {
+        resetError();
         const budgetData = { budgetDescription, budgetAmount: parseFloat(budgetAmount), user: { id: user.id } };
         try {
             if (existingBudget) {
                 await updateExistingBudget(existingBudget.budgetId, budgetData);
+
+                await fetchBudgets(user.id); // Refresh the budget list
+
+                await fetchExpenses(user.id); // Refresh expenses to reflect any changes from the budget update
+                setShowSuccessAlert(true);
+                setTimeout(() => setShowSuccessAlert(false), 5000); // Show success message
             } else {
                 await addNewBudget(budgetData);
+                await fetchBudgets(user.id); // Refresh the budget list for new additions
+                setBudgetDescription('');
+                setBudgetAmount('');
+                setShowSuccessAlert(true);
+                setTimeout(() => setShowSuccessAlert(false), 5000); // Show success message for new budget
             }
-            setShowSuccessAlert(true);
-            setTimeout(() => setShowSuccessAlert(false), 5000); // Adjust duration as needed
-            fetchBudgets(user.id); // Refresh budget list
-            setBudgetDescription('');
-            setBudgetAmount('');
         } catch (serverError) {
-            setShowSuccessAlert(false);
             error(serverError.message);
             resetError();
         }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -152,7 +169,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
                         <BasicModal
                             show={showWarningModal}
-                            handleClose={() => handleWarningClose(false)}
+                            handleClose={enhancedOnClose}
                             title="Warning"
                         >
                             <p><strong>{`Updating this budget to ${formatCurrency(parseFloat(budgetAmount))} is less than the total expenses of ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. Do you want to proceed?`}</strong></p>

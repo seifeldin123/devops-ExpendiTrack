@@ -94,11 +94,6 @@
     padding: 0;
 }
 
-.custom-card-border:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
 /* Alerts styles start */
 
 .required {
@@ -160,23 +155,28 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
-    background-color: #cbcbcb;
+    /*background-color: #cbcbcb;*/
     width: 100%;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    background-color: #2e5274;
+    color: #fff;
 }
 
 
 /* Style for the close button */
 .close-button-custom {
-    color: #333;
+    color: #fff;
     opacity: 1;
     position: absolute;
     top: 15px;
     right: 15px;
+    margin-right: 10px;
 }
 
-/* Adjusting modal dialog for dynamic width and centering */
+/*.close-button-custom*/
+
+    /* Adjusting modal dialog for dynamic width and centering */
 .modal-dialog-custom {
     /* Ensures modal dialog adjusts to content up to this maximum */
     max-width: 600px;
@@ -219,3 +219,81 @@
 }
 
 /* Action buttons end*/
+
+/* Card Design Refinement */
+.custom-card-border {
+    border: 1px solid #e2e6ea;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0.5, 0.07);
+    margin: 10px;
+    transition: all 0.3s ease;
+}
+
+.custom-card-border:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Enhanced Card Title Styles */
+.card-title {
+    color: #31708f;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Button Redesign */
+.action-buttons .btn {
+    margin-top: 10px;
+    margin-right: 5px; /* Space between buttons */
+}
+
+.action-buttons .btn i {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+/* If using FontAwesome */
+.action-buttons .btn .fa-edit {
+    margin-right: 5px;
+}
+
+.action-buttons .btn .fa-trash {
+    margin-right: 5px;
+}
+
+/* Progress Bar Enhancement */
+@keyframes progress-bar-stripes {
+    from { background-position: 3rem 0; } /* Adjusted for even wider stripes */
+    to { background-position: 0 0; }
+}
+
+.progress {
+    height: 2rem; /* Maintaining wider bars */
+    background-color: #e9ecef;
+    border-radius: 0.25rem;
+}
+
+.progress-bar {
+    height: 100%;
+    color: white;
+    text-align: center;
+    /* Increased contrast in the stripe color and made stripes wider */
+    background-image: linear-gradient(45deg, rgba(255,255,255,.3) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.3) 50%, rgba(255,255,255,.3) 75%, transparent 75%, transparent);
+    background-size: 3rem 3rem; /* Significantly wider stripes */
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+.bg-success { background-color: #28a745 !important; } /* Green */
+.bg-warning { background-color: #ffc107 !important; } /* Orange/Yellow */
+.bg-danger { background-color: #dc3545 !important; } /* Red */
+
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 0.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,.3);
+}

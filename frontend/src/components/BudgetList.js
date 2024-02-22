@@ -4,7 +4,7 @@ import BudgetItem from './BudgetItem';
 const BudgetList = React.memo(({ budgets, onEditBudget }) => {
     if (!Array.isArray(budgets) || budgets.length === 0) {
         return (
-            <div className="container mt-4">
+            <div >
                 <section className="panel panel-info">
                     <header className="panel-heading">
                         <h5 className="panel-title text-center">Budgets</h5>
@@ -18,7 +18,7 @@ const BudgetList = React.memo(({ budgets, onEditBudget }) => {
     }
 
     return (
-        <div className="container mt-4">
+        <div >
             <section className="panel panel-info">
                 <header className="panel-heading">
                     <h5 className="panel-title">Budgets</h5>

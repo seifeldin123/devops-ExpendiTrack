@@ -1,6 +1,7 @@
 import React from 'react';
 
 const BasicModal = ({ show, handleClose, children, title }) => {
+
     if (!show) {
         return null;
     }

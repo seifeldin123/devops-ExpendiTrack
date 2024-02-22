@@ -7,28 +7,60 @@ import BasicModal from './Modal';
 import AddBudgetForm from './AddBudgetForm';
 import { useBudgetContext } from "../contexts/BudgetContext";
 
+
 const BudgetItem = ({ budget }) => {
     const { user } = useUserContext();
     const { expenses } = useExpenseContext();
-    const { removeBudget, fetchBudgets } = useBudgetContext();
+    const { removeBudget, fetchBudgets, error, resetError } = useBudgetContext();
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [showDeleteWarning, setShowDeleteWarning] = useState(false); // Added state for delete warning modal
-
-    // Check if the budget has associated expenses
-    const hasExpenses = expenses.some(expense => expense.budgetId === budget.budgetId);
 
     // No need to keep track of totalSpent, remaining, and percentSpent in state if they're derived directly from props and context
     const totalSpent = calculateTotalSpent(expenses, budget.budgetId);
     const remaining = budget.budgetAmount - totalSpent;
     const percentSpent = Math.min((totalSpent / budget.budgetAmount) * 100, 100);
 
+    const ProgressBar = ({ percentSpent }) => {
+        let progressBarClass = "progress-bar progress-bar-striped progress-bar-animated";
+
+        if (percentSpent <= 50) {
+            progressBarClass += " bg-success";
+        } else if (percentSpent <= 75) {
+            progressBarClass += " bg-warning";
+        } else {
+            progressBarClass += " bg-danger";
+        }
+
+        return (
+            <div className="progress mb-3">
+                <div
+                    className={progressBarClass}
+                    role="progressbar"
+                    style={{width: `${percentSpent}%`}}
+                    aria-valuenow={percentSpent}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                ></div>
+            </div>
+        );
+    };
+
+    const handleCloseModal = () => {
+        resetError(); // Assuming resetError is accessible here, either directly or passed down as a prop
+        setShowEditModal(false);
+        setShowDeleteConfirmation(false);
+        setShowDeleteWarning(false);
+    };
+
     const handleEditClick = () => {
+        resetError(); // Assuming resetError() is available and resets the global error state
         setShowEditModal(true);
     };
 
     const handleDeleteClick = () => {
+        resetError();
         // Perform the check for associated expenses directly within this handler
         const linkedExpenses = expenses.some(exp => String(exp.budget.budgetId) === String(budget.budgetId));
 
@@ -40,13 +72,14 @@ const BudgetItem = ({ budget }) => {
     };
 
     const handleDeleteConfirmation = async () => {
+        resetError();
         try {
             await removeBudget(budget.budgetId);
             fetchBudgets(user.id);
             setShowDeleteConfirmation(false);
-        } catch (error) {
-            console.error("Error deleting budget:", error);
-            // Optionally handle error (e.g., show an error message)
+        } catch (serverError) {
+            error(serverError);
+            resetError();
         }
     }
 
@@ -55,39 +88,39 @@ const BudgetItem = ({ budget }) => {
             <div className="card h-100 shadow-sm custom-card-border">
                 <div className="card-body">
                     <h5 className="card-title"><strong>Budget Name: {budget.budgetDescription}</strong></h5>
-                    <p className="card-text"><strong>Budgeted Amount: {formatCurrency(budget.budgetAmount)}</strong></p>
+                    <p className="card-text"><strong>Budgeted
+                        Amount: {formatCurrency(budget.budgetAmount)}</strong></p>
                     <p className="card-text"><strong>Spent: {formatCurrency(totalSpent)}</strong></p>
                     <p className={`card-text`}>
-                        <strong className={`${remaining < 0 ? 'text-danger' : 'text-success'}`}>{remaining < 0 ? `Overspent: ${formatCurrency(-remaining)}` : `Remaining: ${formatCurrency(remaining)}`}</strong>
+                        <strong
+                            className={`${remaining < 0 ? 'text-danger' : 'text-success'}`}>{remaining < 0 ? `Overspent: ${formatCurrency(-remaining)}` : `Remaining: ${formatCurrency(remaining)}`}</strong>
                     </p>
-                    <div className="progress mb-3">
-                        <div role="progressbar"  className={`progress-bar ${remaining < 0 ? 'bg-danger' : 'bg-success'}`}
-                             style={{width: `${percentSpent}%`}} aria-valuenow={percentSpent} aria-valuemin="0"
-                             aria-valuemax="100">
-                            {percentSpent.toFixed(2)}%
-                        </div>
-                    </div>
+
+                    <ProgressBar percentSpent={percentSpent} />
+
                     <div>
                         <Link to={`/budgets/user/${user.id}`} className="card-link">View Details</Link>
                     </div>
                     {/* Edit and Delete Buttons */}
                     <div className="action-buttons mrgn-tp-md">
                         <button onClick={handleEditClick} className="btn btn-default">
-                            Edit Budget
+                            <span className="glyphicon glyphicon-edit"></span>
+                            &nbsp; Edit Budget
                         </button>
-                        <button onClick={handleDeleteClick} className="btn btn-warning">
-                            Delete Budget
+                        <button onClick={handleDeleteClick} className="btn btn-danger">
+                            <span className="glyphicon glyphicon-trash"></span>
+                            &nbsp; Delete Budget
                         </button>
                     </div>
                 </div>
             </div>
             {/* Edit Modal */}
-            {showEditModal && <BasicModal show={showEditModal} handleClose={() => setShowEditModal(false)} title="Edit Budget">
-                <AddBudgetForm existingBudget={budget} onClose={() => setShowEditModal(false)} />
+            {showEditModal && <BasicModal show={showEditModal} handleClose={handleCloseModal} title="Edit Budget">
+                <AddBudgetForm existingBudget={budget} onClose={() => setShowEditModal(false)}/>
             </BasicModal>}
 
             {/* Delete confirmation Modal */}
-            {showDeleteConfirmation && <BasicModal show={showDeleteConfirmation} handleClose={() => setShowDeleteConfirmation(false)} title="Confirm Deletion">
+            {showDeleteConfirmation && <BasicModal show={showDeleteConfirmation} handleClose={handleCloseModal}  title="Confirm Deletion">
                 <div className="text-center">
                     <h5>Are you sure you want to delete this budget?</h5>
                     <div className="action-buttons mrgn-tp-md">
@@ -101,9 +134,9 @@ const BudgetItem = ({ budget }) => {
             </BasicModal>}
 
             {/* Delete Warning Modal */}
-            {showDeleteWarning && <BasicModal show={showDeleteWarning} handleClose={() => setShowDeleteWarning(false)} title="Cannot Delete Budget">
+            {showDeleteWarning && <BasicModal show={showDeleteWarning} handleClose={handleCloseModal} title="Cannot Delete Budget">
                 <div className="text-center">
-                    <p><strong>This budget cannot be deleted because it has associated expenses. Please remove or reassign these expenses before attempting to delete the budget.</strong></p>
+                    <p><strong>This budget cannot be deleted because it has associated expenses. Please remove these expenses before attempting to delete the budget.</strong></p>
                 </div>
             </BasicModal>}
         </div>

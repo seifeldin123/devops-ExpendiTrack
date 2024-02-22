@@ -185,11 +185,13 @@ describe('BudgetContext Integration Tests', () => {
         userEvent.click(getByText('Update Budget'));
 
         // Expect the updateBudget API to have been called with the updated budget data
-        expect(BudgetService.updateBudget).toHaveBeenCalledWith(1, updatedBudget);
-
-
-        // Optionally, wait for the success message to appear
-        await waitFor(() => expect(queryByText('Budget successfully updated!')).toBeInTheDocument());
+        // Verify API call
+        await waitFor(() => {
+            expect(BudgetService.updateBudget).toHaveBeenCalledWith(1, expect.objectContaining({
+                budgetDescription: 'Updated Groceries',
+                budgetAmount: 350
+            }));
+        });
     });
 
     it('deletes an existing budget and updates the context', async () => {

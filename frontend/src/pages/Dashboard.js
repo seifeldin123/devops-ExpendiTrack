@@ -20,7 +20,6 @@ const Dashboard = () => {
         }
     }, [user, fetchBudgets, fetchExpenses]);
 
-
     return (
         <div className="container" data-testid="dashboard">
             {user && <h1>Welcome, {user.name}!</h1>}
@@ -33,7 +32,6 @@ const Dashboard = () => {
             <div>
                 <BudgetList budgets={budgets}/>
                 <ExpenseList expenses={expenses} budgets={budgets} />
-
             </div>
         </div>
     );
