@@ -9,7 +9,7 @@ import BasicModal from "./Modal";
 const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetDescription, setBudgetDescription] = useState('');
     const [budgetAmount, setBudgetAmount] = useState('');
-    const { addNewBudget, updateExistingBudget, fetchBudgets, error, resetError } = useBudgetContext();
+    const { addNewBudget, updateExistingBudget, fetchBudgets, setError, error, resetError } = useBudgetContext();
     const { user } = useUserContext();
     const { expenses, fetchExpenses } = useExpenseContext() || { expenses: [] }; // Fallback to default if context is undefined
 
@@ -19,13 +19,18 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
     // Adjusted to include resetError call on close
     const enhancedOnClose = () => {
-        error("");
+        setError('');
         resetError(); // Clear any existing errors
         if (typeof onClose === 'function') {
             onClose(); // Call the original onClose prop if it's a function
         }
     };
 
+    // Function to reset the form fields
+    const resetFormFields = () => {
+        setBudgetDescription('');
+        setBudgetAmount('');
+    };
 
     // Populate form when existingBudget is provided
     useEffect(() => {
@@ -44,30 +49,27 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     };
 
     const submitBudget = async () => {
-        resetError();
         const budgetData = { budgetDescription, budgetAmount: parseFloat(budgetAmount), user: { id: user.id } };
         try {
             if (existingBudget) {
                 await updateExistingBudget(existingBudget.budgetId, budgetData);
-
                 await fetchBudgets(user.id); // Refresh the budget list
-
                 await fetchExpenses(user.id); // Refresh expenses to reflect any changes from the budget update
-                setShowSuccessAlert(true);
-                setTimeout(() => setShowSuccessAlert(false), 5000); // Show success message
             } else {
                 await addNewBudget(budgetData);
                 await fetchBudgets(user.id); // Refresh the budget list for new additions
-                setBudgetDescription('');
-                setBudgetAmount('');
-                setShowSuccessAlert(true);
-                setTimeout(() => setShowSuccessAlert(false), 5000); // Show success message for new budget
             }
+            resetFormFields(); // Reset the form fields on successful submission
+            setShowSuccessAlert(true);
+            setTimeout(() => setShowSuccessAlert(false), 5000); // Show success message
         } catch (serverError) {
-            error(serverError.message);
+            setError(serverError.message);
             resetError();
+            resetFormFields(); // Reset the form fields on successful submission
+
         }
     };
+
 
 
     const handleSubmit = async (e) => {

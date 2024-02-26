@@ -13,7 +13,6 @@ jest.mock('../../contexts/BudgetContext', () => ({
 jest.mock('../../contexts/ExpenseContext', () => ({
     useExpenseContext: jest.fn(() => ({
         expenses: [], // Provide a default mock value
-        // Add other properties or functions the component expects
     })),
 }));
 
@@ -43,6 +42,7 @@ describe('AddBudgetForm', () => {
             fetchBudgets: mockFetchBudgets,
             error: '',
             resetError: mockResetError,
+            setError: jest.fn(),
         }));
 
         useUserContext.mockImplementation(() => ({

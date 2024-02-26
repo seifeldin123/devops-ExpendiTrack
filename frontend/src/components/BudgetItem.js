@@ -11,7 +11,7 @@ import { useBudgetContext } from "../contexts/BudgetContext";
 const BudgetItem = ({ budget }) => {
     const { user } = useUserContext();
     const { expenses } = useExpenseContext();
-    const { removeBudget, fetchBudgets, error, resetError } = useBudgetContext();
+    const { removeBudget, fetchBudgets, resetError } = useBudgetContext();
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -78,7 +78,6 @@ const BudgetItem = ({ budget }) => {
             fetchBudgets(user.id);
             setShowDeleteConfirmation(false);
         } catch (serverError) {
-            error(serverError);
             resetError();
         }
     }
@@ -87,7 +86,7 @@ const BudgetItem = ({ budget }) => {
         <div className="card-container col-lg-4 col-md-6 mb-4">
             <div className="card h-100 shadow-sm custom-card-border">
                 <div className="card-body">
-                    <h5 className="card-title"><strong>Budget Name: {budget.budgetDescription}</strong></h5>
+                    <h5 className="card-title" data-testid="budget-title-test-id"><strong >Budget Name: {budget.budgetDescription}</strong></h5>
                     <p className="card-text"><strong>Budgeted
                         Amount: {formatCurrency(budget.budgetAmount)}</strong></p>
                     <p className="card-text"><strong>Spent: {formatCurrency(totalSpent)}</strong></p>

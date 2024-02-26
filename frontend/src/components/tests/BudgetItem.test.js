@@ -1,10 +1,11 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import BudgetItem from '../BudgetItem';
 import { UserContext } from '../../contexts/UserContext';
 import { ExpenseContext } from '../../contexts/ExpenseContext';
 import { useBudgetContext } from "../../contexts/BudgetContext";
+import userEvent from "@testing-library/user-event";
 
 const mockRemoveBudget = jest.fn();
 const mockResetError = jest.fn();
@@ -118,14 +119,19 @@ describe('BudgetItem', () => {
 
     it('shows the edit modal with the correct data when the edit button is clicked', async () => {
         const { getByText, getByRole } = renderWithProviders(<BudgetItem budget={mockBudget} />);
-        fireEvent.click(getByText('Edit Budget'));
+        await act(async () => {
+            await userEvent.click(screen.getByText('Edit Budget'));
+        });
         expect(getByRole('dialog')).toHaveTextContent('Edit Budget');
         expect(screen.getByDisplayValue(mockBudget.budgetDescription)).toBeInTheDocument();
     });
 
     it('shows the delete confirmation modal when the delete button is clicked', async () => {
         const { getByText, queryByRole } = renderWithProviders(<BudgetItem budget={mockAnotherBudget} />);
-        fireEvent.click(getByText('Delete Budget'));
+        await act(async () => {
+            fireEvent.click(screen.getByText('Delete Budget'));
+        });
+
         expect(queryByRole('dialog')).toHaveTextContent('Confirm Deletion');
     });
 
@@ -133,9 +139,14 @@ describe('BudgetItem', () => {
         renderWithProviders(<BudgetItem budget={mockAnotherBudget} />);
 
         // Open the delete confirmation modal
-        fireEvent.click(screen.getByText('Delete Budget'));
+        await act(async () => {
+            fireEvent.click(screen.getByText('Delete Budget'));
+        });
 
-        fireEvent.click(screen.getByText('Confirm Delete'));
+        await act(async () => {
+            fireEvent.click(screen.getByText('Confirm Delete'));
+        });
+
 
         // Now check if removeBudget was called with the correct budgetId
         expect(mockRemoveBudget).toHaveBeenCalledWith(mockAnotherBudget.budgetId);

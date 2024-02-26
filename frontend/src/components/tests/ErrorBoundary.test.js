@@ -11,6 +11,16 @@ class ErrorThrowingComponent extends React.Component {
 }
 
 describe('ErrorBoundary Tests', () => {
+
+    beforeEach(() => {
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        console.error.mockRestore();
+    });
+
+
     // Unit test to verify that ErrorBoundary catches errors and displays fallback UI
     it('displays an error message when a child component throws an error', () => {
         render(

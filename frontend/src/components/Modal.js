@@ -11,7 +11,7 @@ const BasicModal = ({ show, handleClose, children, title }) => {
             <div className="modal-dialog modal-dialog-centered modal-dialog-custom" role="document">
                 <div className="modal-content">
                     <div className="modal-header modal-header-custom">
-                        <h5 className="modal-title">{title}</h5>
+                        <h5 className="modal-title" data-testid="modal-title-test-id">{title}</h5>
                         <button type="button" className="close close-button-custom" aria-label="Close" onClick={handleClose}>
                             <span aria-hidden="true">&times;</span>
                         </button>

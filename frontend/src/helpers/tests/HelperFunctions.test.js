@@ -53,19 +53,4 @@ describe('HelperFunctions', () => {
         });
     });
 
-    describe('formatPercentage', () => {
-        // Format Whole Number as Percentage
-        it('correctly formats a whole number as percentage', () => {
-            const amount = 1;
-            const formatted = formatPercentage(amount);
-            expect(formatted).toBe("100%");
-        });
-
-        // Format Decimal Number as Percentage
-        it('correctly formats a decimal number as percentage', () => {
-            const amount = 0.123;
-            const formatted = formatPercentage(amount);
-            expect(formatted).toBe("12%");
-        });
-    });
 });

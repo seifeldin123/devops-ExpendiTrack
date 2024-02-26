@@ -88,6 +88,7 @@ export const BudgetProvider = ({ children }) => {
         removeBudget,
         fetchBudgets,
         error,
+        setError,
         resetError,
     }), [budgets, addNewBudget, updateExistingBudget, removeBudget, fetchBudgets, error, resetError]);
 

@@ -14,6 +14,10 @@ const Nav = () => {
                     {user ? (
                         // Display dashboard and logout for authenticated users
                         <>
+                            <li property="itemListElement" typeof="ListItem">
+                                <span property="name"> Budget Management Application</span>
+                                <meta property="position" content="2"/>
+                            </li>
                             <li><Link to="/dashboard">Dashboard</Link></li>
                         </>
                     ) : (
@@ -31,6 +35,10 @@ const Nav = () => {
                                    href="https://wet-boew.github.io/GCWeb/index-en.html">
                                     <span property="name">GCWeb</span>
                                 </a>
+                                <meta property="position" content="2"/>
+                            </li>
+                            <li property="itemListElement" typeof="ListItem">
+                                <span property="name">Budget Management Application</span>
                                 <meta property="position" content="2"/>
                             </li>
                         </>

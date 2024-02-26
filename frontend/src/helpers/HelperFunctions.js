@@ -11,14 +11,6 @@ export const formatCurrency = (amount) => {
     return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 };
 
-// Formating percentages
-export const formatPercentage = (amt) => {
-    return amt.toLocaleString(undefined, {
-        style: "percent",
-        minimumFractionDigits: 0,
-    });
-};
-
 // Date formatting function
 export const formatDate = (dateString) => {
     // Extract the year, month, and day from the dateString assuming YYYY-MM-DD format

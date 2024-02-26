@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
     render,
     act,
     waitFor,
-    screen, getByTestId,
+    screen, getByText,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BudgetProvider, useBudgetContext } from '../BudgetContext';
@@ -20,7 +20,6 @@ jest.mock('../../services/BudgetService');
 jest.mock('../../contexts/ExpenseContext', () => ({
     useExpenseContext: () => ({
         expenses: [], // Provide a default value for expenses
-        // Add any other functions or properties that are used from the context
     }),
 }));
 
@@ -129,11 +128,13 @@ describe('BudgetContext Integration Tests', () => {
             return null;
         };
 
-        render(
-            <BudgetProvider>
-                <TestComponent />
-            </BudgetProvider>
-        );
+        await act(async () => {
+            render(
+                <BudgetProvider>
+                    <TestComponent/>
+                </BudgetProvider>
+            );
+        });
 
         // Wait for the error state to be updated after the rejection
         await waitFor(() => {
@@ -141,56 +142,67 @@ describe('BudgetContext Integration Tests', () => {
         });
     })
 
-    it('updates an existing budget correctly', async () => {
-        // Initial mock budgets to be fetched
+
+
+    it('updates an existing budget and reflects changes in the context and UI', async () => {
+        // Setup initial budgets and the updated budget
         const initialBudgets = [
             { budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
+            { budgetId: 2, budgetDescription: 'Utilities', budgetAmount: 150 },
         ];
-
-        // Mock the updated budget
-        const updatedBudget = {
-            budgetDescription: 'Updated Groceries',
-            budgetAmount: 350,
-            user: {
-                id: 1
-            } };
+        const updatedBudget = { budgetDescription: 'Updated Groceries', budgetAmount: 350 };
 
         // Mock the API calls
         BudgetService.getBudgetsByUserId.mockResolvedValue(initialBudgets);
-        BudgetService.updateBudget.mockResolvedValue(updatedBudget);
+        BudgetService.updateBudget.mockResolvedValue({ ...initialBudgets[0], ...updatedBudget });
 
-        // Render the BudgetList (and indirectly, BudgetItem components) inside the BudgetProvider
-        const { getByText, getByLabelText, queryByText } = render(
-            <BrowserRouter>
-                <BudgetProvider>
-                    <BudgetList budgets={initialBudgets}  />
-                </BudgetProvider>
-            </BrowserRouter>
-        );
+        // Define the test component
+        const TestComponent = () => {
+            const { budgets, updateExistingBudget, fetchBudgets } = useBudgetContext();
+            useEffect(() => {
+                fetchBudgets(); // Trigger fetching budgets on component mount
+            }, [fetchBudgets]);
 
-        // Wait for the budgets to be fetched and displayed
-        await waitFor(() => expect(getByText('Budget Name: ' + 'Groceries')).toBeInTheDocument());
+            return (
+                <>
+                    {budgets.map((budget) => (
+                        <div key={budget.budgetId} data-testid={`budget-${budget.budgetId}`}>
+                            {budget.budgetDescription} - ${budget.budgetAmount}
+                        </div>
+                    ))}
+                    <button
+                        onClick={() => updateExistingBudget(initialBudgets[0].budgetId, updatedBudget)}
+                    >
+                        Update Budget
+                    </button>
+                </>
+            );
+        };
 
-        // Simulate clicking the edit button for the first budget item
-        userEvent.click(getByText('Edit Budget'));
+        // Render the component within the BudgetProvider
+        await act(async () => {
+            render(
+                <BrowserRouter>
+                    <BudgetProvider>
+                        <TestComponent />
+                    </BudgetProvider>
+                </BrowserRouter>
+            );
+        });
 
-        // Wait for the modal to open and the form to be populated
-        await waitFor(() => expect(getByText('Budget Name: ' + 'Groceries')));
+        // Simulate clicking the "Update Budget" button
+        await act(async () => {
+            userEvent.click(screen.getByText('Update Budget'));
+        });
 
-        // Update the budget amount in the form
-        userEvent.type(screen.getByTestId('budget-amount-input'), "350");
-        userEvent.type(screen.getByTestId('budget-description-input'), 'Updated Groceries');
-
-        // Submit the updated budget
-        userEvent.click(getByText('Update Budget'));
-
-        // Expect the updateBudget API to have been called with the updated budget data
-        // Verify API call
+        // Assertions
         await waitFor(() => {
-            expect(BudgetService.updateBudget).toHaveBeenCalledWith(1, expect.objectContaining({
-                budgetDescription: 'Updated Groceries',
-                budgetAmount: 350
-            }));
+            expect(BudgetService.updateBudget).toHaveBeenCalledWith(initialBudgets[0].budgetId, expect.objectContaining(updatedBudget));
+        });
+
+        // Verify the updated budget is displayed in the UI
+        await waitFor(() => {
+            expect(screen.getByTestId(`budget-${initialBudgets[0].budgetId}`).textContent).toContain('Updated Groceries - $350');
         });
     });
 
