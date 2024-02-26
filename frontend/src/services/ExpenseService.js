@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8080/expenses';
 
-export const getUserExpenses = (userId) => {
-    return axios.get(`${API_URL}/user/${userId}`)
-        .then(response => response.data)
-        .catch(error => {
+export const getUserExpenses = ( userId ) => {
+    return axios.get( `${API_URL}/user/${userId}` )
+        .then( response => response.data )
+        .catch( error => {
             throw new Error(error.response?.data || 'Failed to load expenses. Please refresh the page to try again.');
         });
 };
@@ -20,11 +20,10 @@ export const createExpense = (expenseData) => {
         budget: { budgetId: parseInt(expenseData.budget.budgetId, 10) },
     };
 
-
-    return axios.post(API_URL, formattedData)
-        .then(response => response.data)
-        .catch(error => {
-            throw new Error(error.response?.data || 'An error occurred while creating the expense. Please try again later.');
+    return axios.post( API_URL, formattedData )
+        .then(response  =>  response.data)
+        .catch(error  =>  {
+            throw new Error(error.response?.data || 'An error occurred while creating an expense. Please try again later.');
         });
 };
 

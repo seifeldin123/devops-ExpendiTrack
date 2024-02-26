@@ -17,6 +17,7 @@ const ExpenseList = React.memo(({ expenses, budgets }) => {
     };
 
     const handleEdit = (expense) => {
+        resetError(); // Clear any existing error messages
         setSelectedExpense(expense);
         setShowEditModal(true);
     };
@@ -57,9 +58,9 @@ const ExpenseList = React.memo(({ expenses, budgets }) => {
                         <div key={expense.expensesId} className="col-lg-4 col-md-6 mb-4">
                             <div className="card h-100 shadow-sm custom-card-border">
                                 <div className="card-body">
-                                    <h5 className="card-title"><strong>Expense
+                                    <h5 className="card-title" data-testid="expense-title-test-id"><strong>Expense
                                         Name: </strong>{expense.expensesDescription}</h5>
-                                    <p className="card-text"><strong>Expense
+                                    <p className="card-text"  data-testid="expense-amount-test-id"><strong>Expense
                                         Amount: </strong>{formatCurrency(expense.expensesAmount)}</p>
                                     <p className="card-text"><strong>Expense
                                         Date: </strong>{formatDate(expense.expensesDate)}</p>
@@ -69,7 +70,7 @@ const ExpenseList = React.memo(({ expenses, budgets }) => {
 
                                     </div>
                                     <div className="action-buttons mrgn-tp-md">
-                                        <button className="btn btn-default "
+                                        <button data-testid="edit-expense" className="btn btn-default "
                                                 onClick={() => handleEdit(expense)}>
                                             <span className="glyphicon glyphicon-edit"></span>
                                             &nbsp; Edit Expense
@@ -78,7 +79,7 @@ const ExpenseList = React.memo(({ expenses, budgets }) => {
                                         <button className="btn btn-danger"
                                                 onClick={() => handleDeleteClick(expense)}>
                                             <span className="glyphicon glyphicon-trash"></span>
-                                            &nbsp; Delete Budget
+                                            &nbsp; Delete Expense
                                         </button>
                                     </div>
                                 </div>

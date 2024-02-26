@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useExpenseContext } from '../contexts/ExpenseContext';
-import { calculateTotalSpent, formatDate} from '../helpers/HelperFunctions';
+import { formatDate} from '../helpers/HelperFunctions';
 import { useUserContext } from '../contexts/UserContext';
 import BasicModal from "./Modal";
 
@@ -9,7 +9,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState('');
     const [selectedBudgetId, setSelectedBudgetId] = useState('');
-    const { addNewExpense, fetchExpenses, updateExistingExpense, expenses, error, resetError } = useExpenseContext();
+    const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses } = useExpenseContext();
     const { user } = useUserContext(); // Get the current user
 
     const [showWarningModal, setShowWarningModal] = useState(false);
@@ -17,12 +17,12 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
     // Initialize form with existingExpense data if present
     useEffect(() => {
-        if (existingExpense) {
+        if (existingExpense && existingExpense.budget && budgets.length > 0) {
             setDescription(existingExpense.expensesDescription);
             setAmount(existingExpense.expensesAmount);
             setDate(existingExpense.expensesDate.slice(0, 10)); // Assuming ISO string format
             setSelectedBudgetId(existingExpense.budget.budgetId.toString());
-        } else if (budgets.length > 0) {
+        } else if (budgets && budgets.length > 0) {
             setSelectedBudgetId(budgets[0].budgetId.toString());
         }
     }, [existingExpense, budgets]);
@@ -30,38 +30,38 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const handleWarningClose = async (proceed) => {
         setShowWarningModal(false);
         if (proceed) {
-            await submitExpense();
+            await submitExpense(); // Proceed with the expense submission.
         }
     };
 
     const submitExpense = async () => {
-        const expenseData = {
-            expensesDescription: description,
-            expensesAmount: parseFloat(amount),
-            expensesDate: new Date(date).toISOString(),
-            budget: { budgetId: parseInt(selectedBudgetId) },
-        };
 
         try {
             if (existingExpense) {
+                const expenseData = {
+                    expensesDescription: description,
+                    expensesAmount: parseFloat(amount),
+                    budget: { budgetId: parseInt(selectedBudgetId) },
+                };
                 await updateExistingExpense(existingExpense.expensesId, expenseData);
-                setShowSuccessAlert(true);
-                setTimeout(() => setShowSuccessAlert(false), 5000); // Adjust duration as needed
             } else {
+                const expenseData = {
+                    expensesDescription: description,
+                    expensesAmount: parseFloat(amount),
+                    expensesDate: new Date(date).toISOString(),
+                    budget: { budgetId: parseInt(selectedBudgetId) },
+                };
                 await addNewExpense(expenseData);
-                // Clear form fields after submission
-                setDescription('');
-                setAmount('');
-                setDate('');
             }
+            setDescription('');
+            setAmount('');
+            setDate('');
             setShowSuccessAlert(true);
             setTimeout(() => setShowSuccessAlert(false), 5000); // Adjust duration as needed
             fetchExpenses(user.id); // Refresh expense list
-
             setSelectedBudgetId(budgets.length > 0 ? budgets[0].budgetId.toString() : '');
         } catch (serverError) {
             setShowSuccessAlert(false);
-            error(serverError.message);
             resetError();
         }
     };
@@ -70,16 +70,28 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
         e.preventDefault();
         resetError();
 
-        const totalSpent = calculateTotalSpent(expenses, parseInt(selectedBudgetId));
+        // No need to fetch budgets and expenses if they are already up-to-date.
         const budgetAmount = budgets.find(budget => budget.budgetId.toString() === selectedBudgetId)?.budgetAmount;
+        let totalExpensesForBudget = expenses
+            .filter(expense => expense.budget?.budgetId.toString() === selectedBudgetId)
+            .reduce((acc, current) => acc + parseFloat(current.expensesAmount), 0);
 
-        if (budgetAmount < totalSpent + parseFloat(amount)) {
-            setShowWarningModal(true);
-            return;
+        // Adjust total if we are updating an expense.
+        if (existingExpense) {
+            totalExpensesForBudget -= parseFloat(existingExpense.expensesAmount);
         }
 
-        await submitExpense();
+        const newTotal = totalExpensesForBudget + parseFloat(amount);
+
+        // Determine if we should show the warning modal or submit the expense directly.
+        if (budgetAmount < newTotal) {
+            setShowWarningModal(true);
+        } else {
+            await submitExpense();
+        }
     };
+
+
 
     return (
         <div className="dashboard-expense-form">
@@ -99,6 +111,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                             <div>
                                 <input
+                                    data-testid="expense-description-input"
                                     type="text"
                                     className="form-control"
                                     value={description}
@@ -118,6 +131,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                             <div>
                                 <input
+                                    data-testid="expense-amount-input"
                                     type="number"
                                     className="form-control"
                                     value={amount}
@@ -151,6 +165,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                                 // If adding a new expense, display the date input field
                                 <input
+                                    data-testid="expense-date"
                                     type="date"
                                     className="form-control"
                                     value={date}
@@ -166,7 +181,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                             {existingExpense ? (
                                 <label htmlFor="budget-category">
-                                    <span className="field-name">Budget Category</span>
+                                    <span className="field-name"  >Budget Category</span>
                                 </label>
                             ) : (
                                 <label htmlFor="budget-category">
@@ -183,6 +198,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             ) : (
                                 // If adding a new expense, display the dropdown for budget selection
                                 <select
+                                    data-testid="budget-category"
                                     className="form-control"
                                     value={selectedBudgetId}
                                     onChange={(e) => setSelectedBudgetId(e.target.value)}
@@ -205,7 +221,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             </button>
                         ) : (
                             <div className="mrgn-bttm-md">
-                                <button type="submit" className="btn-lg btn-default">
+                                <button data-testid="create-expense" type="submit" className="btn-lg btn-default">
                                     <span className="glyphicon glyphicon-plus"></span>
                                     &nbsp;Create Expense
                                 </button>

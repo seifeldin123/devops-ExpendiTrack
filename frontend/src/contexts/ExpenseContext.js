@@ -70,7 +70,7 @@ export const ExpenseProvider = ({ children }) => {
         try {
             await deleteExpense(expenseId);
             setExpenses(prevExpenses =>
-                prevExpenses.filter(expense => expense.id !== expenseId)
+                prevExpenses.filter(expense => expense.expensesId !== expenseId)
             );
             setError('');
             await fetchExpenses(userId); // Fetch expenses again to update UI
