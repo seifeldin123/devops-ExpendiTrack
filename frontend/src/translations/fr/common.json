@@ -1,0 +1,20 @@
+{
+  "app": {
+    "welcome-heading": "Bienvenue sur notre application de gestion budgétaire !",
+    "information": "Cette plateforme est conçue pour vous aider à suivre et à gérer facilement vos finances. Rejoignez-nous pour commencer à optimiser votre budget dès aujourd'hui !",
+    "login-button": "Connectez-vous à votre compte",
+    "create-new-account": "Créer un nouveau compte",
+    "no-account": "Vous n'avez pas encore de compte ?",
+    "sign-up-here": "Inscrivez-vous ici",
+    "login-sign-up": "Se connecter",
+    "Sign-up-create": "Créer un compte",
+    "Sign-up-login-here": "Connectez-vous ici",
+    "Sign-up-sign-up": "S'inscrire",
+    "menuLink" : "https://www.canada.ca/content/dam/canada/sitemenu/sitemenu-v2-fr.html",
+    "jobs" : "https://www.canada.ca/fr/services/emplois.html",
+    "jobs-tag": "Emplois et milieu de travail",
+    "immigration":"https://www.canada.ca/fr/services/immigration-citoyennete.html",
+    "immigration-tag": "Immigration et citoyenneté",
+    "search": "Recherche Canada.ca"
+  }
+}

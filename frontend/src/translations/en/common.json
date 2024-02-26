@@ -1,0 +1,21 @@
+{
+  "app": {
+    "welcome-heading": "Welcome to Our Budget Management App!",
+    "information": "This platform is designed to help you track and manage your finances with ease. Join us to start optimizing your budget today!",
+    "login-button": "Login to Your Account",
+    "create-new-account": "Create a New Account",
+    "no-account": "Do not have an account yet?",
+    "sign-up-here": "Sign up here",
+    "login-sign-up": "Login",
+    "Sign-up-create": "Create Account",
+    "Sign-up-login-here": "Login here",
+    "Sign-up-sign-up": "Sign Up",
+    "menuLink" : "https://www.canada.ca/content/dam/canada/sitemenu/sitemenu-v2-en.html",
+    "jobs" : "https://www.canada.ca/en/services/jobs.html",
+    "jobs-tag": "Jobs and the workplace",
+    "immigration":"https://www.canada.ca/en/services/immigration-citizenship.html",
+    "immigration-tag": "Immigration and citizenship",
+    "search": "Search Canada.ca"
+
+  }
+}
