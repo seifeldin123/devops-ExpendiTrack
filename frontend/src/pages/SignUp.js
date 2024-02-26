@@ -2,12 +2,14 @@ import React, {useState} from 'react';
 import {createUser} from '../services/UserService';
 import {useUserContext} from '../contexts/UserContext';
 import {useNavigate} from 'react-router-dom';
+import {useTranslation} from "react-i18next";
 
 const SignUp = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const {t} = useTranslation("global");
 
     const {setUser} = useUserContext();
 
@@ -30,7 +32,7 @@ const SignUp = () => {
     return (
         <div className="container">
             <form className="form-horizontal" onSubmit={handleSubmit}>
-                <h1>Create Account</h1>
+                <h1>{t("app.Sign-up-create")}</h1>
                 {error && <div style={{color: 'red'}}>{error}</div>}
 
                 <div className="form-group">
@@ -69,15 +71,15 @@ const SignUp = () => {
 
                 <div className="col-sm-offset-3 col-sm-9">
                     <button type="submit" className="btn-lg btn-primary">
-                        Sign Up <span className="glyphicon glyphicon-user"></span>
+                        {t("app.Sign-up-sign-up")} <span className="glyphicon glyphicon-user"></span>
                     </button>
                 </div>
             </form>
             <section>
                 <p className="mrgn-tp-lg">
-                    Already have an account? &nbsp;
+                    {t("app.Sign-up-have-account")} &nbsp;
                     <button className="btn btn-default" type="button" onClick={() => navigate('/login')}>
-                        Login here
+                        {t("app.Sign-up-login-here")}
                     </button>
                 </p>
             </section>

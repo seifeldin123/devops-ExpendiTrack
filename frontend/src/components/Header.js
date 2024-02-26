@@ -3,6 +3,8 @@ import Nav from "./Nav";
 import LogoutComponent from "./LogoutComponent";
 import {useUserContext} from "../contexts/UserContext";
 import LanguageSelector from "./language-selector";
+import {useTranslation} from "react-i18next";
+import i18n from "i18next";
 
 const Header = () => {
 
@@ -10,6 +12,7 @@ const Header = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const { user } = useUserContext(); // Use the useContext hook to access the current user
+    const{t} = useTranslation("global")
 
 
     // Handler to update the search query state
@@ -28,14 +31,38 @@ const Header = () => {
                         <h2 className="wb-inv">Language selection</h2>
                         <ul className="list-inline mrgn-bttm-0">
                             <li>
-                                <a lang="fr" hrefLang="fr" href="content-fr.html">
-                                    <span className="hidden-xs" translate="no">Français</span>
-                                    <abbr title="Français" translate="no"
+                                <a
+                                    href="#" // or the current page's URL
+                                    onClick={(e) => {
+                                        e.preventDefault(); // Prevent default link behavior
+                                        i18n.changeLanguage('fr'); // Change language to French
+                                        window.location.reload(); // Reload the page
+                                    }}
+                                    className={i18n.language === 'fr' ? "selected" : ""}
+                                >
+                                    <span className="hidden-xs">Français</span>
+                                    <abbr title="Français"
                                           className="visible-xs h3 mrgn-tp-sm mrgn-bttm-0 text-uppercase">fr</abbr>
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#" // or the current page's URL
+                                    onClick={(e) => {
+                                        e.preventDefault(); // Prevent default link behavior
+                                        i18n.changeLanguage('en'); // Change language to English
+                                        window.location.reload(); // Reload the page
+                                    }}
+                                    className={i18n.language === 'en' ? "selected" : ""}
+                                >
+                                    <span className="hidden-xs">English</span>
+                                    <abbr title="English"
+                                          className="visible-xs h3 mrgn-tp-sm mrgn-bttm-0 text-uppercase">en</abbr>
                                 </a>
                             </li>
                         </ul>
                     </section>
+
                     <section id="wb-lng" className="col-xs-3 col-sm-12 pull-right text-right">
                         <h2 className="wb-inv">Language selection</h2>
                         <ul className="list-inline mrgn-bttm-0">
@@ -95,7 +122,7 @@ const Header = () => {
                                 className="wb-inv">Main </span>Menu <span
                                 className="expicon glyphicon glyphicon-chevron-down"></span></button>
                             <ul role="menu" aria-orientation="vertical"
-                                data-ajax-replace="https://www.canada.ca/content/dam/canada/sitemenu/sitemenu-v2-en.html">
+                                data-ajax-replace={t("app.menuLink")}>
                                 <li role="presentation"><a role="menuitem"
                                                            href="https://www.canada.ca/en/services/jobs.html">Jobs and
                                     the

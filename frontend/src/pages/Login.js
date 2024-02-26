@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { findUser } from '../services/UserService';
 import { useUserContext } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import { useNavigate } from 'react-router-dom';
+import {useTranslation} from "react-i18next"; // Import useNavigate hook
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -9,6 +10,7 @@ const Login = () => {
     const { setUser } = useUserContext();
     const navigate = useNavigate(); // Use navigate for redirection after login
     const [error, setError] = useState(''); // State to hold error messages
+    const {t} = useTranslation("global")
 
     // Modified to accept the event argument
     const handleLogin = async (event) => {
@@ -37,7 +39,7 @@ const Login = () => {
     return (
         <div className="container" >
             <form className="form-horizontal" onSubmit={handleLogin}>
-                <h1>Login</h1>
+                <h1>{t("app.login-sign-up")}</h1>
                 {error && <div style={{color: 'red'}}>{error}</div>}
 
 
@@ -77,15 +79,15 @@ const Login = () => {
 
                 <div className="col-sm-offset-3 col-sm-9">
                     <button type="submit" className="btn-lg btn-primary">
-                        Login <span className="glyphicon glyphicon-log-in"></span>
+                        {t("app.login-sign-up")} <span className="glyphicon glyphicon-log-in"></span>
                     </button>
                 </div>
             </form>
             <div>
 
-                    <span>Don't have an account yet?</span> &nbsp;
+                    <span>{t("app.no-account")}</span> &nbsp;
                     <button className="btn btn-default" type="button"
-                            onClick={() => navigate('/signup')}>Sign up here
+                            onClick={() => navigate('/signup')}>{t("app.sign-up-here")}
                     </button>
 
 
