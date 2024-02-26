@@ -1,7 +1,7 @@
 /* Unique Container for Forms within Dashboard */
 .dashboard-forms-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     gap: 20px;
     flex-wrap: wrap;
     margin-bottom: 30px;
@@ -10,11 +10,18 @@
 /* Specific Styles for Each Form */
 .dashboard-budget-form, .dashboard-expense-form {
     flex: 1;
-    max-width: calc(50% - 10px); /* Adjusting the gap consideration */
     padding: 20px;
     background-color: #fff;
     border-radius: 5px;
-    /*box-shadow: 0 4px 6px rgba(0,0,0,0.1);*/
+    min-width: 350px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: calc(60% - 10px);
+}
+
+/* Additional styling to ensure content is not shrunk */
+.form-control, .select-control {
+    max-width: 100%;
 }
 
 /* Styling for .form-section-container specifically */
@@ -33,8 +40,6 @@
     border: 1px solid #ced4da;
     border-radius: 4px;
 }
-
-
 
 /* Styling for labels within the specific forms for clarity */
 .dashboard-budget-form .label,
@@ -76,9 +81,8 @@
     margin-bottom: 15px;
 }
 
-
 .custom-card-border {
-    border: 2px solid #0e59a9;
+    border: 1px solid #c0c0c0;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -86,7 +90,210 @@
     margin: 10px;
 }
 
+.card-container {
+    padding: 0;
+}
+
+/* Alerts styles start */
+
+.required {
+    color: #d9534f;
+}
+
+.alert-danger {
+    margin-top: 10px;
+    background: #f3e9e8;
+    padding-right: 10px;
+}
+
+.alert-success {
+    background: #d8eeca;
+    border-color: #278400;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.alert-success p {
+    padding-top: 10px;
+}
+.close {
+    margin-right: 10px;
+}
+
+/* Alerts styles end*/
+
+/* Modal styles start */
+
+/* modal animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Style for the modal backdrop */
+.modal-backdrop-custom {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    animation: fadeIn 0.3s ease-out forwards;
+    padding-top: 5vh;
+}
+
+
+/* Style for the modal header */
+.modal-header-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    /*background-color: #cbcbcb;*/
+    width: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: #2e5274;
+    color: #fff;
+}
+
+
+/* Style for the close button */
+.close-button-custom {
+    color: #fff;
+    opacity: 1;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    margin-right: 10px;
+}
+
+/*.close-button-custom*/
+
+    /* Adjusting modal dialog for dynamic width and centering */
+.modal-dialog-custom {
+    /* Ensures modal dialog adjusts to content up to this maximum */
+    max-width: 600px;
+    width: auto;
+    margin: auto;
+    animation: zoomIn 0.3s ease-out forwards;
+}
+
+/* Centering form content inside the modal */
+.modal-body-custom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+
+/* Ensure modal content width is responsive and forms are well adjusted */
+.modal-content {
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+}
+
+.modal-footer {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Modal styles end */
+
+/* Action buttons start */
+
+.action-buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Action buttons end*/
+
+/* Card Design Refinement */
+.custom-card-border {
+    border: 1px solid #e2e6ea;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0.5, 0.07);
+    margin: 10px;
+    transition: all 0.3s ease;
+}
+
 .custom-card-border:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Enhanced Card Title Styles */
+.card-title {
+    color: #31708f;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Button Redesign */
+.action-buttons .btn {
+    margin-top: 10px;
+    margin-right: 5px; /* Space between buttons */
+}
+
+.action-buttons .btn i {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+/* If using FontAwesome */
+.action-buttons .btn .fa-edit {
+    margin-right: 5px;
+}
+
+.action-buttons .btn .fa-trash {
+    margin-right: 5px;
+}
+
+/* Progress Bar Enhancement */
+@keyframes progress-bar-stripes {
+    from { background-position: 3rem 0; } /* Adjusted for even wider stripes */
+    to { background-position: 0 0; }
+}
+
+.progress {
+    height: 2rem; /* Maintaining wider bars */
+    background-color: #e9ecef;
+    border-radius: 0.25rem;
+}
+
+.progress-bar {
+    height: 100%;
+    color: white;
+    text-align: center;
+    /* Increased contrast in the stripe color and made stripes wider */
+    background-image: linear-gradient(45deg, rgba(255,255,255,.3) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.3) 50%, rgba(255,255,255,.3) 75%, transparent 75%, transparent);
+    background-size: 3rem 3rem; /* Significantly wider stripes */
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+.bg-success { background-color: #28a745 !important; } /* Green */
+.bg-warning { background-color: #ffc107 !important; } /* Orange/Yellow */
+.bg-danger { background-color: #dc3545 !important; } /* Red */
+
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 0.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,.3);
 }

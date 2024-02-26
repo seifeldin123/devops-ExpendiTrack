@@ -9,7 +9,7 @@ const PageNotFound = () => {
                         <h1><span className="glyphicon glyphicon-warning-sign mrgn-rght-md"></span> We couldn't find that Web page (Error 404)</h1>
                         <p>We're sorry you ended up here. Sometimes a page gets moved or deleted, but hopefully we can help you find what you're looking for.</p>
                         <ul>
-                            <li>Return to the <a href="/">home page</a></li>
+                            <li>Return to the <a href="/">Homepage</a></li>
                         </ul>
                     </div>
                 </div>

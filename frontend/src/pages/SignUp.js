@@ -20,9 +20,11 @@ const SignUp = () => {
             setUser(user); // Set the user in context
             navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
         } catch (error) {
-            // Now, error is the message we rejected with in createUser
-            setError(error);
+            // Extract and set only the error message to display it correctly
+            const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
+            setError(errorMessage);
         }
+
     };
 
     return (

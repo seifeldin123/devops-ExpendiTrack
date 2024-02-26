@@ -3,8 +3,8 @@ import axios from 'axios';
 import {createUser, findUser} from '../UserService';
 
 describe('UserService Tests', () => {
-    // TC_UI_001: Verify Successful User Creation
-    it('TC_UI_001: should create a user successfully', async () => {
+    // Verify Successful User Creation
+    it('should create a user successfully', async () => {
         const userData = {name: 'JohnDoe', email: 'john@example.com'};
         const mockResponse = {id: 1, name: 'JohnDoe', email: 'john@example.com'};
 
@@ -13,8 +13,8 @@ describe('UserService Tests', () => {
         await expect(createUser(userData)).resolves.toEqual(mockResponse.data);
     });
 
-    // TC_UI_002: Verify User Creation Failure due to Duplicate Accounts
-    it('TC_UI_002: should handle duplicate user error', async () => {
+    // Verify User Creation Failure due to Duplicate Accounts
+    it('should handle duplicate user error', async () => {
         const userData = {name: 'JaneDoe', email: 'jane@example.com'};
 
         axios.post.mockRejectedValue({
@@ -28,8 +28,8 @@ describe('UserService Tests', () => {
         await expect(createUser(userData)).rejects.toThrow('An account with these credentials already exists.');
     });
 
-    // TC_UI_003: Verify User Creation Failure due to Server Error
-    it('TC_UI_003: should handle server error on user creation', async () => {
+    // Verify User Creation Failure due to Server Error
+    it('should handle server error on user creation', async () => {
         const userData = {name: 'NewUser', email: 'newuser@example.com'};
 
         axios.post.mockRejectedValue({
@@ -42,8 +42,8 @@ describe('UserService Tests', () => {
         await expect(createUser(userData)).rejects.toThrow('An error occurred during the signup process. Please try again later.');
     });
 
-    // TC_UI_004: Verify Successful User Search by Name and Email
-    it('TC_UI_004: should find a user by name and email successfully', async () => {
+    // Verify Successful User Search by Name and Email
+    it('should find a user by name and email successfully', async () => {
         const userData = {name: 'JohnDoe', email: 'john@example.com'};
 
         const mockResponse = {id: 1, name: userData.name, email: userData.email};
@@ -52,8 +52,8 @@ describe('UserService Tests', () => {
         await expect(findUser(userData.name, userData.email)).resolves.toEqual(mockResponse.data);
     });
 
-    // TC_UI_005: Verify User Search Failure due to Nonexistent User
-    it('TC_UI_005: should handle user search for a nonexistent user', async () => {
+    // Verify User Search Failure due to Nonexistent User
+    it('should handle user search for a nonexistent user', async () => {
 
         const userData = {name: 'NotExist', email: 'notexist@example.com'};
         const mockResponse = "User not found. Proceed with creation.";
@@ -68,8 +68,8 @@ describe('UserService Tests', () => {
         await expect(findUser(userData)).resolves.toEqual(mockResponse.data);
     });
 
-    // TC_UI_006: Verify User Search Failure due to Server Error
-    it('TC_UI_006: should handle server error during user search', async () => {
+    // Verify User Search Failure due to Server Error
+    it('should handle server error during user search', async () => {
         axios.get.mockRejectedValue({
             response: {
                 status: 400,
@@ -81,8 +81,8 @@ describe('UserService Tests', () => {
     });
 
 
-    // TC_UI_007: Verify User Creation Failure due to Invalid Name Format
-    it('TC_UI_007: should reject user creation due to invalid name format', async () => {
+    // Verify User Creation Failure due to Invalid Name Format
+    it('should reject user creation due to invalid name format', async () => {
         const userData = {name: "123456", email: "user@example.com"};
 
         axios.post.mockRejectedValue({
@@ -97,8 +97,8 @@ describe('UserService Tests', () => {
     });
 
 
-    // TC_UI_008: Verify User Creation Failure due to Invalid Email Format
-    it('TC_UI_008: should reject user creation due to invalid email format', async () => {
+    // Verify User Creation Failure due to Invalid Email Format
+    it('should reject user creation due to invalid email format', async () => {
         const userData = {name: "ValidName", email: "invalidemail"};
 
         axios.post.mockRejectedValue({
