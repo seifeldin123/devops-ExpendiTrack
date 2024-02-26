@@ -35,6 +35,14 @@ const Header = () => {
                             </li>
                         </ul>
                     </section>
+                    <section id="wb-lng" className="col-xs-3 col-sm-12 pull-right text-right">
+                        <h2 className="wb-inv">Language selection</h2>
+                        <ul className="list-inline mrgn-bttm-0">
+                            <li>
+                                <LanguageSelector/>
+                            </li>
+                        </ul>
+                    </section>
 
                     {/* Brand logo section */}
                     <div className="brand col-xs-9 col-sm-5 col-md-4" property="publisher"
