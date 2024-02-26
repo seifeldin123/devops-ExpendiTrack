@@ -6,6 +6,7 @@ import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,10 +41,11 @@ public class UserController {
      * bad request status if the user already exists or if input is invalid.
      */
     @PostMapping
-    @Operation(summary = "Create a new user", responses = {
+    @Operation(summary = "Create a new user", description = "Create a user with provided user name and user email", responses = {
             @ApiResponse(description = "User created successfully", responseCode = "201",
                     content = @Content(schema = @Schema(implementation = User.class))),
-            @ApiResponse(description = "Bad Request", responseCode = "400")
+            @ApiResponse(description = "Bad Request", responseCode = "400",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
@@ -71,10 +73,11 @@ public class UserController {
      */
     @GetMapping("/find")
     @Operation(summary = "Find a user by name and email", responses = {
-            @ApiResponse(description = "User found", responseCode = "200"),
-            @ApiResponse(description = "User not found", responseCode = "200")
+            @ApiResponse(description = "User found", responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(description = "User not found", responseCode = "200", content = @Content(schema = @Schema(implementation = String.class)))
     })
-    public ResponseEntity<?> findUser(@RequestParam String name, @RequestParam String email) {
+    public ResponseEntity<?> findUser(@Parameter(name="name", description = "Name of the user to find", example="Sasha") @RequestParam String name,
+                                      @Parameter(name="email", description = "Email of the user to find", example = "test@gmail.com") @RequestParam String email) {
         Optional<User> userOpt = userService.findUserByNameAndEmail(name, email);
         if (userOpt.isPresent()) {
             return ResponseEntity.ok(userOpt.get());

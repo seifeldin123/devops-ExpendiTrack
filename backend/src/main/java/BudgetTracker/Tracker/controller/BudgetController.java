@@ -5,6 +5,8 @@ import BudgetTracker.Tracker.entity.User;
 import BudgetTracker.Tracker.exceptions.*;
 import BudgetTracker.Tracker.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,11 +31,13 @@ public class BudgetController {
      * @return ResponseEntity containing a list of budgets associated with the user, if found, along with the HTTP status.
      */
     @GetMapping("/user/{userId}")
-    @Operation(summary = "Find budgets by user id", responses = {
-            @ApiResponse(description = "budgets found", responseCode = "200"),
-            @ApiResponse(description = "budgets not found", responseCode = "200")
+    @Operation(summary = "Find budgets by user id", description = "Provide an user id to get user's budgets", responses = {
+            @ApiResponse(responseCode = "200", description = "Budgets found",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = Budget.class)))),
+            @ApiResponse(responseCode = "404", description = "Budgets not found")
     })
-    public ResponseEntity<List<Budget>> getBudgetsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<Budget>> getBudgetsByUserId(@Parameter(name="userId", description = "ID of the user to find budgets for", example = "1")
+                                                               @PathVariable Long userId) {
         List<Budget> budgets = budgetService.getBudgetsByUserId(userId);
         return new ResponseEntity<>(budgets, HttpStatus.OK);
     }
@@ -45,12 +49,13 @@ public class BudgetController {
      *         If the budget creation fails due to duplicate name, invalid input, or user not found, an appropriate error message is returned.
      */
     @PostMapping
-    @Operation(summary = "Create a new budget", responses = {
-            @ApiResponse(description = "Budget Created successfully", responseCode = "201",
-                    content = @Content(schema = @Schema(implementation = Budget.class))),
-            @ApiResponse(description = "Bad Request", responseCode = "400")
-    })
-    public ResponseEntity<?> createBudget(@RequestBody Budget budget) {
+    @Operation(summary = "Create a new budget", description = "Creates the budget with provided name and email.",
+            responses = {
+                    @ApiResponse(description = "Budget Created successfully", responseCode = "201",
+                            content = @Content(schema = @Schema(implementation = Budget.class))),
+                    @ApiResponse(description = "Bad Request", responseCode = "400")
+            })
+    public ResponseEntity<?> createBudget (@RequestBody Budget budget) {
         try {
             Budget createdBudget = budgetService.createBudget(budget);
             return new ResponseEntity<>(createdBudget, HttpStatus.CREATED);
@@ -70,10 +75,11 @@ public class BudgetController {
     @Operation(summary = "Update an existing budget", description = "Updates the budget identified by its ID with new values provided in the request body.", responses = {
             @ApiResponse(description = "Budget updated successfully", responseCode = "200",
                     content = @Content(schema = @Schema(implementation = Budget.class))),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = ErrorDetails.class))),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+            @ApiResponse(description = "Bad Request", responseCode = "400"),
+            @ApiResponse(description = "Not Found", responseCode = "404")
     })
-    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Budget budget) {
+    public ResponseEntity<?> updateBudget(@Parameter(name="id", description = "Budget id to update budget", example="1")@PathVariable Long id,
+                                          @RequestBody Budget budget) {
         try {
             Budget updatedBudget = budgetService.updateBudget(id, budget);
             return new ResponseEntity<>(updatedBudget, HttpStatus.OK);
@@ -90,9 +96,9 @@ public class BudgetController {
     @Operation(summary = "Delete a budget", description = "Deletes the budget identified by its ID.", responses = {
             @ApiResponse(description = "Budget deleted successfully", responseCode = "200",
                     content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+            @ApiResponse(description = "Not Found", responseCode = "404")
     })
-    public ResponseEntity<?> deleteBudget(@PathVariable("id") long id) {
+    public ResponseEntity<?> deleteBudget(@Parameter(name="id",description = "Budget id to delete budget", example="1")@PathVariable("id") long id) {
         try {
             budgetService.deleteBudget(id);
             return new ResponseEntity<>("Budget deleted successfully!", HttpStatus.OK);
