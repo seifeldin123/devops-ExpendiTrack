@@ -1,10 +1,7 @@
 package BudgetTracker.Tracker.service;
 
 import BudgetTracker.Tracker.entity.Budget;
-import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
-import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
-import BudgetTracker.Tracker.exceptions.InvalidInputException;
-import BudgetTracker.Tracker.exceptions.UserNotFoundException;
+import BudgetTracker.Tracker.exceptions.*;
 import BudgetTracker.Tracker.repository.BudgetRepository;
 import BudgetTracker.Tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +73,17 @@ public class BudgetService {
     private boolean isValidAlphanumeric(String name) {
         return name.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9 ]+$");
     }
-
+    /**
+     * Updates an existing budget with the given ID using the provided budget details.
+     *
+     * @param id             The ID of the budget to be updated.
+     * @param budgetDetails  The details of the budget to update.
+     * @return               The updated budget.
+     * @throws BudgetNotFoundException       If the budget with the specified ID is not found.
+     * @throws UserNotFoundException         If the user associated with the budget is not found.
+     * @throws InvalidInputException         If the provided budget details are invalid.
+     * @throws DuplicateBudgetNameException  If a budget with the same description already exists for the same user.
+     */
     public Budget updateBudget(Long id, Budget budgetDetails) {
         Budget budgetToUpdate = budgetRepository.findById(id)
                 .orElseThrow(() -> new BudgetNotFoundException("Budget with ID " + id + " not found"));
@@ -103,7 +110,12 @@ public class BudgetService {
 
         return budgetRepository.save(budgetToUpdate);
     }
-
+    /**
+     * Deletes an budget by its ID.
+     *
+     * @param id The ID of the budget to be deleted.
+     * @throws BudgetNotFoundException If the budget with the specified ID is not found.
+     */
     public void deleteBudget(Long id) {
         if (!budgetRepository.existsById(id)) {
             throw new BudgetNotFoundException("Budget with ID " + id + " not found.");
