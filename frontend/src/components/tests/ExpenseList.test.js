@@ -1,6 +1,6 @@
 import React from 'react';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {ExpenseProvider} from '../../contexts/ExpenseContext';
+import {ExpenseProvider, removeExpense} from '../../contexts/ExpenseContext';
 import { UserProvider } from '../../contexts/UserContext';
 import ExpenseList from "../ExpenseList";
 
