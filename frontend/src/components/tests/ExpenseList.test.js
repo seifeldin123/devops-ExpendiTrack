@@ -1,9 +1,8 @@
 import React from 'react';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {ExpenseProvider, removeExpense } from '../../contexts/ExpenseContext';
+import {ExpenseProvider} from '../../contexts/ExpenseContext';
 import { UserProvider } from '../../contexts/UserContext';
 import ExpenseList from "../ExpenseList";
-import {useBudgetContext, } from "../../contexts/BudgetContext";
 
 jest.mock('../../contexts/ExpenseContext', () => {
     // Mock removeExpense function
@@ -59,7 +58,15 @@ describe('ExpenseList Component', () => {
         expect(screen.getByText('No expenses available')).toBeInTheDocument();
     });
 
+    it('renders consistently with the same props', () => {
+        const { container: firstRender } = render(<ExpenseList expenses={mockExpenses} />);
+        const firstRenderOutput = firstRender.innerHTML;
 
+        const { container: secondRender } = render(<ExpenseList expenses={mockExpenses} />);
+        const secondRenderOutput = secondRender.innerHTML;
+
+        expect(firstRenderOutput).toEqual(secondRenderOutput);
+    });
 
     it('opens delete confirmation modal on delete button click', async () => {
         render(
