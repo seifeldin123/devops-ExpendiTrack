@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Nav from "./Nav";
 import LogoutComponent from "./LogoutComponent";
 import {useUserContext} from "../contexts/UserContext";
+import LanguageSelector from "./language-selector";
 
 const Header = () => {
 
