@@ -3,16 +3,16 @@ package BudgetTracker.Tracker.service;
 import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.entity.User;
+import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
 import BudgetTracker.Tracker.exceptions.DuplicateBudgetNameException;
 import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.exceptions.UserNotFoundException;
 import BudgetTracker.Tracker.repository.BudgetRepository;
+import BudgetTracker.Tracker.repository.BudgetRepositoryTest;
 import BudgetTracker.Tracker.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -22,11 +22,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+//import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.time;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,5 +142,85 @@ public class BudgetServiceTest {
                 "Budget Description must be alphanumeric and non-empty");
     }
 
+    @Test
+    void updateBudgetSuccess() {
+        Long budgetId = budget1.getBudgetId();
+        given(userService.existsById(budget1.getUser().getId())).willReturn(true);
+        given(budgetRepository.findById(budgetId)).willReturn(Optional.of(budget1));
+        given(budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(
+                budget1.getBudgetDescription(), budget1.getUser().getId(), budgetId)).willReturn(false);
+        given(budgetRepository.save(any(Budget.class))).willReturn(budget1);
+
+        Budget updatedBudget = budgetService.updateBudget(budgetId, budget1);
+
+        assertThat(updatedBudget.getBudgetDescription()).isEqualTo("Vacation");
+        assertThat(updatedBudget.getBudgetAmount()).isEqualTo(1000);
+    }
+
+    @Test
+    void deleteBudgetSuccess() {
+        given(budgetRepository.existsById(budget1.getBudgetId())).willReturn(true);
+        willDoNothing().given(budgetRepository).deleteById(budget1.getBudgetId());
+        budgetService.deleteBudget(budget1.getBudgetId());
+        verify(budgetRepository, times(1)).deleteById(budget1.getBudgetId());
+    }
+
+    @Test
+    void updateBudgetThrowsDuplicateBudgetNameException() {
+        Long budgetId = budget1.getBudgetId();
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(true);
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(budgetRepository.existsByBudgetDescriptionAndUserIdExcludingId(
+                budget1.getBudgetDescription(), budget1.getUser().getId(), budgetId)).thenReturn(true);
+        assertThatThrownBy(() -> budgetService.updateBudget(budgetId, budget1))
+                .isInstanceOf(DuplicateBudgetNameException.class)
+                .hasMessageContaining("already exists");
+        verify(budgetRepository, never()).save(any(Budget.class));
+    }
+
+
+
+    @Test
+    void updateBudgetThrowsUserNotFoundException() {
+        Long budgetId = budget1.getBudgetId();
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(false);
+        Exception exception = assertThrows(UserNotFoundException.class,
+                () -> budgetService.updateBudget(budgetId, budget1));
+        assertTrue(exception.getMessage().contains("User with ID " + budget1.getUser().getId() + " not found"));
+        verify(budgetRepository, never()).save(any(Budget.class));
+    }
+
+
+    @Test
+    void updateBudgetThrowsInvalidInputExceptionForDescription() {
+        Long budgetId = budget1.getBudgetId();
+        budget1.setBudgetDescription("");
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(true);
+        Exception exception = assertThrows(InvalidInputException.class,
+                () -> budgetService.updateBudget(budgetId, budget1));
+        assertTrue(exception.getMessage().contains("BudgetDescription must be alphanumeric"));
+    }
+
+
+    @Test
+    void updateBudgetThrowsInvalidInputExceptionForAmount() {
+        Long budgetId = budget1.getBudgetId();
+        budget1.setBudgetAmount(-500);
+        when(budgetRepository.findById(budgetId)).thenReturn(Optional.of(budget1));
+        when(userService.existsById(budget1.getUser().getId())).thenReturn(true);
+        Exception exception = assertThrows(InvalidInputException.class,
+                () -> budgetService.updateBudget(budgetId, budget1));
+        assertTrue(exception.getMessage().contains("Budget amount cannot be negative"));
+    }
+
+    @Test
+    void deleteBudgetThrowsInvalidIdExceptionForNonExistentBudget() {
+        Long invalidBudgetId = 999L;
+        when(budgetRepository.existsById(invalidBudgetId)).thenReturn(false);
+        assertThrows(BudgetNotFoundException.class, () -> budgetService.deleteBudget(invalidBudgetId),
+                "Expected deleteBudget to throw, but it didn't");
+    }
 
 }

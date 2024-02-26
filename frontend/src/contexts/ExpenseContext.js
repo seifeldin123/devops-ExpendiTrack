@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createExpense, getUserExpenses } from '../services/ExpenseService';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { getUserExpenses, createExpense, updateExpense, deleteExpense } from '../services/ExpenseService';
 import { useUserContext } from "./UserContext";
 
 export const ExpenseContext = createContext();
@@ -8,51 +8,93 @@ export const useExpenseContext = () => useContext(ExpenseContext);
 
 export const ExpenseProvider = ({ children }) => {
     const [expenses, setExpenses] = useState([]);
-    const { user } = useUserContext(); // Use UserContext to get the current user
-    const [error, setError] = useState(''); // State to manage any errors
+    const { user } = useUserContext();
+    const [error, setError] = useState('');
+    const userId = user?.id; // Extract userId for dependency tracking
 
-    useEffect(() => {
-        // Initialize expenses and reset error when user changes
-        setError('');
-        if (user && user.id) {
-            fetchExpenses(user.id); // Use fetchExpenses to load user-specific expenses
-        } else {
-            // If there's no user (e.g., not logged in), clear expenses
-            setExpenses([]);
-        }
-    }, [user]);
-
-    // Function to fetch user-specific expenses
-    const fetchExpenses = async (userId) => {
+    const fetchExpenses = useCallback(async (userId) => {
         try {
             const response = await getUserExpenses(userId);
-            setExpenses(response.data); // Update the expenses state with fetched data
-            setError(''); // Ensure error is reset upon successful fetch
+            if (!Array.isArray(response)) {
+                throw new Error("Fetched data is not an array");
+            }
+            setExpenses(response);
         } catch (error) {
-            console.error('Error fetching user-specific expenses', error);
-            setError('Failed to fetch expenses'); // Update the error state
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
         }
-    };
+    }, []); // Empty dependencies array since it's intended to be a generic fetch function
 
-    const addNewExpense = async (expenseData) => {
+    useEffect(() => {
+        if (userId) {
+            fetchExpenses(userId);
+        }
+    }, [userId, fetchExpenses]);
+
+    // Use useCallback to memoize addNewExpense to keep it stable across renders
+    const addNewExpense = useCallback(async (expenseData) => {
+
+        if (!userId) return; // Guard clause to ensure userId is available
+
         try {
             const response = await createExpense({
                 ...expenseData,
-                userId: user.id, // Ensure you're passing the user ID if needed by your backend
+                userId: userId,
             });
-            setExpenses(prevExpenses => [...prevExpenses, response.data]);
-            setError(''); // Reset error on successful addition
+            setExpenses(prevExpenses => Array.isArray(prevExpenses) ? [...prevExpenses, response] : [response]);
+            setError('');
         } catch (error) {
-            console.error('Error adding expense', error);
-            setError('Failed to add expense'); // Update error state on failure
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
         }
-    };
+    }, [userId]); // Removed 'expenses' from the dependency array
 
-    // Function to reset error state
-    const resetError = () => setError('');
+    const updateExistingExpense = useCallback(async (expenseId, expenseData) => {
+        try {
+            const updatedExpense = await updateExpense(expenseId, expenseData);
+            const updatedExpenses = expenses.map(expense =>
+                expense.expensesId === updatedExpense.expensesId ? updatedExpense : expense
+            );
+            setExpenses(updatedExpenses);
+            setError('');
+        } catch (error) {
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
+        }
+    }, [expenses, setExpenses, setError]);
+
+    const removeExpense = useCallback(async (expenseId) => {
+
+        if (!userId) return; // Guard clause to ensure userId is available
+
+        try {
+            await deleteExpense(expenseId);
+            setExpenses(prevExpenses =>
+                prevExpenses.filter(expense => expense.expensesId !== expenseId)
+            );
+            setError('');
+            await fetchExpenses(userId); // Fetch expenses again to update UI
+        } catch (error) {
+            const errorMessage = error.message || 'An unexpected error occurred';
+            setError(errorMessage);
+        }
+    }, [userId, setExpenses, setError, fetchExpenses]);
+
+    const resetError = useCallback(() => setError(''), []); // Wrap resetError in useCallback
+
+    // Use useMemo to memoize the context value to prevent unnecessary re-renders
+    const providerValue = useMemo(() => ({
+        expenses,
+        addNewExpense,
+        updateExistingExpense,
+        removeExpense,
+        fetchExpenses,
+        error,
+        resetError // Now stable across renders
+    }), [expenses, addNewExpense, updateExistingExpense, removeExpense, fetchExpenses, error, resetError]);
 
     return (
-        <ExpenseContext.Provider value={{ expenses, addNewExpense, fetchExpenses, error, resetError }}>
+        <ExpenseContext.Provider value={providerValue}>
             {children}
         </ExpenseContext.Provider>
     );

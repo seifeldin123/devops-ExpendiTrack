@@ -20,7 +20,6 @@ const Dashboard = () => {
         }
     }, [user, fetchBudgets, fetchExpenses]);
 
-
     return (
         <div className="container" data-testid="dashboard">
             {user && <h1>Welcome, {user.name}!</h1>}
@@ -30,9 +29,9 @@ const Dashboard = () => {
                 {Array.isArray(budgets) && budgets.length > 0 && <AddExpenseForm budgets={budgets}/>}
             </div>
 
-            <div className="container mt-4">
+            <div>
                 <BudgetList budgets={budgets}/>
-                <ExpenseList expenses={expenses}/>
+                <ExpenseList expenses={expenses} budgets={budgets} />
             </div>
         </div>
     );

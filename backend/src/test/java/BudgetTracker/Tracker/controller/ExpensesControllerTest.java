@@ -4,14 +4,15 @@ import BudgetTracker.Tracker.entity.Budget;
 import BudgetTracker.Tracker.entity.Expenses;
 import BudgetTracker.Tracker.entity.User;
 import BudgetTracker.Tracker.exceptions.BudgetNotFoundException;
+import BudgetTracker.Tracker.exceptions.ExpenseNotFoundException;
 import BudgetTracker.Tracker.exceptions.InvalidDAteException;
 import BudgetTracker.Tracker.exceptions.InvalidInputException;
 import BudgetTracker.Tracker.service.ExpensesService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,8 +32,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,7 +92,7 @@ public class ExpensesControllerTest {
     }
 
     @Test
-    @DisplayName("Should create a new expense and return HTTP status 201 Created")
+    @DisplayName("Should create a new expense ")
     void createExpenseTest() {
         // Mock the service method to return the created expense
         when(expensesService.createExpense(expense1)).thenReturn(expense1);
@@ -131,34 +136,41 @@ public class ExpensesControllerTest {
     }
     @Test
     @DisplayName("Should update an existing expense from the database")
-    void updateExpenseByIdTest() {
+    void updateExpense_Success() throws Exception {
+        // Given
         Long expenseId = 1L;
         Expenses updatedExpense = new Expenses();
-        updatedExpense.setExpensesDescription("Updated Groceries");
-        updatedExpense.setExpensesAmount(75);
-        updatedExpense.setExpensesDate(Instant.now());
-        updatedExpense.setBudget(budget);
+        updatedExpense.setExpensesId(expenseId);
+        // Set other fields as needed
 
+        // Convert the updatedExpense to JSON string
+        String requestBody = new ObjectMapper().writeValueAsString(updatedExpense);
 
-        when(expensesService.updateExpense(expenseId, updatedExpense)).thenReturn(updatedExpense);
+        // Stub the service method to return the updated expense
+        when(expensesService.updateExpense(eq(expenseId), any(Expenses.class))).thenReturn(updatedExpense);
 
-        Expenses result = expensesController.updateExpense(expenseId, updatedExpense);
+        // Perform the PUT request
+        mockMvc.perform(MockMvcRequestBuilders.put("/expenses/{id}", expenseId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                // Verify the response
+                .andExpect(status().isOk());
+        // Add more assertions if needed
 
-        assertEquals(updatedExpense, result);
-        verify(expensesService).updateExpense(expenseId, updatedExpense);
+        // Verify that the service method was called with the correct arguments
+        verify(expensesService).updateExpense(eq(expenseId), any(Expenses.class));
     }
-
     @Test
     @DisplayName("Should delete by id an existing expenses from the database")
-    void deleteExpenseByIdTest() {
+    void deleteExpense_Success() throws Exception {
         Long expenseId = 1L;
 
-        ResponseEntity<Expenses> result = expensesController.deleteExpense(expenseId);
+        mockMvc.perform(delete("/expenses/{id}", expenseId))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Expense with ID " + expenseId + " deleted successfully"));
 
-        assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(expensesService).deleteExpense(expenseId);
     }
-
     @Test
     void createExpensesThrowsInvalidInputExceptions() throws Exception {
         given(expensesService.createExpense(any(Expenses.class))).willThrow(new InvalidInputException("Invalid input"));
@@ -192,6 +204,83 @@ public class ExpensesControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Invalid input: Budget not found")));
     }
+
+    @Test
+    void updateExpense_ExpenseNotFound() throws Exception {
+        // Given
+        Long expenseId = 1L;
+        Expenses expenseDetails = new Expenses();
+        when(expensesService.updateExpense(eq(expenseId), any(Expenses.class)))
+                .thenThrow(new ExpenseNotFoundException("Expense with ID " + expenseId + " not found"));
+
+        // Perform the PUT request
+        mockMvc.perform(MockMvcRequestBuilders.put("/expenses/{id}", expenseId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(expenseDetails)))
+                // Verify the response
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string("An expense with ID = " + expenseId + " is not found"));
+
+        // Verify that the service method was called with the correct arguments
+        verify(expensesService).updateExpense(eq(expenseId), any(Expenses.class));
+    }
+
+    @Test
+    void updateExpense_InvalidInput() throws Exception {
+        // Given
+        Long expenseId = 1L;
+        Expenses expenseDetails = new Expenses();
+
+        when(expensesService.updateExpense(eq(expenseId), any(Expenses.class)))
+                .thenThrow(new InvalidInputException("Invalid input message"));
+
+        // Perform the PUT request
+        mockMvc.perform(MockMvcRequestBuilders.put("/expenses/{id}", expenseId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(expenseDetails)))
+                // Verify the response
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("Invalid input: Invalid input message"));
+
+        // Verify that the service method was called with the correct arguments
+        verify(expensesService).updateExpense(eq(expenseId), any(Expenses.class));
+    }
+
+    @Test
+    void updateExpense_InternalServerError() throws Exception {
+        // Given
+        Long expenseId = 1L;
+        Expenses expenseDetails = new Expenses();
+        // Set expenseDetails fields as needed
+
+        // Stub the service method to throw any other exception
+        when(expensesService.updateExpense(eq(expenseId), any(Expenses.class)))
+                .thenThrow(new RuntimeException("Internal server error"));
+
+        // Perform the PUT request
+        mockMvc.perform(MockMvcRequestBuilders.put("/expenses/{id}", expenseId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(expenseDetails)))
+                // Verify the response
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string("An unexpected error occurred. Please try again later."));
+
+        // Verify that the service method was called with the correct arguments
+        verify(expensesService).updateExpense(eq(expenseId), any(Expenses.class));
+    }
+    @Test
+    void deleteExpense_ExpenseNotFound() throws Exception {
+        Long expenseId = 1L;
+        doThrow(new ExpenseNotFoundException("Expense with ID " + expenseId + " not found"))
+                .when(expensesService).deleteExpense(expenseId);
+
+        mockMvc.perform(delete("/expenses/{id}", expenseId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Expense with ID 1 not found"));
+
+        verify(expensesService).deleteExpense(expenseId);
+    }
+
     }
 
 
