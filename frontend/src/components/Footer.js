@@ -1,6 +1,8 @@
 import React from 'react';
+import {useTranslation} from "react-i18next";
 
 const Footer = () => {
+    const {t} = useTranslation("global");
     return (
         <footer id="wb-info">
             <h2 className="wb-inv">About this site</h2>
@@ -12,40 +14,33 @@ const Footer = () => {
                         <h3>Government of Canada</h3>
                         {/* List of links for Government of Canada */}
                         <ul className="list-col-xs-1 list-col-sm-2 list-col-md-3">
-                            <li><a href="https://www.canada.ca/en/contact.html">All contacts</a></li>
-                            <li><a href="https://www.canada.ca/en/government/dept.html">Departments and agencies</a></li>
-                            <li><a href="https://www.canada.ca/en/government/system.html">About government</a></li>
+                            <li><a href={t("app.footer-all-contacts-link")}>{t("app.footer-all-contacts")}</a></li>
+                            <li><a href={t("app.footer-departments-link")}>{t("app.footer-departments")}</a></li>
+                            <li><a href={t("app.footer-government-link")}>{t("app.footer-government")}</a></li>
                         </ul>
                         {/* Heading for Themes and Topics */}
                         <h4><span className="wb-inv">Themes and topics</span></h4>
                         {/* List of links for Themes and Topics */}
                         <ul className="list-unstyled colcount-sm-2 colcount-md-3">
-                            <li><a href="https://www.canada.ca/en/services/jobs.html">Jobs</a></li>
-                            <li><a href="https://www.canada.ca/en/services/immigration-citizenship.html">Immigration and citizenship</a></li>
-                            <li><a href="https://travel.gc.ca/">Travel and tourism</a></li>
-                            <li><a href="https://www.canada.ca/en/services/business.html">Business</a></li>
-                            <li><a href="https://www.canada.ca/en/services/benefits.html">Benefits</a></li>
-                            <li><a href="https://www.canada.ca/en/services/health.html">Health</a></li>
-                            <li><a href="https://www.canada.ca/en/services/taxes.html">Taxes</a></li>
-                            <li><a href="https://www.canada.ca/en/services/environment.html">Environment and natural
-                                resources</a></li>
-                            <li><a href="https://www.canada.ca/en/services/defence.html">National security and
-                                defence</a></li>
-                            <li><a href="https://www.canada.ca/en/services/culture.html">Culture, history and sport</a>
+                            <li><a href={t("app.footer-jobs-link")}>{t("app.footer-jobs")}</a></li>
+                            <li><a href={t("app.footer-immigration-link")}>{t("app.footer-immigration")}</a></li>
+                            <li><a href={t("app.footer-travel-link")}>{t("app.footer-travel")}</a></li>
+                            <li><a href={t("app.footer-business-link")}>{t("app.footer-business")}</a></li>
+                            <li><a href={t("app.footer-benefits-link")}>{t("app.footer-benefits")}</a></li>
+                            <li><a href={t("app.footer-health-link")}>{t("app.footer-health")}</a></li>
+                            <li><a href={t("app.footer-taxes-link")}>{t("app.footer-taxes")}</a></li>
+                            <li><a href={t("app.footer-environment-link")}>{t("app.footer-environment")}</a></li>
+                            <li><a href={t("app.footer-security-link")}>{t("app.footer-security")}</a></li>
+                            <li><a href={t("app.footer-culture-link")}>{t("app.footer-culture")}</a>
                             </li>
-                            <li><a href="https://www.canada.ca/en/services/policing.html">Policing, justice and
-                                emergencies</a></li>
-                            <li><a href="https://www.canada.ca/en/services/transport.html">Transport and
-                                infrastructure</a></li>
-                            <li><a href="https://international.gc.ca/world-monde/index.aspx?lang=eng">Canada and the
-                                world</a></li>
-                            <li><a href="https://www.canada.ca/en/services/finance.html">Money and finance</a></li>
-                            <li><a href="https://www.canada.ca/en/services/science.html">Science and innovation</a></li>
-                            <li><a href="https://www.canada.ca/en/services/indigenous-peoples.html">Indigenous
-                                peoples</a></li>
-                            <li><a href="https://www.canada.ca/en/services/veterans-military.html">Veterans and
-                                military</a></li>
-                            <li><a href="https://www.canada.ca/en/services/youth.html">Youth</a></li>
+                            <li><a href={t("app.footer-justice-link")}>{t("app.footer-justice")}</a></li>
+                            <li><a href={t("app.footer-transport-link")}>{t("app.footer-transport")}</a></li>
+                            <li><a href={t("app.footer-world-link")}>{t("app.footer-world")}</a></li>
+                            <li><a href={t("app.footer-money-link")}>{t("app.footer-money")}</a></li>
+                            <li><a href={t("app.footer-science-link")}>{t("app.footer-science")}</a></li>
+                            <li><a href={t("app.footer-indigenous-link")}>{t("app.footer-indigenous")}</a></li>
+                            <li><a href={t("app.footer-military-link")}>{t("app.footer-military")}</a></li>
+                            <li><a href={t("app.footer-youth-link")}>{t("app.footer-youth")}</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -58,11 +53,11 @@ const Footer = () => {
                         <h3 className="wb-inv">Government of Canada Corporate</h3>
                         {/* List of links for Government of Canada Corporate */}
                         <ul>
-                            <li><a href="https://www.canada.ca/en/social.html">Social media</a></li>
-                            <li><a href="https://www.canada.ca/en/mobile.html">Mobile applications</a></li>
-                            <li><a href="https://www.canada.ca/en/government/about.html">About Canada.ca</a></li>
-                            <li><a href="https://www.canada.ca/en/transparency/terms.html">Terms and conditions</a></li>
-                            <li><a href="https://www.canada.ca/en/transparency/privacy.html">Privacy</a></li>
+                            <li><a href={t("app.footer-social-link")}>{t("app.footer-social")}</a></li>
+                            <li><a href={t("app.footer-mobile-link")}>{t("app.footer-mobile")}</a></li>
+                            <li><a href={t("app.footer-about-canada-link")}>{t("app.footer-about-canada")}</a></li>
+                            <li><a href={t("app.footer-terms-link")}>{t("app.footer-terms")}</a></li>
+                            <li><a href={t("app.footer-privacy-link")}>{t("app.footer-privacy")}</a></li>
                         </ul>
                     </nav>
                     {/* Government of Canada watermark */}

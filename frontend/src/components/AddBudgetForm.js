@@ -4,10 +4,12 @@ import { useUserContext } from '../contexts/UserContext';
 import {calculateTotalSpent, formatCurrency} from "../helpers/HelperFunctions";
 import { useExpenseContext } from '../contexts/ExpenseContext';
 import BasicModal from "./Modal";
+import {useTranslation} from "react-i18next";
 
 
 const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetDescription, setBudgetDescription] = useState('');
+    const{t} = useTranslation("global")
     const [budgetAmount, setBudgetAmount] = useState('');
     const { addNewBudget, updateExistingBudget, fetchBudgets, setError, error, resetError } = useBudgetContext();
     const { user } = useUserContext();
@@ -77,7 +79,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
         resetError();
 
         if (!budgetDescription || isNaN(parseFloat(budgetAmount))) {
-            alert("Please fill in all fields.");
+            alert(t("app.add-budget-alert"));
             return;
         }
 
@@ -121,7 +123,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                         <div className="form-group">
 
                             <label htmlFor="budget-amount">
-                                <span className="field-name">Amount</span> <strong
+                                <span className="field-name">{t("app.add-budget-amount")}</span> <strong
                                 className="required">(required)</strong>
                             </label>
 

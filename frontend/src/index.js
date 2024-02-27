@@ -11,7 +11,7 @@ import fr from "./translations/fr/common.json";
 
 i18next.init({
     interpolation: { escapeValue: false },
-    lng:"en",
+    lng: localStorage.getItem('i18nextLng') || "en",
     resources: {
         en: {
             global:en
