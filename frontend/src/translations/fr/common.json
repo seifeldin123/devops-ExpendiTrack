@@ -72,6 +72,22 @@
     "app-name": "Application de gestion budgétaire",
     "dashboard-welcome": "Bienvenue",
     "add-budget-alert": "Merci de remplir tous les champs.",
-    "add-budget-amount": "Montante"
+    "add-budget-amount": "Montante",
+    "add-budget-create-budget-title": "Créer un budget",
+    "add-budget-budget-name": "Nom du budget",
+    "budgetItem-spent": "Dépensé",
+    "budgetItem-overspent": "Trop dépensé",
+    "budgetItem-remaining": "Restante",
+    "budgetItem-view": "Voir les détails",
+    "budgetItem-edit": "Modifier le budget",
+    "budgetItem-delete": "Supprimer le budget",
+    "budgetItem-cannot-delete": "Ce budget ne peut pas être supprimé car il comporte des dépenses associées. Veuillez supprimer ces dépenses avant de tenter de supprimer le budget.",
+    "budgetItem-confirm-delete": "Confirmation de la suppression",
+    "budgetItem-are-you-sure-delete": "Êtes-vous sûr de vouloir supprimer ce budget?",
+    "budgetItem-cancel": "Annuler",
+    "budgetItem-the-form-cannot-be-submitted": "Le formulaire n'a pas pu être soumis car les erreurs suivantes ont été trouvées:",
+    "add-budget-successfully": "Budgétiser avec succès",
+    "add-budget-updated": "mis à jour",
+    "add-budget-added": "ajouté"
   }
 }

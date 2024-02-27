@@ -72,6 +72,22 @@
     "app-name": "Budget Management Application",
     "dashboard-welcome": "Welcome",
     "add-budget-alert": "Please fill in all fields.",
-    "add-budget-amount": "Amount"
+    "add-budget-amount": "Amount",
+    "add-budget-create-budget-title": "Create Budget",
+    "add-budget-budget-name": "Budget Name",
+    "budgetItem-spent": "Spent",
+    "budgetItem-overspent": "Overspent",
+    "budgetItem-remaining": "Remaining",
+    "budgetItem-view": "View Details",
+    "budgetItem-edit": "Edit Budget",
+    "budgetItem-delete": "Delete Budget",
+    "budgetItem-cannot-delete": "This budget cannot be deleted because it has associated expenses. Please remove these expenses before attempting to delete the budget.",
+    "budgetItem-confirm-delete": "Confirm Delete",
+    "budgetItem-are-you-sure-delete": "Are you sure you want to delete this budget?",
+    "budgetItem-cancel": "Cancel",
+    "budgetItem-the-form-cannot-be-submitted": "The form could not be submitted because these errors were found:",
+    "add-budget-successfully": "Budget successfully",
+    "add-budget-updated": "updated",
+    "add-budget-added": "added"
   }
 }
