@@ -46,6 +46,7 @@ const SignUp = () => {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            onInvalid={(e) => e.target.setCustomValidity(t("app.usernameRequiredMessage"))}
                             placeholder="Username"
                             required
                         />
@@ -63,6 +64,7 @@ const SignUp = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            onInvalid={(e) => e.target.setCustomValidity(t("app.emailRequiredMessage"))}
                             placeholder="Email"
                             required
                         />

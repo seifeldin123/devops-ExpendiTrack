@@ -55,6 +55,8 @@ const Login = () => {
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
+                            onInvalid={(e) => e.target.setCustomValidity(t("app.usernameRequiredMessage"))}
+                            onInput={(e) => e.target.setCustomValidity('')}
                             placeholder="Username"
                             required/>
                     </div>
@@ -72,6 +74,8 @@ const Login = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            onInvalid={(e) => e.target.setCustomValidity(t("app.emailRequiredMessage"))}
+                            onInput={(e) => e.target.setCustomValidity('')}
                             placeholder="Email"
                             required/>
                     </div>

@@ -9,7 +9,7 @@ import {useTranslation} from "react-i18next";
 
 const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetDescription, setBudgetDescription] = useState('');
-    const{t} = useTranslation("global")
+    const{t} = useTranslation("global");
     const [budgetAmount, setBudgetAmount] = useState('');
     const { addNewBudget, updateExistingBudget, fetchBudgets, setError, error, resetError } = useBudgetContext();
     const { user } = useUserContext();
@@ -114,6 +114,8 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                                 className="form-control"
                                 value={budgetDescription}
                                 onChange={(e) => setBudgetDescription(e.target.value)}
+                                onInvalid={(e) => e.target.setCustomValidity(t("app.budgetNameRequired"))}
+                                onInput={(e) => e.target.setCustomValidity('')}
                                 placeholder="e.g., Groceries"
                                 id="budget-description"
                                 data-testid="budget-description-input"
@@ -132,6 +134,8 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                                 className="form-control"
                                 value={budgetAmount}
                                 onChange={(e) => setBudgetAmount(e.target.value)}
+                                onInvalid={(e) => e.target.setCustomValidity(t("app.budgetAmountRequired"))}
+                                onInput={(e) => e.target.setCustomValidity('')}
                                 placeholder="e.g., 500"
                                 id="budget-amount"
                                 data-testid="budget-amount-input"
@@ -176,11 +180,11 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                             handleClose={enhancedOnClose}
                             title="Warning"
                         >
-                            <p><strong>{`Updating this budget to ${formatCurrency(parseFloat(budgetAmount))} is less than the total expenses of ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. Do you want to proceed?`}</strong></p>
+                            <p><strong>{`{t("app.add-budget-warning-1")} ${formatCurrency(parseFloat(budgetAmount))} {t("app.add-budget-warning-2")} ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. {t("app.add-budget-warning-3")}`}</strong></p>
                             <div>
-                                <button onClick={() => handleWarningClose(true)} className="btn btn-danger mrgn-rght-lg">Proceed
+                                <button onClick={() => handleWarningClose(true)} className="btn btn-danger mrgn-rght-lg">{t("app.add-expenses-proceed")}
                                 </button>
-                                <button onClick={() => handleWarningClose(false)} className="btn btn-default">Cancel
+                                <button onClick={() => handleWarningClose(false)} className="btn btn-default">{t("app.budgetItem-cancel")}
                                 </button>
                             </div>
 
