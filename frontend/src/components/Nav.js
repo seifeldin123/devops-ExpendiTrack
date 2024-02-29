@@ -20,7 +20,7 @@ const Nav = () => {
                                 <span property="name">{t("app.app-name")}</span>
                                 <meta property="position" content="2"/>
                             </li>
-                            <li><Link to="/dashboard">Dashboard</Link></li>
+                            <li><Link to="/dashboard">{t("app.dashaboardLink")}</Link></li>
                         </>
                     ) : (
                         // Display login and sign up for unauthenticated users

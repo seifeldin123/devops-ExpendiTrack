@@ -106,7 +106,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
                             <label htmlFor="budget-description">
                                 <span className="field-name">{t("app.add-budget-budget-name")}</span> <strong
-                                className="required">(required)</strong>
+                                className="required">{t("app.add-budget-required")}</strong>
                             </label>
 
                             <input
@@ -126,7 +126,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
                             <label htmlFor="budget-amount">
                                 <span className="field-name">{t("app.add-budget-amount")}</span> <strong
-                                className="required">(required)</strong>
+                                className="required">{t("app.add-budget-required")}</strong>
                             </label>
 
                             <input

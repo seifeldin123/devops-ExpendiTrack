@@ -108,7 +108,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                         <div className="form-group mrgn-tp-sm">
                             <label htmlFor="expense-description">
                                 <span className="field-name">{t("app.add-expenses-add")}</span> <strong
-                                className="required">(required)</strong>
+                                className="required">{t("app.add-budget-required")}</strong>
                             </label>
 
                             <div>
@@ -130,7 +130,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                         <div className="form-group">
                             <label htmlFor="expense-amount">
                                 <span className="field-name">{t("app.add-expenses-amount")}</span> <strong
-                                className="required">(required)</strong>
+                                className="required">{t("app.add-budget-required")}</strong>
                             </label>
 
                             <div>
@@ -158,7 +158,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             ) : (
                                 <label htmlFor="expense-date">
                                     <span className="field-name">{t("app.add-expenses-date")}</span> <strong
-                                    className="required">(required)</strong>
+                                    className="required">{t("app.add-budget-required")}</strong>
                                 </label>
                             )}
 
@@ -194,7 +194,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             ) : (
                                 <label htmlFor="budget-category">
                                     <span className="field-name">{t("app.add-expenses-budget-category")}</span> <strong
-                                    className="required">(required)</strong>
+                                    className="required">{t("app.add-budget-required")}</strong>
                                 </label>
                             )}
 

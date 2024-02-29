@@ -111,6 +111,18 @@
     "budgetAmountRequired": "Please enter budget amount",
     "expenseDescriptionRequired": "Please enter expense name",
     "expenseAmountRequired": "Please enter expense name",
-    "expenseDateRequired": "Please enter date"
+    "expenseDateRequired": "Please enter date",
+    "expenseListTitle": "Expenses",
+    "expenseListTitleDelete": "Delete Expense",
+    "expenseListTitleSureDelete": "Are you sure you want to delete this expense?",
+    "expenseListNotAvailable": "No expenses available",
+    "add-budget-required": "(required)",
+    "logoutComponent-logout": "Logout",
+    "logoutWindow": "Are you sure you want to logout? This will end your current session.",
+    "budgeListNotAvailable": "No budgets available",
+    "modalClose": "Close",
+    "budgetListConfirmDeletion": "Confirm Deletion",
+    "budgetListEdit": "Edit Expense",
+    "dashaboardLink": "Dashboard"
   }
 }

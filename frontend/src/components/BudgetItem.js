@@ -121,12 +121,12 @@ const BudgetItem = ({ budget }) => {
                 </div>
             </div>
             {/* Edit Modal */}
-            {showEditModal && <BasicModal show={showEditModal} handleClose={handleCloseModal} title="Edit Budget">
+            {showEditModal && <BasicModal show={showEditModal} handleClose={handleCloseModal} title={t("app.budgetListEdit")}>
                 <AddBudgetForm existingBudget={budget} onClose={() => setShowEditModal(false)}/>
             </BasicModal>}
 
             {/* Delete confirmation Modal */}
-            {showDeleteConfirmation && <BasicModal show={showDeleteConfirmation} handleClose={handleCloseModal}  title="Confirm Deletion">
+            {showDeleteConfirmation && <BasicModal show={showDeleteConfirmation} handleClose={handleCloseModal}  title={t("app.budgetListConfirmDeletion")}>
                 <div className="text-center">
                     <h5>{t("app.budgetItem-are-you-sure-delete")}</h5>
                     <div className="action-buttons mrgn-tp-md">

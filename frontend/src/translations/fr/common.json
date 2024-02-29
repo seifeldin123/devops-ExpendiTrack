@@ -112,6 +112,18 @@
     "budgetAmountRequired": "Veuillez saisir le montant du budget",
     "expenseDescriptionRequired": "Veuillez saisir le nom de la dépense",
     "expenseAmountRequired": "Veuillez saisir le nom de la dépense",
-    "expenseDateRequired": "Veuillez entrer la date"
+    "expenseDateRequired": "Veuillez entrer la date",
+    "expenseListTitle": "Dépenses",
+    "expenseListTitleDelete": "Supprimer une dépense",
+    "expenseListTitleSureDelete": "Etes-vous sûr de vouloir supprimer cette dépense?",
+    "expenseListNotAvailable": "Aucune dépense disponible",
+    "add-budget-required": "(requis)",
+    "logoutComponent-logout": "Se déconnecter",
+    "logoutWindow": "Êtes-vous sûr de vouloir vous déconnecter? Cela mettra fin à votre session en cours.",
+    "budgeListNotAvailable": "Aucun budget disponible",
+    "modalClose": "Fermer",
+    "budgetListConfirmDeletion": "Confirmer la suppression",
+    "budgetListEdit": "Modifier les dépenses",
+    "dashaboardLink": "Tableau de bord"
   }
 }
