@@ -1,10 +1,25 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BudgetList from '../BudgetList';
+import i18next from "i18next";
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
+import { I18nextProvider } from 'react-i18next';
 
 // Mock the BudgetItem component
 jest.mock('../BudgetItem', () => (props) => <div data-testid="mock-budget-item">{props.budget.budgetDescription}</div>);
 
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
+});
 describe('BudgetList', () => {
     const mockBudgets = [
         { budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 300 },
@@ -13,7 +28,9 @@ describe('BudgetList', () => {
 
     // Display Budget List
     it('renders a list of budget items', () => {
-        render(<BudgetList budgets={mockBudgets} />);
+        render(
+            <BudgetList budgets={mockBudgets} />
+        );
 
         // Check for the "Budgets" heading
         expect(screen.getByText('Budgets')).toBeInTheDocument();
@@ -30,7 +47,11 @@ describe('BudgetList', () => {
 
     // Display No Budgets Message
     it('displays a message when no budgets are available', () => {
-        render(<BudgetList budgets={[]} />);
+        render(
+            <I18nextProvider i18n={i18next}>
+            <BudgetList budgets={[]} />
+            </I18nextProvider>);
+
 
         expect(screen.getByText('No budgets available')).toBeInTheDocument();
     });

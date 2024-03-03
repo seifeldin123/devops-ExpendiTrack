@@ -2,6 +2,10 @@ import React from 'react';
 import {render, screen, fireEvent, act} from '@testing-library/react';
 import AddExpenseForm from '../AddExpenseForm';
 import {ExpenseContext} from '../../contexts/ExpenseContext';
+import i18next from "i18next";
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
+import { I18nextProvider } from 'react-i18next';
 
 
 jest.mock('../../helpers/HelperFunctions', () => ({
@@ -19,6 +23,18 @@ jest.mock('../../contexts/UserContext', () => ({
         user: { id: 'user1', name: 'Test User' },
     }),
 }));
+
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
+});
 
 // Mock data and functions
 const mockBudgets = [
@@ -110,7 +126,12 @@ describe('AddExpenseForm Tests', () => {
 
 
     it('shows a warning modal when the expense amount exceeds the selected budget limit', async () => {
-        render(<AddExpenseForm budgets={mockBudgets} />, { wrapper: Wrapper });
+        render(
+            <I18nextProvider i18n={i18next}>
+                <AddExpenseForm budgets={mockBudgets} />
+            </I18nextProvider>,
+                { wrapper: Wrapper });
+
 
         fireEvent.change(screen.getByTestId('budget-category'), { target: { value: '1' } });
         fireEvent.change(screen.getByPlaceholderText('e.g., Walmart'), { target: { value: 'Big Shopping' } });

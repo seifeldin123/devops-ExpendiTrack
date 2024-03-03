@@ -3,6 +3,10 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ExpenseProvider, removeExpense} from '../../contexts/ExpenseContext';
 import { UserProvider } from '../../contexts/UserContext';
 import ExpenseList from "../ExpenseList";
+import { I18nextProvider } from 'react-i18next';
+import i18next from "i18next";
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
 
 jest.mock('../../contexts/ExpenseContext', () => {
     // Mock removeExpense function
@@ -17,6 +21,18 @@ jest.mock('../../contexts/ExpenseContext', () => {
         // Export the mock so it can be referenced in assertions
         removeExpense,
     };
+});
+
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
 });
 
 jest.mock('../../contexts/BudgetContext', () => ({
@@ -34,11 +50,13 @@ describe('ExpenseList Component', () => {
     it('renders a list of expenses correctly', () => {
 
         render(
-            <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
-                <ExpenseProvider>
-                    <ExpenseList expenses={mockExpenses} />
-                </ExpenseProvider>
-            </UserProvider>
+            <I18nextProvider i18n={i18next}>
+                <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
+                    <ExpenseProvider>
+                        <ExpenseList expenses={mockExpenses} />
+                    </ExpenseProvider>
+                </UserProvider>
+            </I18nextProvider>
         );
 
         expect(screen.getByText('Coffee')).toBeInTheDocument();
@@ -49,11 +67,13 @@ describe('ExpenseList Component', () => {
 
     it('displays a message when no expenses are available', () => {
         render(
-            <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
-                <ExpenseProvider>
-                    <ExpenseList expenses={[]} />
-                </ExpenseProvider>
-            </UserProvider>
+            <I18nextProvider i18n={i18next}>
+                <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
+                    <ExpenseProvider>
+                        <ExpenseList expenses={[]} />
+                    </ExpenseProvider>
+                </UserProvider>
+            </I18nextProvider>
         );
         expect(screen.getByText('No expenses available')).toBeInTheDocument();
     });
@@ -70,11 +90,13 @@ describe('ExpenseList Component', () => {
 
     it('opens delete confirmation modal on delete button click', async () => {
         render(
-            <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
-                <ExpenseProvider>
-                    <ExpenseList expenses={mockExpenses} budgets={[]} />
-                </ExpenseProvider>
-            </UserProvider>
+            <I18nextProvider i18n={i18next}>
+                <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
+                    <ExpenseProvider>
+                        <ExpenseList expenses={mockExpenses} budgets={[]} />
+                    </ExpenseProvider>
+                </UserProvider>
+            </I18nextProvider>
         );
 
         fireEvent.click(screen.getAllByText('Delete Expense')[0]);
@@ -84,11 +106,13 @@ describe('ExpenseList Component', () => {
 
     it('confirms deletion of an expense on confirm delete button click', async () => {
         render(
-            <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
-                <ExpenseProvider>
-                    <ExpenseList expenses={mockExpenses} budgets={[]} />
-                </ExpenseProvider>
-            </UserProvider>
+            <I18nextProvider i18n={i18next}>
+                <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
+                    <ExpenseProvider>
+                        <ExpenseList expenses={mockExpenses} budgets={[]} />
+                    </ExpenseProvider>
+                </UserProvider>
+            </I18nextProvider>
         );
 
         fireEvent.click(screen.getAllByText('Delete Expense')[0]);
@@ -100,11 +124,13 @@ describe('ExpenseList Component', () => {
 
     it('shows the edit modal with correct data and closes on cancel', async () => {
         render(
-            <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
-                <ExpenseProvider>
-                    <ExpenseList expenses={mockExpenses} budgets={[]} />
-                </ExpenseProvider>
-            </UserProvider>
+            <I18nextProvider i18n={i18next}>
+                <UserProvider value={{ user: { id: 1, name: 'Test User' } }}>
+                    <ExpenseProvider>
+                        <ExpenseList expenses={mockExpenses} budgets={[]} />
+                    </ExpenseProvider>
+                </UserProvider>
+            </I18nextProvider>
         );
 
         // Trigger modal open

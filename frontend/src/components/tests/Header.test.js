@@ -1,8 +1,24 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import Header from '../Header';
 import { UserContext } from "../../contexts/UserContext";
 import { BrowserRouter as Router } from 'react-router-dom';
+import i18next from "i18next";
+import { I18nextProvider } from 'react-i18next';
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
+
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
+});
 
 describe('Header Component', () => {
     // Mock user for logged in state
@@ -45,14 +61,17 @@ describe('Header Component', () => {
     });
 
     // Perform Search
-    it('allows user to type in the search box', () => {
+    it('allows user to type in the search box', async () => {
         const { getByPlaceholderText } = render(
-            <Router>
-                <UserContext.Provider value={{ user: null }}>
-                    <Header />
-                </UserContext.Provider>
-            </Router>
+            <I18nextProvider i18n={i18next}>
+                <Router>
+                    <UserContext.Provider value={{ user: null }}>
+                        <Header />
+                    </UserContext.Provider>
+                </Router>
+            </I18nextProvider>
         );
+
         const searchBox = getByPlaceholderText(/Search Canada.ca/i);
         fireEvent.change(searchBox, { target: { value: 'test search' } });
         expect(searchBox.value).toBe('test search');
@@ -61,11 +80,13 @@ describe('Header Component', () => {
     // Display Navigation Menu
     it('displays navigation menu items', () => {
         const { getByText } = render(
-            <Router>
-                <UserContext.Provider value={{ user: null }}>
-                    <Header />
-                </UserContext.Provider>
-            </Router>
+            <I18nextProvider i18n={i18next}>
+                <Router>
+                    <UserContext.Provider value={{ user: null }}>
+                        <Header />
+                    </UserContext.Provider>
+                </Router>
+            </I18nextProvider>
         );
         expect(getByText('Jobs and the workplace')).toBeInTheDocument();
         expect(getByText('Immigration and citizenship')).toBeInTheDocument();
