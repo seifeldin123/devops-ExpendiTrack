@@ -102,7 +102,7 @@ const BudgetItem = ({ budget }) => {
                     </div>
                     {/* Edit and Delete Buttons */}
                     <div className="action-buttons mrgn-tp-md">
-                        <button onClick={handleEditClick} className="btn btn-default">
+                        <button onClick={handleEditClick} className="btn btn-default" id="edit-budget-btn">
                             <span className="glyphicon glyphicon-edit"></span>
                             &nbsp; Edit Budget
                         </button>
