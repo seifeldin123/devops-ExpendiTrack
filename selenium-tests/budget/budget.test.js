@@ -26,7 +26,7 @@ async function signupAndLogin(driver) {
 }
 
 // Helper function to log in a user
-async function loginUser(driver, username, password) {
+async function loginUser(driver) {
     // Navigate to the login page
     await driver.get('http://localhost:3000/login');
 
@@ -56,8 +56,7 @@ async function fillBudgetForm(driver, name, amount) {
 
 // Helper function to fill in the budget form within a modal
 async function fillBudgetFormInModal(driver, name, amount) {
-    // Assuming your modal has a unique class or ID, adjust '.modal-class' to your modal's actual class or ID
-    const modal = await driver.findElement(By.css('.modal')); // Adjust '.modal-class' as necessary
+    const modal = await driver.findElement(By.css('.modal'));
 
     const budgetNameInput = await modal.findElement(By.id('budget-description'));
     await budgetNameInput.clear();
@@ -95,11 +94,11 @@ async function submitUpdateFormAndCheckError(driver, expectedError) {
 
 // Helper Function to click on "Edit" button for a specific budget item
 async function clickEditButtonForBudget(driver, budgetName) {
-    // Find all budget item containers. This selector might need adjustment based on your actual DOM structure.
+    // Find all budget item containers.
     const budgetItems = await driver.findElements(By.css('.card-container'));
 
     for (let budgetItem of budgetItems) {
-        // Assuming the budget name is inside an element with a specific class or id within the budget item container
+        // Find the title of a budget
         const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
 
         if (budgetTitle.includes(budgetName)) {
@@ -111,6 +110,22 @@ async function clickEditButtonForBudget(driver, budgetName) {
     }
 
     throw new Error(`Budget item with name '${budgetName}' not found.`);
+}
+
+// Helper function to create a budget
+async function createBudget(driver, budgetName, budgetAmount) {
+
+    // Fill in the budget form
+    await fillBudgetForm(driver, budgetName, budgetAmount);
+
+    // Submit the budget form
+    const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Budget')]"));
+    await submitButton.click();
+
+    // Wait for and verify the success message
+    let successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 10000); // Increased wait time
+    const successMessage = await successMessageElement.getText();
+    expect(successMessage).toContain('Budget successfully added');
 }
 
 describe('Budget Creation Tests - Invalid Data Scenarios', () => {
@@ -162,14 +177,8 @@ describe('Budget Creation Tests - Valid Data Scenarios', () => {
     });
 
     it('Create Budget with Valid Data', async () => {
-        const budgetName = 'Utilities';
-        const budgetAmount = '500';
-
-        await fillBudgetForm(driver, budgetName, budgetAmount);
-
-        // Submit the create budget form
-        const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Budget')]"));
-        await submitButton.click();
+        // Use the helper function to create a budget
+        await createBudget(driver, 'Housing', '1500');
 
         // Verify success message
         let successMessageElement;
@@ -191,6 +200,9 @@ describe('Budget Editing Tests - Invalid Data Scenarios', () => {
     beforeAll(async () => {
         driver = await buildDriver();
         await loginUser(driver);
+
+        // Use the helper function to create a budget
+        await createBudget(driver, 'Utilities', '500');
     });
 
     afterAll(async () => {
@@ -232,3 +244,46 @@ describe('Budget Editing Tests - Invalid Data Scenarios', () => {
     });
 });
 
+describe('Budget Editing Tests - Valid Data Scenarios', () => {
+    let driver;
+
+    beforeAll(async () => {
+        driver = await buildDriver();
+        await loginUser(driver);
+
+        // Use the helper function to create a budget
+        await createBudget(driver, 'Transportation', '300');
+    });
+
+    afterAll(async () => {
+        await driver.quit();
+    });
+
+    it('Edit Budget with Valid Data Successfully', async () => {
+        // Wait for the success message to ensure the budget is created
+        let successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 7000);
+
+        // Close the success alert by clicking the 'x' button
+        const closeButtonOnAlert = await successMessageElement.findElement(By.css('.close'));
+        await closeButtonOnAlert.click();
+
+        // Click on an "Edit" button next to the 'TRANSPORTATION' budget that already exists
+        await clickEditButtonForBudget(driver, 'TRANSPORTATION');
+
+        // Fill in the form within the modal
+        await fillBudgetFormInModal(driver, 'Updated Transportation', '400');
+
+        // Submit the update budget form
+        const updateButton = await driver.findElement(By.xpath("//button[contains(text(), 'Update Budget')]"));
+        await updateButton.click();
+
+        // Verify success message for the updated budget
+        successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 7000);
+        const successMessage = await successMessageElement.getText();
+        expect(successMessage).toContain('Budget successfully updated!');
+
+        // Close the edit budget modal
+        const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
+        await closeButton.click();
+    });
+});
