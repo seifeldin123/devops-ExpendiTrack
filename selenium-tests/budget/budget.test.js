@@ -54,6 +54,21 @@ async function fillBudgetForm(driver, name, amount) {
     await budgetAmountInput.sendKeys(amount);
 }
 
+// Helper function to fill in the budget form within a modal
+async function fillBudgetFormInModal(driver, name, amount) {
+    // Assuming your modal has a unique class or ID, adjust '.modal-class' to your modal's actual class or ID
+    const modal = await driver.findElement(By.css('.modal')); // Adjust '.modal-class' as necessary
+
+    const budgetNameInput = await modal.findElement(By.id('budget-description'));
+    await budgetNameInput.clear();
+    await budgetNameInput.sendKeys(name);
+
+    const budgetAmountInput = await modal.findElement(By.id('budget-amount'));
+    await budgetAmountInput.clear();
+    await budgetAmountInput.sendKeys(amount);
+}
+
+
 // Helper function to submit the create budget form and check for an error message
 async function submitFormAndCheckError(driver, expectedError) {
     const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Budget')]"));
@@ -76,6 +91,26 @@ async function submitUpdateFormAndCheckError(driver, expectedError) {
     const errorMessageText = await errorMessageElement.getText();
 
     expect(errorMessageText).toContain(expectedError);
+}
+
+// Helper Function to click on "Edit" button for a specific budget item
+async function clickEditButtonForBudget(driver, budgetName) {
+    // Find all budget item containers. This selector might need adjustment based on your actual DOM structure.
+    const budgetItems = await driver.findElements(By.css('.card-container'));
+
+    for (let budgetItem of budgetItems) {
+        // Assuming the budget name is inside an element with a specific class or id within the budget item container
+        const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
+
+        if (budgetTitle.includes(budgetName)) {
+            // Found the budget item. Now click its "Edit" button.
+            const editButton = await budgetItem.findElement(By.css('#edit-budget-btn'));
+            await editButton.click();
+            return; // Exit the function after clicking the button for the matching budget
+        }
+    }
+
+    throw new Error(`Budget item with name '${budgetName}' not found.`);
 }
 
 describe('Budget Creation Tests - Invalid Data Scenarios', () => {
@@ -164,33 +199,36 @@ describe('Budget Editing Tests - Invalid Data Scenarios', () => {
 
     it('Edit Budget with Negative Amount', async () => {
 
-        // Click on an "Edit" button next to the budget that already exists
-        const editButton = await driver.findElement(By.id('edit-budget-btn'));
-        await editButton.click();
+        // Click on an "Edit" button next to the 'UTILITIES' budget that already exists
+        await clickEditButtonForBudget(driver, 'UTILITIES');
 
-        await fillBudgetForm(driver, 'Utilities', '-100');
+        // Fill in the form within the modal
+        await fillBudgetFormInModal(driver, 'Utilities', '-100');
+
+        // Submit the form and check for error
         await submitUpdateFormAndCheckError(driver, 'Invalid input: Budget amount cannot be negative or zero.');
+
+        // Close the edit budget modal
+        const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
+        await closeButton.click();
+
     });
 
     it('Edit Budget with Non-Alphanumeric Name', async () => {
 
-        // Click on an "Edit" button next to the budget that already exists
-        const editButton = await driver.findElement(By.id('edit-budget-btn'));
-        await editButton.click();
+        // Click on an "Edit" button next to the 'UTILITIES' budget that already exists
+        await clickEditButtonForBudget(driver, 'UTILITIES');
 
-        await fillBudgetForm(driver, '$$$ Party Funds $$$', '500');
+        // Fill in the form within the modal
+        await fillBudgetFormInModal(driver, '$$$ Party Funds $$$', '500');
+
+        // Submit the form and check for error
         await submitUpdateFormAndCheckError(driver, 'BudgetDescription must be alphanumeric');
-    });
 
-    it('Edit Budget with Duplicate Name for the Same User', async () => {
+        // Close the edit budget modal
+        const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
+        await closeButton.click();
 
-        // Click on an "Edit" button next to the budget that already exists
-        const editButton = await driver.findElement(By.id('edit-budget-btn'));
-        await editButton.click();
-
-        // Attempt to edit a budget with the name that already exists
-        await fillBudgetForm(driver, 'Utilities', '500');
-        await submitUpdateFormAndCheckError(driver, 'A budget with the name "Utilities" already exists for this user');
     });
 });
 

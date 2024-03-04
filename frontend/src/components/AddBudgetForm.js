@@ -12,6 +12,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const { addNewBudget, updateExistingBudget, fetchBudgets, setError, error, resetError } = useBudgetContext();
     const { user } = useUserContext();
     const { expenses, fetchExpenses } = useExpenseContext() || { expenses: [] }; // Fallback to default if context is undefined
+    const { shouldPopulateForm, disableFormPopulation } = useBudgetContext();
 
     const [showWarningModal, setShowWarningModal] = useState(false);
 
@@ -34,11 +35,12 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
     // Populate form when existingBudget is provided
     useEffect(() => {
-        if (existingBudget) {
+        if (existingBudget && shouldPopulateForm) {
             setBudgetDescription(existingBudget.budgetDescription);
             setBudgetAmount(existingBudget.budgetAmount);
+            disableFormPopulation(); // Prevent further population until enabled again
         }
-    }, [existingBudget, onClose]);
+    }, [existingBudget, shouldPopulateForm, disableFormPopulation, onClose]);
 
     const handleWarningClose = async (proceed) => {
         setShowWarningModal(false);
@@ -65,9 +67,9 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
         } catch (serverError) {
             setError(serverError.message);
             resetError();
-            resetFormFields(); // Reset the form fields on successful submission
-
+            resetFormFields(); // Reset the form fields on unsuccessful submission
         }
+        disableFormPopulation(); // Add this line
     };
 
 
@@ -78,6 +80,12 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
         if (!budgetDescription || isNaN(parseFloat(budgetAmount))) {
             alert("Please fill in all fields.");
+            return;
+        }
+
+        // Directly proceed with submission if the budget amount is 0 or negative.
+        if (parseFloat(budgetAmount) <= 0) {
+            await submitBudget();
             return;
         }
 

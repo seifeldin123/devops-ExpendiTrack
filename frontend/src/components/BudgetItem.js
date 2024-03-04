@@ -13,6 +13,8 @@ const BudgetItem = ({ budget }) => {
     const { expenses } = useExpenseContext();
     const { removeBudget, fetchBudgets, resetError } = useBudgetContext();
 
+    const { enableFormPopulation } = useBudgetContext();
+
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [showDeleteWarning, setShowDeleteWarning] = useState(false); // Added state for delete warning modal
@@ -56,6 +58,8 @@ const BudgetItem = ({ budget }) => {
 
     const handleEditClick = () => {
         resetError(); // Assuming resetError() is available and resets the global error state
+        console.log(typeof enableFormPopulation); // Should log "function"
+        enableFormPopulation();
         setShowEditModal(true);
     };
 

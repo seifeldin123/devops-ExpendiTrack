@@ -9,12 +9,17 @@ import userEvent from "@testing-library/user-event";
 
 const mockRemoveBudget = jest.fn();
 const mockResetError = jest.fn();
+const mockEnableFormPopulation = jest.fn();
+// const mockDisableFormPopulation = jest.fn();
 
 // Mock the useBudgetContext hook
 jest.mock("../../contexts/BudgetContext", () => ({
     useBudgetContext: jest.fn(() => ({
         removeBudget: mockRemoveBudget,
         resetError: mockResetError,
+        enableFormPopulation: mockEnableFormPopulation,
+        // Mimic enabling form population
+        shouldPopulateForm: true,
     })),
 }));
 
@@ -56,6 +61,8 @@ const renderWithProviders = (ui, { user = mockUser, expenses = mockExpenses, bud
     useBudgetContext.mockReturnValue({
         removeBudget: mockRemoveBudget,
         resetError: mockResetError,
+        enableFormPopulation: mockEnableFormPopulation,
+        // disableFormPopulation: mockDisableFormPopulation,
         // Include other context values and functions as needed
     });
 
@@ -117,14 +124,33 @@ describe('BudgetItem', () => {
         expect(screen.getByRole('link', { name: 'View Details' })).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
     });
 
+    // it('shows the edit modal with the correct data when the edit button is clicked', async () => {
+    //
+    //     const { getByText, getByRole } = renderWithProviders(<BudgetItem budget={mockBudget} />);
+    //     await act(async () => {
+    //         await userEvent.click(screen.getByText('Edit Budget'));
+    //     });
+    //     expect(getByRole('dialog')).toHaveTextContent('Edit Budget');
+    //     expect(screen.getByDisplayValue(mockBudget.budgetDescription)).toBeInTheDocument();
+    // });
+
     it('shows the edit modal with the correct data when the edit button is clicked', async () => {
-        const { getByText, getByRole } = renderWithProviders(<BudgetItem budget={mockBudget} />);
+        renderWithProviders(<BudgetItem budget={mockBudget} />);
+
+        // Trigger the action to show the modal
         await act(async () => {
-            await userEvent.click(screen.getByText('Edit Budget'));
+            userEvent.click(screen.getByText('Edit Budget'));
         });
-        expect(getByRole('dialog')).toHaveTextContent('Edit Budget');
-        expect(screen.getByDisplayValue(mockBudget.budgetDescription)).toBeInTheDocument();
+
+        const modalTitle = await screen.findByTestId('modal-title-test-id');
+        expect(modalTitle).toBeInTheDocument();
+        expect(modalTitle).toHaveTextContent('Edit Budget');
+
+        const budgetInput = await screen.findByDisplayValue(mockBudget.budgetDescription);
+        expect(budgetInput).toBeInTheDocument();
     });
+
+
 
     it('shows the delete confirmation modal when the delete button is clicked', async () => {
         const { getByText, queryByRole } = renderWithProviders(<BudgetItem budget={mockAnotherBudget} />);
