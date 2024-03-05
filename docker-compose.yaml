@@ -1,30 +1,38 @@
 version: '3.8'
 
 services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: Expendi
+    ports:
+      - "3306:3306"
+
+
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile  # Specify the path to your backend Dockerfile
+      dockerfile: Dockerfile  # Path to the directory containing your backend Dockerfile
     ports:
-      - "9090:8080"  # Map container port 8080 to host port 8080
+      - "8080:8080"
     depends_on:
-      - database  # Ensure that the database service is running before starting the backend
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/Expendi
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile # Specify the path to your frontend Dockerfile
-    ports:
+   build:
+    context: ./frontend
+    dockerfile: Dockerfile
+   ports:
       - "3000:80"
-    depends_on:
+   depends_on:
       - backend
-    environment:
-      - REACT_APP_BACKEND_URL=http://backend:8080
+   environment:
+      - REACT_APP_BACKEND_URL=http://backend:8080/
 
-  database:
-    image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: password  # Set the MySQL root password
-      MYSQL_DATABASE: Expendi  # Create a database named 'Expendi'
-    ports:
-      - "3308:3306"
+

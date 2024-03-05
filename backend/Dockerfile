@@ -1,13 +1,12 @@
 
 # Use the official OpenJDK 17 Alpine image as the base image
 FROM openjdk:17-jdk-alpine
-
 # Argument for the JAR file (passed during build)
 ARG JAR_FILE=target/*.jar
-
 # Copy the JAR file into the container as 'app.jar'
 COPY ${JAR_FILE} docker-tracker.jar
-
+# Expose the port that your backend application runs on
+EXPOSE 8080
 # Define the entry point for running the application
 ENTRYPOINT ["java", "-jar", "/docker-tracker.jar"]
 
