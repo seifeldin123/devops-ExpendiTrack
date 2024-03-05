@@ -25,7 +25,7 @@ const BudgetItem = ({ budget }) => {
     const percentSpent = Math.min((totalSpent / budget.budgetAmount) * 100, 100);
 
     const ProgressBar = ({ percentSpent }) => {
-        let progressBarClass = "progress-bar progress-bar-striped progress-bar-animated";
+        let progressBarClass = "progress-bar progress-bar-striped progress-bar-animated percent-spent";
 
         if (percentSpent <= 50) {
             progressBarClass += " bg-success";
@@ -93,8 +93,8 @@ const BudgetItem = ({ budget }) => {
                     <h5 className="card-title" data-testid="budget-title-test-id"><strong >Budget Name: {budget.budgetDescription}</strong></h5>
                     <p className="card-text"><strong>Budgeted
                         Amount: {formatCurrency(budget.budgetAmount)}</strong></p>
-                    <p className="card-text"><strong>Spent: {formatCurrency(totalSpent)}</strong></p>
-                    <p className={`card-text`}>
+                    <p className="card-text total-spent"><strong>Spent: {formatCurrency(totalSpent)}</strong></p>
+                    <p className={`card-text remaining`}>
                         <strong
                             className={`${remaining < 0 ? 'text-danger' : 'text-success'}`}>{remaining < 0 ? `Overspent: ${formatCurrency(-remaining)}` : `Remaining: ${formatCurrency(remaining)}`}</strong>
                     </p>
@@ -110,7 +110,7 @@ const BudgetItem = ({ budget }) => {
                             <span className="glyphicon glyphicon-edit"></span>
                             &nbsp; Edit Budget
                         </button>
-                        <button onClick={handleDeleteClick} className="btn btn-danger">
+                        <button onClick={handleDeleteClick} className="btn btn-danger" id="delete-budget-btn">
                             <span className="glyphicon glyphicon-trash"></span>
                             &nbsp; Delete Budget
                         </button>

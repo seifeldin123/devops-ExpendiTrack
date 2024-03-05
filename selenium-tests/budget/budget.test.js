@@ -22,7 +22,7 @@ async function signupAndLogin(driver) {
     await driver.executeScript("arguments[0].click();", submitButton);
 
     // Wait for navigation to the dashboard
-    await driver.wait(until.urlIs('http://localhost:3000/dashboard'), 10000);
+    await driver.wait(until.urlIs('http://localhost:3000/dashboard'), 5000);
 }
 
 // Helper function to log in a user
@@ -39,7 +39,7 @@ async function loginUser(driver) {
     await driver.executeScript("arguments[0].click();", loginButton);
 
     // Wait for navigation to the dashboard or another indicator of successful login
-    await driver.wait(until.urlIs('http://localhost:3000/dashboard'), 10000);
+    await driver.wait(until.urlIs('http://localhost:3000/dashboard'), 5000);
 }
 
 
@@ -123,9 +123,33 @@ async function createBudget(driver, budgetName, budgetAmount) {
     await submitButton.click();
 
     // Wait for and verify the success message
-    let successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 10000); // Increased wait time
+    let successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 5000);
     const successMessage = await successMessageElement.getText();
     expect(successMessage).toContain('Budget successfully added');
+}
+
+// Helper function to add a new expense
+async function createExpense(driver, description, amount, budgetName) {
+
+    // Wait for the Add Expense form to load
+    await driver.wait(until.elementLocated(By.id('expense-description')), 5000);
+
+    // Fill in the expense form
+    await driver.findElement(By.id('expense-description')).sendKeys(description);
+    await driver.findElement(By.id('expense-amount')).sendKeys(amount);
+
+    // Select the appropriate budget for the expense
+    // Assuming that the select dropdown can be interacted with by typing the budget name
+    await driver.findElement(By.id('budget-category')).sendKeys(budgetName);
+
+    // Submit the expense form
+    const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Expense')]"));
+    await submitButton.click();
+
+    // Wait for and verify the success message
+    let successMessageElement = await driver.wait(until.elementLocated(By.css('.expense-message')), 5000);
+    const successMessage = await successMessageElement.getText();
+    expect(successMessage).toContain('Expense successfully added');
 }
 
 describe('Budget Creation Tests - Invalid Data Scenarios', () => {
@@ -261,7 +285,7 @@ describe('Budget Editing Tests - Valid Data Scenarios', () => {
 
     it('Edit Budget with Valid Data Successfully', async () => {
         // Wait for the success message to ensure the budget is created
-        let successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 7000);
+        let successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 5000);
 
         // Close the success alert by clicking the 'x' button
         const closeButtonOnAlert = await successMessageElement.findElement(By.css('.close'));
@@ -278,12 +302,210 @@ describe('Budget Editing Tests - Valid Data Scenarios', () => {
         await updateButton.click();
 
         // Verify success message for the updated budget
-        successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 7000);
+        successMessageElement = await driver.wait(until.elementLocated(By.css('.alert.alert-success')), 5000);
         const successMessage = await successMessageElement.getText();
         expect(successMessage).toContain('Budget successfully updated!');
 
         // Close the edit budget modal
         const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
         await closeButton.click();
+    });
+});
+
+describe('Budget Calculation Tests', () => {
+    let driver;
+
+    beforeAll(async () => {
+        driver = await buildDriver();
+        await loginUser(driver);
+
+        // Create a budget first, since an expense needs a budget to be associated with
+        await createBudget(driver, 'Food', '750');
+
+        // Then, add an expense to the budget
+        await createExpense(driver, 'Restaurant Meals', '250', 'Food');
+    });
+
+    afterAll(async () => {
+        await driver.quit();
+    });
+
+
+    // Revised part of the test case for verifying budget calculations
+    it('Verify budget calculations after adding an expense', async function () {
+
+        // Wait for the budget items to be loaded
+        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+
+        for (let budgetItem of budgetItems) {
+            // Find the title of the budget
+            const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
+
+            if (budgetTitle.includes('FOOD')) {
+
+                // Fetch the displayed values for total spent, remaining, and percent spent
+                const totalSpent = await budgetItem.findElement(By.css('.total-spent')).getText();
+                const remaining = await budgetItem.findElement(By.css('.remaining')).getText();
+                const percentSpentElement = await budgetItem.findElement(By.css('.progress-bar.percent-spent'));
+                const percentSpent = await percentSpentElement.getAttribute('aria-valuenow');
+
+                // Assert that the displayed values match expected calculations
+                expect(totalSpent).toContain('$250');
+                expect(remaining).toContain('$500');
+                expect(percentSpent).toContain('33');
+            }
+        }
+    });
+
+    it('Try to Edit Budget to Amount Less Than Expense and Verify Warning Modal Shows Up', async () => {
+        // Navigate to and trigger the edit form for the 'Utilities' budget
+        await clickEditButtonForBudget(driver, 'FOOD');
+
+        // Attempt to edit the budget to an amount less than total expenses
+        await fillBudgetFormInModal(driver, 'Updated Food', '100'); // Setting budget amount less than existing expenses
+
+        // Submit the form
+        const updateButton = await driver.findElement(By.xpath("//button[contains(text(), 'Update Budget')]"));
+        await updateButton.click();
+
+        // Wait for the warning modal to appear
+        const warningModal = await driver.wait(until.elementLocated(By.css('.modal')), 5000);
+        expect(warningModal).toBeDefined();
+
+        // Verify the text/content within the warning modal
+        const modalText = await warningModal.getText();
+        expect(modalText).toContain('Updating this budget to $100.00 is less than the total expenses of $250.00. Do you want to proceed?');
+
+        // Click the proceed button and edit budget
+        const proceedButton = await driver.findElement(By.xpath("//button[contains(text(), 'Proceed')]"));
+        await proceedButton.click();
+
+        // Wait for the budget items to be loaded
+        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+
+        for (let budgetItem of budgetItems) {
+            // Find the title of the budget
+            const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
+
+            if (budgetTitle.includes('FOOD')) {
+
+                // Fetch the displayed values for total spent, remaining, and percent spent
+                const totalSpent = await budgetItem.findElement(By.css('.total-spent')).getText();
+                const overspent = await budgetItem.findElement(By.css('.remaining')).getText();
+                const percentSpentElement = await budgetItem.findElement(By.css('.progress-bar.percent-spent'));
+                const percentSpent = await percentSpentElement.getAttribute('aria-valuenow');
+
+                // Assert that the displayed values match expected calculations
+                expect(totalSpent).toContain('$250');
+                expect(overspent).toContain('Overspent: $150.00');
+                expect(percentSpent).toContain('100');
+            }
+        }
+    });
+});
+
+describe('Budget Deletion Tests', () => {
+    let driver;
+
+    beforeAll(async () => {
+        driver = await buildDriver();
+        await loginUser(driver);
+
+        // Create a budget first, since an expense needs a budget to be associated with
+        await createBudget(driver, 'Insurance', '650');
+
+        // Then, add an expense to the budget
+        await createExpense(driver, 'Auto insurance', '200', 'Insurance');
+
+        // Create another budget without an expense associated with it
+        await createBudget(driver, 'Medical', '150');
+    });
+
+    afterAll(async () => {
+        await driver.quit();
+    });
+
+    it('Attempt to Delete Budget with Existing Expenses and Delete Warning Modal shows', async () => {
+
+        // Wait for the budget items to be loaded
+        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+
+        for (let budgetItem of budgetItems) {
+            // Find the title of the budget
+            const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
+
+            if (budgetTitle.includes('INSURANCE')) {
+
+                // Click on delete budget button
+                const deleteButton = await budgetItem.findElement(By.css('#delete-budget-btn'));
+                await deleteButton.click();
+            }
+        }
+
+        // await driver.sleep(10000); // Pauses for 10,000 milliseconds (10 seconds)
+
+
+        // Wait for the delete warning modal to appear
+        const deleteWarningModal = await driver.wait(until.elementLocated(By.css('.modal')), 5000);
+        expect(deleteWarningModal).toBeDefined();
+
+        // Verify the title within the delete warning modal
+        const deleteModalTitle = await deleteWarningModal.getText();
+        expect(deleteModalTitle).toContain('Cannot Delete Budget');
+
+        // Verify the body within the delete warning modal
+        const deleteModalBody = await deleteWarningModal.getText();
+        expect(deleteModalBody).toContain('This budget cannot be deleted because it has associated expenses. Please remove these expenses before attempting to delete the budget.');
+
+        // Close the delete warning modal
+        const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
+        await closeButton.click();
+    });
+
+    it('Successfully Delete Budget and Verify Deletion', async () => {
+        // Wait for the budget items to be loaded
+        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+
+        for (let budgetItem of budgetItems) {
+            // Find the title of the budget
+            const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
+
+            if (budgetTitle.includes('MEDICAL')) {
+
+                // Click on delete budget button
+                const deleteButton = await budgetItem.findElement(By.css('#delete-budget-btn'));
+                await deleteButton.click();
+            }
+        }
+
+        // Wait for the delete modal to appear
+        const deleteModal = await driver.wait(until.elementLocated(By.css('.modal')), 5000);
+        expect(deleteModal).toBeDefined();
+
+        // Verify the title within the delete modal
+        const deleteModalTitle = await deleteModal.getText();
+        expect(deleteModalTitle).toContain('Confirm Deletion');
+
+        // Verify the body within the delete modal
+        const deleteModalBody = await deleteModal.getText();
+        expect(deleteModalBody).toContain('Are you sure you want to delete this budget?');
+
+        // Click on Confirm Delete button within the delete modal
+        const confirmDeleteButton = await driver.findElement(By.xpath("//button[contains(text(), 'Confirm Delete')]"));
+        await confirmDeleteButton.click();
+
+        // Verify budget is actually deleted
+        const budgetItemsAfterDeletion = await driver.findElements(By.css('.card-container'));
+        let medicalBudgetExistsPostDeletion = false;
+
+        for (let budgetItem of budgetItemsAfterDeletion) {
+            const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
+            if (budgetTitle.includes('MEDICAL')) {
+                medicalBudgetExistsPostDeletion = true;
+                break;
+            }
+        }
+
+        expect(medicalBudgetExistsPostDeletion).toBe(false); // Expect the Medical budget to no longer exist after deletion
     });
 });
