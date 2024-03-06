@@ -123,6 +123,10 @@
     "modalClose": "Close",
     "budgetListConfirmDeletion": "Confirm Deletion",
     "budgetListEdit": "Edit Expense",
-    "dashaboardLink": "Dashboard"
+    "dashaboardLink": "Dashboard",
+    "invalidExpenseInput": "Invalid input: expenses amount cannot be negative.",
+    "creationFailed": "Invalid input: Invalid email format",
+    "loginFailed": "Login failed. User not found or incorrect credentials.",
+    "invalidBudgetInput": "Invalid input: Budget amount cannot be negative or zero."
   }
 }

@@ -124,6 +124,10 @@
     "modalClose": "Fermer",
     "budgetListConfirmDeletion": "Confirmer la suppression",
     "budgetListEdit": "Modifier les dépenses",
-    "dashaboardLink": "Tableau de bord"
+    "dashaboardLink": "Tableau de bord",
+    "invalidExpenseInput": "Saisie invalide : le montant des dépenses ne peut pas être négatif.",
+    "creationFailed": "Saisie invalide : format d'e-mail invalide",
+    "loginFailed": "La connexion a échoué. Utilisateur introuvable ou identifiants incorrects.",
+    "invalidBudgetInput": "Saisie non valide: le montant du budget ne peut pas être négatif ou nul."
   }
 }

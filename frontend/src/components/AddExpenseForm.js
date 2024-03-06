@@ -250,7 +250,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             <div className="alert alert-danger" role="alert">
                                 <h4>{t("app.add-expenses-form-cannot-be-submitted")}</h4>
                                 <ul>
-                                    <li>{error}</li>
+                                    <li>{t("app.invalidExpenseInput")}</li>
                                 </ul>
                             </div>
                         )}

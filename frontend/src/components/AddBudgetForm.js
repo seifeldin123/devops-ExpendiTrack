@@ -160,7 +160,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                             <div className="alert alert-danger" role="alert">
                                 <h4>{t("app.budgetItem-the-form-cannot-be-submitted")}</h4>
                                 <ul>
-                                    <li>{error}</li>
+                                    <li>{t("app.invalidBudgetInput")}</li>
                                 </ul>
                             </div>
                         )}

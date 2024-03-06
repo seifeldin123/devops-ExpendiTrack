@@ -15,7 +15,7 @@ const Header = () => {
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng).then(() => {
             localStorage.setItem('i18nextLng', lng);
-            window.location.reload();
+            // window.location.reload();
         }).catch(err => {
             console.error('Error changing language:', err);
         });

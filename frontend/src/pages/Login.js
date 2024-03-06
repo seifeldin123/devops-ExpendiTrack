@@ -40,7 +40,7 @@ const Login = () => {
         <div className="container" >
             <form className="form-horizontal" onSubmit={handleLogin}>
                 <h1>{t("app.login-sign-up")}</h1>
-                {error && <div style={{color: 'red'}}>{error}</div>}
+                {error && <div style={{color: 'red'}}>{t("app.loginFailed")}</div>}
 
 
                 <div className="form-group">
