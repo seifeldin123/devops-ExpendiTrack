@@ -176,14 +176,18 @@ describe('AddBudgetForm', () => {
             addNewBudget: jest.fn(),
             updateExistingBudget: jest.fn(),
             fetchBudgets: jest.fn(),
-            error: 'Network Error',
+            error: 'Invalid input: Budget amount cannot be negative or zero.',
             resetError: mockResetError,
         }));
 
-        render(<AddBudgetForm />);
+        render(
+            <I18nextProvider i18n={i18next}>
+                <AddBudgetForm />
+            </I18nextProvider>
+        );
 
         // Error message should be displayed from context
-        expect(screen.getByText('Network Error')).toBeInTheDocument();
+        expect(screen.getByText('Invalid input: Budget amount cannot be negative or zero.')).toBeInTheDocument();
     });
 
     // Test updating form fields when existingBudget prop changes

@@ -146,17 +146,21 @@ describe('AddExpenseForm Tests', () => {
     });
 
     it('displays an error message when there is a server error during submission', async () => {
-        const testErrorMessage = 'Server error';
+        const testErrorMessage = 'Invalid input: expenses amount cannot be negative.';
         render(
-            <ExpenseContext.Provider value={{
-                addNewExpense: mockAddNewExpense.mockRejectedValue(new Error(testErrorMessage)),
-                expenses: [],
-                error: testErrorMessage,
-                resetError: mockResetError,
-                fetchExpenses: mockFetchExpenses,
-            }}>
-                <AddExpenseForm budgets={mockBudgets} />
-            </ExpenseContext.Provider>
+
+                <ExpenseContext.Provider value={{
+                    addNewExpense: mockAddNewExpense.mockRejectedValue(new Error(testErrorMessage)),
+                    expenses: [],
+                    error: testErrorMessage,
+                    resetError: mockResetError,
+                    fetchExpenses: mockFetchExpenses,
+                }}>
+                    <I18nextProvider i18n={i18next}>
+                    <AddExpenseForm budgets={mockBudgets} />
+                    </I18nextProvider>
+                </ExpenseContext.Provider>
+
         );
 
         fireEvent.change(screen.getByTestId('budget-category'), { target: { value: '2' } });
