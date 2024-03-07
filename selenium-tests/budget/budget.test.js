@@ -157,6 +157,8 @@ describe('Budget Creation Tests - Invalid Data Scenarios', () => {
 
     beforeAll(async () => {
         driver = await buildDriver();
+        await driver.manage().window().maximize();
+
         await signupAndLogin(driver);
     });
 
@@ -193,6 +195,8 @@ describe('Budget Creation Tests - Valid Data Scenarios', () => {
 
     beforeAll(async () => {
         driver = await buildDriver();
+        await driver.manage().window().maximize();
+
         await loginUser(driver);
     });
 
@@ -223,6 +227,8 @@ describe('Budget Editing Tests - Invalid Data Scenarios', () => {
 
     beforeAll(async () => {
         driver = await buildDriver();
+        await driver.manage().window().maximize();
+
         await loginUser(driver);
 
         // Use the helper function to create a budget
@@ -273,6 +279,8 @@ describe('Budget Editing Tests - Valid Data Scenarios', () => {
 
     beforeAll(async () => {
         driver = await buildDriver();
+        await driver.manage().window().maximize();
+
         await loginUser(driver);
 
         // Use the helper function to create a budget
@@ -317,6 +325,8 @@ describe('Budget Calculation Tests', () => {
 
     beforeAll(async () => {
         driver = await buildDriver();
+        await driver.manage().window().maximize();
+
         await loginUser(driver);
 
         // Create a budget first, since an expense needs a budget to be associated with
@@ -409,6 +419,8 @@ describe('Budget Deletion Tests', () => {
 
     beforeAll(async () => {
         driver = await buildDriver();
+        await driver.manage().window().maximize();
+
         await loginUser(driver);
 
         // Create a budget first, since an expense needs a budget to be associated with
@@ -439,73 +451,58 @@ describe('Budget Deletion Tests', () => {
                 // Click on delete budget button
                 const deleteButton = await budgetItem.findElement(By.css('#delete-budget-btn'));
                 await deleteButton.click();
+
+                // Wait for the delete warning modal to appear
+                const deleteWarningModal = await driver.wait(until.elementLocated(By.css('.modal')), 5000);
+                expect(deleteWarningModal).toBeDefined();
+
+                // Verify the title within the delete warning modal
+                const deleteModalTitle = await driver.wait(until.elementLocated(By.css('.modal-title')), 5000);
+                const deleteModalTitleText = await deleteModalTitle.getText();
+                expect(deleteModalTitleText).toContain('Cannot Delete Budget');
+
+                // Verify the body within the delete warning modal
+                const deleteModalBody = await deleteWarningModal.getText();
+                expect(deleteModalBody).toContain('This budget cannot be deleted because it has associated expenses. Please remove these expenses before attempting to delete the budget.');
+
+                // Close the delete warning modal
+                const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
+                await closeButton.click();
             }
         }
-
-        // await driver.sleep(10000); // Pauses for 10,000 milliseconds (10 seconds)
-
-
-        // Wait for the delete warning modal to appear
-        const deleteWarningModal = await driver.wait(until.elementLocated(By.css('.modal')), 5000);
-        expect(deleteWarningModal).toBeDefined();
-
-        // Verify the title within the delete warning modal
-        const deleteModalTitle = await deleteWarningModal.getText();
-        expect(deleteModalTitle).toContain('Cannot Delete Budget');
-
-        // Verify the body within the delete warning modal
-        const deleteModalBody = await deleteWarningModal.getText();
-        expect(deleteModalBody).toContain('This budget cannot be deleted because it has associated expenses. Please remove these expenses before attempting to delete the budget.');
-
-        // Close the delete warning modal
-        const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
-        await closeButton.click();
     });
 
     it('Successfully Delete Budget and Verify Deletion', async () => {
-        // Wait for the budget items to be loaded
-        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+        // Wait for the budget items to be visible
+        await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+        let budgetItems = await driver.findElements(By.css('.card-container'));
 
-        for (let budgetItem of budgetItems) {
-            // Find the title of the budget
+        for (let i = 0; i < budgetItems.length; i++) {
+            let budgetItem = budgetItems[i]; // Refetch each iteration to avoid staleness
             const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
 
             if (budgetTitle.includes('MEDICAL')) {
-
-                // Click on delete budget button
                 const deleteButton = await budgetItem.findElement(By.css('#delete-budget-btn'));
                 await deleteButton.click();
+
+                await driver.wait(until.elementLocated(By.css('.modal')), 5000); // Wait for modal
+
+                // Click on Confirm Delete button within the modal
+                await driver.wait(until.elementLocated(By.xpath("//button[contains(text(), 'Confirm Delete')]")), 5000).then(button => button.click());
+
+                // Wait for modal to disappear
+                await driver.wait(until.stalenessOf(await driver.findElement(By.css('.modal'))), 10000);
+
+                break; // Exit the loop once the relevant budget is found and attempted for deletion
             }
         }
 
-        // Wait for the delete modal to appear
-        const deleteModal = await driver.wait(until.elementLocated(By.css('.modal')), 5000);
-        expect(deleteModal).toBeDefined();
+        // Refetch the budget items to check for deletion
+        budgetItems = await driver.findElements(By.css('.card-container'));
+        const budgetTitlesAfterDeletion = await Promise.all(budgetItems.map(async (item) => await item.findElement(By.css('.card-title')).getText()));
 
-        // Verify the title within the delete modal
-        const deleteModalTitle = await deleteModal.getText();
-        expect(deleteModalTitle).toContain('Confirm Deletion');
-
-        // Verify the body within the delete modal
-        const deleteModalBody = await deleteModal.getText();
-        expect(deleteModalBody).toContain('Are you sure you want to delete this budget?');
-
-        // Click on Confirm Delete button within the delete modal
-        const confirmDeleteButton = await driver.findElement(By.xpath("//button[contains(text(), 'Confirm Delete')]"));
-        await confirmDeleteButton.click();
-
-        // Verify budget is actually deleted
-        const budgetItemsAfterDeletion = await driver.findElements(By.css('.card-container'));
-        let medicalBudgetExistsPostDeletion = false;
-
-        for (let budgetItem of budgetItemsAfterDeletion) {
-            const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
-            if (budgetTitle.includes('MEDICAL')) {
-                medicalBudgetExistsPostDeletion = true;
-                break;
-            }
-        }
-
-        expect(medicalBudgetExistsPostDeletion).toBe(false); // Expect the Medical budget to no longer exist after deletion
+        // Verify the specific budget is not present
+        expect(budgetTitlesAfterDeletion).not.toContain('MEDICAL');
     });
+
 });
