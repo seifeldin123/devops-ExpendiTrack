@@ -127,21 +127,26 @@ describe('User Registration Test', () => {
         expect(errorMessage).not.toBe('Invalid input: Invalid email format');
     });
 
-    test("User with name and email already exist" , async () => {
+    test("User with name and email already exist", async () => {
+        await driver.get("http://localhost:3000/signup");
+        await driver.findElement(By.id('username')).sendKeys(name); // Use specific 'name' and 'email'
+        await driver.findElement(By.id('email')).sendKeys(email);
+        let signUpButton = await driver.findElement(By.xpath("//button[contains(text(), 'Sign Up')]"));
+        await driver.executeScript("arguments[0].click();", signUpButton);
         await driver.get("http://localhost:3000/");
-        await driver.manage().setTimeouts({ implicit: 1000 });
         const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
         await driver.executeScript("arguments[0].click();", createAccountButton);
         await driver.wait(until.urlIs('http://localhost:3000/signup'), 5000);
         await driver.findElement(By.id('username')).sendKeys(name);
         await driver.findElement(By.id('email')).sendKeys(email);
-        const signUpButton = await driver.findElement(By.xpath("//button[contains(text(), 'Sign Up')]"));
+        signUpButton = await driver.findElement(By.xpath("//button[contains(text(), 'Sign Up')]"));
         await driver.executeScript("arguments[0].click();", signUpButton);
-        const errorMessage = await driver.executeScript(`
-        const errorDivs = [...document.querySelectorAll('div')].filter(div => div.style.color === 'red');
-        return errorDivs.length > 0 ? errorDivs[0].innerText : '';  
-    `);
-        expect(errorMessage).not.toBe('A user with the provided name or email already exists.');
+
+        await driver.wait(until.elementLocated(By.id('error-message')), 10000); // Adjust the timeout as necessary
+        const errorMessageElement = await driver.findElement(By.id('error-message'));
+        const errorMessage = await errorMessageElement.getText();
+
+        expect(errorMessage).toBe('An account with these credentials already exists.');
     });
 
 });
