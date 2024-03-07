@@ -13,6 +13,9 @@ const SignUp = () => {
 
     const {setUser} = useUserContext();
 
+    // Define local variable error;
+    // if (error ===
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -22,9 +25,29 @@ const SignUp = () => {
             setUser(user); // Set the user in context
             navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
         } catch (error) {
+            console.log(error.message)
             // Extract and set only the error message to display it correctly
-            const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
-            setError(errorMessage);
+            // const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
+            // setError(errorMessage);
+            // console.log(errorMessage, localStorage.getItem("i18nextLng"))
+            // if (errorMessage) {
+            //     setError(errorMessage);
+            //
+            // }
+        // else
+            if (error.message === "Invalid input: Invalid email format") {
+                setError(t("app.creationFailed"));
+            } else if (error.message === "A user with the provided name or email already exists.") {
+                setError(t("app.userExist"))
+            }
+            else if (error.message === "An error occurred during the signup process. Please try again later.") {
+                setError(t("app.signupError"));
+            } else {
+                setError(t("app.unexpectedError"))
+            }
+
+
+
         }
 
     };
@@ -33,7 +56,7 @@ const SignUp = () => {
         <div className="container">
             <form className="form-horizontal" onSubmit={handleSubmit}>
                 <h1>{t("app.Sign-up-create")}</h1>
-                {error && <div style={{color: 'red'}}>{t("app.creationFailed")}</div>}
+                {error && <div style={{color: 'red'}}>{error}</div>}
 
                 <div className="form-group">
                     <div>

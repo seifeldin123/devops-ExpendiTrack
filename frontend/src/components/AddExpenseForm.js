@@ -63,6 +63,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
             fetchExpenses(user.id); // Refresh expense list
             setSelectedBudgetId(budgets.length > 0 ? budgets[0].budgetId.toString() : '');
         } catch (serverError) {
+            console.log(error)
             setShowSuccessAlert(false);
             resetError();
         }
@@ -250,7 +251,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             <div className="alert alert-danger" role="alert">
                                 <h4>{t("app.add-expenses-form-cannot-be-submitted")}</h4>
                                 <ul>
-                                    <li>{t("app.invalidExpenseInput")}</li>
+                                    <li>{error}</li>
                                 </ul>
                             </div>
                         )}

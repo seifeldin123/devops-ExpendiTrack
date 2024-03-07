@@ -127,6 +127,12 @@
     "invalidExpenseInput": "Invalid input: expenses amount cannot be negative.",
     "creationFailed": "Invalid input: Invalid email format",
     "loginFailed": "Login failed. User not found or incorrect credentials.",
-    "invalidBudgetInput": "Invalid input: Budget amount cannot be negative or zero."
+    "invalidBudgetInput": "Invalid input: Budget amount cannot be negative or zero.",
+    "signupError" : "An error occurred during the signup process. Please try again later.",
+    "serverError": "Server error occurred. Please try again later.",
+    "unexpectedError" : "An unexpected error occurred",
+    "errorOccueredCreatedBudget": "An error occurred while creating the budget. Please try again later.",
+    "budgetDescriptionError": "Invalid input: Budget description should be alphanumeric.",
+    "userExist" : "A user with the provided name or email already exists."
   }
 }

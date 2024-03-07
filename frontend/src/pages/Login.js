@@ -26,12 +26,20 @@ const Login = () => {
             if (user && user !== "User not found. Proceed with creation.") {
                 setUser(user); // Set the user in context if found
                 navigate('/dashboard'); // Navigate to the Dashboard upon successful login
-            } else {
-                // The user does not exist, so inform them of a failed login attempt
-                setError('Login failed. User not found or incorrect credentials.');
             }
+            else {
+                // The user does not exist, so inform them of a failed login attempt
+                setError(t("app.loginFailed"));
+            }
+
         } catch (error) {
-            setError('An error occurred during login');
+            // else if (errorMessage.message==="Server error occurred. Please try again later." ) {
+            //     setError(t("app.serverError"))
+            // }
+            if (error.message==="Server error occurred. Please try again later.") {
+                setError(t("app.serverError"))
+            }
+
         }
     };
 
@@ -40,7 +48,7 @@ const Login = () => {
         <div className="container" >
             <form className="form-horizontal" onSubmit={handleLogin}>
                 <h1>{t("app.login-sign-up")}</h1>
-                {error && <div style={{color: 'red'}}>{t("app.loginFailed")}</div>}
+                {error && <div style={{color: 'red'}}>{error}</div>}
 
 
                 <div className="form-group">

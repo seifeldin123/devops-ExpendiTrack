@@ -128,6 +128,12 @@
     "invalidExpenseInput": "Saisie invalide : le montant des dépenses ne peut pas être négatif.",
     "creationFailed": "Saisie invalide : format d'e-mail invalide",
     "loginFailed": "La connexion a échoué. Utilisateur introuvable ou identifiants incorrects.",
-    "invalidBudgetInput": "Saisie non valide: le montant du budget ne peut pas être négatif ou nul."
+    "invalidBudgetInput": "Saisie non valide: le montant du budget ne peut pas être négatif ou nul.",
+    "signupError" : "Une erreur s'est produite lors du processus d'inscription. Veuillez réessayer plus tard.",
+    "serverError": "Une erreur de serveur s'est produite. Veuillez réessayer plus tard.",
+    "unexpectedError" : "Une erreur inattendue est apparue",
+    "errorOccueredCreatedBudget": "Une erreur s'est produite lors de la création du budget. Veuillez réessayer plus tard.",
+    "budgetDescriptionError": "Saisie non valide : la description du budget doit être alphanumérique.",
+    "userExist" : "Un utilisateur avec le nom ou l'adresse e-mail fourni existe déjà."
   }
 }

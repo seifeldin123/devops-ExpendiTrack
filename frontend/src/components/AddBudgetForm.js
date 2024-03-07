@@ -7,6 +7,7 @@ import BasicModal from "./Modal";
 import {useTranslation} from "react-i18next";
 
 
+
 const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetDescription, setBudgetDescription] = useState('');
     const{t} = useTranslation("global");
@@ -64,11 +65,22 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
             resetFormFields(); // Reset the form fields on successful submission
             setShowSuccessAlert(true);
             setTimeout(() => setShowSuccessAlert(false), 5000); // Show success message
-        } catch (serverError) {
-            setError(serverError.message);
-            resetError();
-            resetFormFields(); // Reset the form fields on successful submission
+        } catch (error) {
+            console.log('Error caught in submitBudget:', error);
+            setError('Test error');
 
+            alert('Check the console for the error log.');
+            // First, check if the specific error condition is met
+            if (error.message === "Invalid input: Budget amount cannot be negative or zero.") {
+                setError(t("app.invalidBudgetInput"));
+            } else if (error.message ==="BudgetDescription must be alphanumeric") {
+                // If not, set a generic error message
+                setError(t("app.budgetDescriptionError"))
+            } else {
+                setError(t("app.errorOccueredCreatedBudget"));
+            }
+            // Don't call resetError() here as it would clear the error you've just set
+            resetFormFields(); // It's okay to reset the form fields
         }
     };
 
@@ -160,7 +172,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                             <div className="alert alert-danger" role="alert">
                                 <h4>{t("app.budgetItem-the-form-cannot-be-submitted")}</h4>
                                 <ul>
-                                    <li>{t("app.invalidBudgetInput")}</li>
+                                    <li>{error}</li>
                                 </ul>
                             </div>
                         )}
@@ -180,9 +192,13 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                             handleClose={enhancedOnClose}
                             title="Warning"
                         >
-                            <p><strong>{`{t("app.add-budget-warning-1")} ${formatCurrency(parseFloat(budgetAmount))} {t("app.add-budget-warning-2")} ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. {t("app.add-budget-warning-3")}`}</strong></p>
+                            <p>
+                                <strong>{`${t("app.add-budget-warning-1")} ${formatCurrency(parseFloat(budgetAmount))} ${t("app.add-budget-warning-2")} ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. ${t("app.add-budget-warning-3")}`}</strong>
+                            </p>
+
                             <div>
-                                <button onClick={() => handleWarningClose(true)} className="btn btn-danger mrgn-rght-lg">{t("app.add-expenses-proceed")}
+                                <button onClick={() => handleWarningClose(true)}
+                                        className="btn btn-danger mrgn-rght-lg">{t("app.add-expenses-proceed")}
                                 </button>
                                 <button onClick={() => handleWarningClose(false)} className="btn btn-default">{t("app.budgetItem-cancel")}
                                 </button>
