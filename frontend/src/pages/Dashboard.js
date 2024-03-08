@@ -7,11 +7,13 @@ import ExpenseList from "../components/ExpenseList";
 import AddExpenseForm from "../components/AddExpenseForm";
 import {useExpenseContext} from "../contexts/ExpenseContext";
 import '../styles/Dashboard.css';
+import {useTranslation} from "react-i18next";
 
 const Dashboard = () => {
     const { user } = useUserContext();
     const { budgets, fetchBudgets } = useBudgetContext();
     const { expenses, fetchExpenses } = useExpenseContext();
+    const{t} = useTranslation("global")
 
     useEffect(() => {
         if (user && user.id) {
@@ -22,7 +24,7 @@ const Dashboard = () => {
 
     return (
         <div className="container" data-testid="dashboard">
-            {user && <h1>Welcome, {user.name}!</h1>}
+            {user && <h1>{t("app.dashboard-welcome")}, {user.name}!</h1>}
 
             <div className="dashboard-forms-container">
                 <AddBudgetForm/>

@@ -1,7 +1,9 @@
 import React from 'react';
 import BudgetItem from './BudgetItem';
+import {useTranslation} from "react-i18next";
 
 const BudgetList = React.memo(({ budgets, onEditBudget }) => {
+    const {t}=useTranslation("global")
     if (!Array.isArray(budgets) || budgets.length === 0) {
         return (
             <div >
@@ -10,7 +12,7 @@ const BudgetList = React.memo(({ budgets, onEditBudget }) => {
                         <h5 className="panel-title text-center">Budgets</h5>
                     </header>
                     <div className="panel-body">
-                        <p className="text-center">No budgets available</p>
+                        <p className="text-center">{t("app.budgeListNotAvailable")}</p>
                     </div>
                 </section>
             </div>

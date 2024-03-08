@@ -6,10 +6,25 @@ import { BudgetContext } from '../../contexts/BudgetContext';
 import { ExpenseContext } from '../../contexts/ExpenseContext';
 import Dashboard from '..//Dashboard';
 import axios from 'axios';
+import {I18nextProvider} from "react-i18next";
+import i18next from "i18next";
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
 
 // Mock axios for all tests in this file
 jest.mock('axios');
 
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
+});
 describe('Dashboard Component', () => {
     const mockUser = {
         id: 1,
@@ -39,13 +54,15 @@ describe('Dashboard Component', () => {
     it('renders user expenses data correctly', async () => {
         render(
             <Router>
-                <UserContext.Provider value={{ user: mockUser }}>
-                    <BudgetContext.Provider value={{ budgets: [mockBudget], fetchBudgets: jest.fn() }}>
-                        <ExpenseContext.Provider value={{ expenses: [mockExpense], fetchExpenses: jest.fn() }}>
-                            <Dashboard />
-                        </ExpenseContext.Provider>
-                    </BudgetContext.Provider>
-                </UserContext.Provider>
+                <I18nextProvider i18n={i18next}>
+                    <UserContext.Provider value={{ user: mockUser }}>
+                        <BudgetContext.Provider value={{ budgets: [mockBudget], fetchBudgets: jest.fn() }}>
+                            <ExpenseContext.Provider value={{ expenses: [mockExpense], fetchExpenses: jest.fn() }}>
+                                <Dashboard />
+                            </ExpenseContext.Provider>
+                        </BudgetContext.Provider>
+                    </UserContext.Provider>
+                </I18nextProvider>
             </Router>
         );
 

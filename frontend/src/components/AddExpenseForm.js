@@ -3,6 +3,7 @@ import { useExpenseContext } from '../contexts/ExpenseContext';
 import { formatDate} from '../helpers/HelperFunctions';
 import { useUserContext } from '../contexts/UserContext';
 import BasicModal from "./Modal";
+import {useTranslation} from "react-i18next";
 
 const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [description, setDescription] = useState('');
@@ -11,6 +12,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [selectedBudgetId, setSelectedBudgetId] = useState('');
     const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses } = useExpenseContext();
     const { user } = useUserContext(); // Get the current user
+    const{t}=useTranslation("global")
 
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -61,6 +63,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
             fetchExpenses(user.id); // Refresh expense list
             setSelectedBudgetId(budgets.length > 0 ? budgets[0].budgetId.toString() : '');
         } catch (serverError) {
+            console.log(error)
             setShowSuccessAlert(false);
             resetError();
         }
@@ -99,14 +102,14 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                 <section className="panel panel-primary">
 
                     <header className="panel-heading">
-                        <h2 className="panel-title">{existingExpense ? 'Edit Expense' : 'Create Expense'}</h2>
+                        <h2 className="panel-title">{existingExpense ? t("app.add-expenses-edit") : t("app.add-expenses-create")}</h2>
                     </header>
 
                     <div className="form-section-container">
                         <div className="form-group mrgn-tp-sm">
                             <label htmlFor="expense-description">
-                                <span className="field-name">Expense Name</span> <strong
-                                className="required">(required)</strong>
+                                <span className="field-name">{t("app.add-expenses-add")}</span> <strong
+                                className="required">{t("app.add-budget-required")}</strong>
                             </label>
 
                             <div>
@@ -116,6 +119,8 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                                     className="form-control"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
+                                    onInvalid={(e) => e.target.setCustomValidity(t("app.expenseDescriptionRequired"))}
+                                    onInput={(e) => e.target.setCustomValidity('')}
                                     placeholder="e.g., Walmart"
                                     id="expense-description"
                                     required
@@ -125,8 +130,8 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                         <div className="form-group">
                             <label htmlFor="expense-amount">
-                                <span className="field-name">Expense Amount</span> <strong
-                                className="required">(required)</strong>
+                                <span className="field-name">{t("app.add-expenses-amount")}</span> <strong
+                                className="required">{t("app.add-budget-required")}</strong>
                             </label>
 
                             <div>
@@ -136,6 +141,8 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                                     className="form-control"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
+                                    onInvalid={(e) => e.target.setCustomValidity(t("app.expenseAmountRequired"))}
+                                    onInput={(e) => e.target.setCustomValidity('')}
                                     placeholder="e.g., 150.47"
                                     id="expense-amount"
                                     required
@@ -147,12 +154,12 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                             {existingExpense ? (
                                 <label htmlFor="expense-date">
-                                    <span className="field-name">Expense Date</span>
+                                    <span className="field-name">{t("app.add-expenses-date")}</span>
                                 </label>
                             ) : (
                                 <label htmlFor="expense-date">
-                                    <span className="field-name">Expense Date</span> <strong
-                                    className="required">(required)</strong>
+                                    <span className="field-name">{t("app.add-expenses-date")}</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
                                 </label>
                             )}
 
@@ -170,6 +177,8 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                                     className="form-control"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
+                                    onInvalid={(e) => e.target.setCustomValidity(t("app.expenseDateRequired"))}
+                                    onInput={(e) => e.target.setCustomValidity('')}
                                     placeholder="Date"
                                     id="expense-date"
                                     required
@@ -181,12 +190,12 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                             {existingExpense ? (
                                 <label htmlFor="budget-category">
-                                    <span className="field-name"  >Budget Category</span>
+                                    <span className="field-name"  >{t("app.add-expenses-budget-category")}</span>
                                 </label>
                             ) : (
                                 <label htmlFor="budget-category">
-                                    <span className="field-name">Budget Category</span> <strong
-                                    className="required">(required)</strong>
+                                    <span className="field-name">{t("app.add-expenses-budget-category")}</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
                                 </label>
                             )}
 
@@ -204,7 +213,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                                     onChange={(e) => setSelectedBudgetId(e.target.value)}
                                     id="budget-category"
                                     required>
-                                    <option defaultValue value="">Select Budget</option>
+                                    <option defaultValue value="">{t("app.add-expenses-budget-selection")}</option>
                                     {budgets.map(budget => (
                                         <option key={budget.budgetId} value={budget.budgetId}>
                                             {budget.budgetDescription}
@@ -217,13 +226,13 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                         {existingExpense ? (
                             <button type="submit" className="btn-lg btn-success">
                                 <span className="glyphicon glyphicon-floppy-save"></span>
-                                &nbsp; Update Expense
+                                &nbsp; {t("app.add-expenses-update")}
                             </button>
                         ) : (
                             <div className="mrgn-bttm-md">
                                 <button data-testid="create-expense" type="submit" className="btn-lg btn-default">
                                     <span className="glyphicon glyphicon-plus"></span>
-                                    &nbsp;Create Expense
+                                    &nbsp;{t("app.add-expense-create")}
                                 </button>
                             </div>
                         )}
@@ -234,13 +243,13 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                                         onClick={() => setShowSuccessAlert(false)}>
                                     <span aria-hidden="true">&times;</span>
                                 </button>
-                                <p>Expense successfully {existingExpense ? 'updated' : 'added'}!</p>
+                                <p>{t("app.add-expense-successfully")} {existingExpense ? t("app.add-budget-updated") : t("app.add-expenses-added")}!</p>
                             </div>
                         )}
 
                         {error && (
                             <div className="alert alert-danger" role="alert">
-                                <h4>The form could not be submitted because these errors were found:</h4>
+                                <h4>{t("app.add-expenses-form-cannot-be-submitted")}</h4>
                                 <ul>
                                     <li>{error}</li>
                                 </ul>
@@ -253,12 +262,12 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             handleClose={() => handleWarningClose(false)}
                             title="Warning"
                         >
-                            <p><strong>{`Adding this expense exceeds your budget. Do you want to proceed?`}</strong></p>
+                            <p><strong>{t("app.add-expenses-exceeds-budget")}</strong></p>
                             <div>
                                 <button onClick={() => handleWarningClose(true)}
-                                        className="btn btn-danger mrgn-rght-lg">Proceed
+                                        className="btn btn-danger mrgn-rght-lg">{t("app.add-expenses-proceed")}
                                 </button>
-                                <button onClick={() => handleWarningClose(false)} className="btn btn-default">Cancel
+                                <button onClick={() => handleWarningClose(false)} className="btn btn-default">{t("app.budgetItem-cancel")}
                                 </button>
                             </div>
                         </BasicModal>
