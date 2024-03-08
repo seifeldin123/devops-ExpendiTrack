@@ -60,6 +60,8 @@ describe('AddBudgetForm', () => {
             error: '',
             resetError: mockResetError,
             setError: jest.fn(),
+            // enableFormPopulation: jest.fn(),
+            disableFormPopulation: jest.fn(),
         }));
 
         useUserContext.mockImplementation(() => ({
@@ -191,15 +193,19 @@ describe('AddBudgetForm', () => {
     });
 
     // Test updating form fields when existingBudget prop changes
-    it('updates form fields when existingBudget prop changes', () => {
-        const { rerender } = render(<AddBudgetForm existingBudget={{ budgetDescription: 'Groceries', budgetAmount: '500' }} />);
+    it('updates form fields when existingBudget prop changes', async () => {
+
+        const {rerender} = render(<AddBudgetForm
+            existingBudget={{budgetDescription: 'Groceries', budgetAmount: '500'}}/>);
 
         // Initial values should match the existing budget
-        expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('Groceries');
+        await waitFor(() => {
+            expect(screen.getByDisplayValue('Groceries')).toBeInTheDocument();
+        });
         expect(screen.getByPlaceholderText('e.g., 500').value).toBe('500');
 
         // Rerender with updated props
-        rerender(<AddBudgetForm existingBudget={{ budgetDescription: 'Utilities', budgetAmount: '750' }} />);
+        rerender(<AddBudgetForm existingBudget={{budgetDescription: 'Utilities', budgetAmount: '750'}}/>);
 
         // Form fields should update to reflect the new props
         expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('Utilities');

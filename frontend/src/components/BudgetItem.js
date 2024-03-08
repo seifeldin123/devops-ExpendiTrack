@@ -15,6 +15,8 @@ const BudgetItem = ({ budget }) => {
     const { removeBudget, fetchBudgets, resetError } = useBudgetContext();
     const {t} = useTranslation("global");
 
+    const { enableFormPopulation } = useBudgetContext();
+
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [showDeleteWarning, setShowDeleteWarning] = useState(false); // Added state for delete warning modal
@@ -25,7 +27,7 @@ const BudgetItem = ({ budget }) => {
     const percentSpent = Math.min((totalSpent / budget.budgetAmount) * 100, 100);
 
     const ProgressBar = ({ percentSpent }) => {
-        let progressBarClass = "progress-bar progress-bar-striped progress-bar-animated";
+        let progressBarClass = "progress-bar progress-bar-striped progress-bar-animated percent-spent";
 
         if (percentSpent <= 50) {
             progressBarClass += " bg-success";
@@ -58,6 +60,8 @@ const BudgetItem = ({ budget }) => {
 
     const handleEditClick = () => {
         resetError(); // Assuming resetError() is available and resets the global error state
+        console.log(typeof enableFormPopulation); // Should log "function"
+        enableFormPopulation();
         setShowEditModal(true);
     };
 
@@ -109,11 +113,11 @@ const BudgetItem = ({ budget }) => {
                     </div>
                     {/* Edit and Delete Buttons */}
                     <div className="action-buttons mrgn-tp-md">
-                        <button onClick={handleEditClick} className="btn btn-default">
+                        <button onClick={handleEditClick} className="btn btn-default" id="edit-budget-btn">
                             <span className="glyphicon glyphicon-edit"></span>
                             &nbsp; {t("app.budgetItem-edit")}
                         </button>
-                        <button onClick={handleDeleteClick} className="btn btn-danger">
+                        <button onClick={handleDeleteClick} className="btn btn-danger" id="delete-budget-btn">
                             <span className="glyphicon glyphicon-trash"></span>
                             &nbsp; {t("app.budgetItem-delete")}
                         </button>

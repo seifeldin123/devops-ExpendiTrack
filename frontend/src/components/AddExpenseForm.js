@@ -8,11 +8,16 @@ import {useTranslation} from "react-i18next";
 const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
-    const [date, setDate] = useState('');
     const [selectedBudgetId, setSelectedBudgetId] = useState('');
     const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses } = useExpenseContext();
     const { user } = useUserContext(); // Get the current user
     const{t}=useTranslation("global")
+
+    const [date, setDate] = useState(() => {
+        const today = new Date();
+        const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+        return localDate.toISOString().slice(0, 10);
+    });
 
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -238,7 +243,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                         )}
                         {/* Success and error alerts */}
                         {showSuccessAlert && !error && (
-                            <div className="alert alert-success" role="alert">
+                            <div className="expense-message alert alert-success" role="alert">
                                 <button type="button" className="close" data-dismiss="alert" aria-label="Close"
                                         onClick={() => setShowSuccessAlert(false)}>
                                     <span aria-hidden="true">&times;</span>

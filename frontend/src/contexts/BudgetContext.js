@@ -12,6 +12,7 @@ export const BudgetProvider = ({ children }) => {
     const { user } = useUserContext();
     const [error, setError] = useState('');
     const userId = user?.id;
+    const [shouldPopulateForm, setShouldPopulateForm] = useState(false);
 
     const fetchBudgets = useCallback(async (userId) => {
         try {
@@ -25,6 +26,15 @@ export const BudgetProvider = ({ children }) => {
             const errorMessage = error.message || 'An unexpected error occurred';
             setError(errorMessage);
         }
+    }, []);
+
+    // Functions to toggle the state of updating input form fields during budget update
+    const enableFormPopulation = useCallback(() => {
+        setShouldPopulateForm(true);
+    }, []);
+
+    const disableFormPopulation = useCallback(() => {
+        setShouldPopulateForm(false);
     }, []);
 
 
@@ -135,12 +145,15 @@ export const BudgetProvider = ({ children }) => {
         budgets,
         addNewBudget,
         updateExistingBudget,
+        shouldPopulateForm,
+        enableFormPopulation,
+        disableFormPopulation,
         removeBudget,
         fetchBudgets,
         error,
         setError,
         resetError,
-    }), [budgets, addNewBudget, updateExistingBudget, removeBudget, fetchBudgets, error, resetError]);
+    }), [budgets, addNewBudget, updateExistingBudget, shouldPopulateForm, enableFormPopulation, disableFormPopulation, removeBudget, fetchBudgets, error, resetError]);
 
     return (
         <BudgetContext.Provider value={providerValue}>
