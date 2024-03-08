@@ -23,6 +23,7 @@ const Header = () => {
 
 
 
+
     // Handler to update the search query state
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);

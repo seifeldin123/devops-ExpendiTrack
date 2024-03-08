@@ -75,6 +75,12 @@ export const BudgetProvider = ({ children }) => {
                 } else if (language === "fr") {
                     message = "Saisie non valide : la description du budget doit être alphanumérique."
                 }
+            } else if (error.message.startsWith("A budget with the name")) {
+                if(language ==="en") {
+                    message = error.message
+                } else {
+                    message = "Un budget avec ce nom existe déjà."
+                }
             } else {
                 message = "An unexpected error occurred";
             }

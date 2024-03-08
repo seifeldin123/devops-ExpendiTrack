@@ -63,6 +63,12 @@ export const ExpenseProvider = ({ children }) => {
                 } else if (language === "fr") {
                     message = "Entrée non valide : BudgetDescription doit être alphanumérique"
                 }
+            } else if (error.message.startsWith("An expense with the name")) {
+                if (language === "en") {
+                    message = error.message
+                } else {
+                    message = "Un depense avec ce nom existe déjà."
+                }
             } else {
                 message = "An unexpected error occurred";
             }
