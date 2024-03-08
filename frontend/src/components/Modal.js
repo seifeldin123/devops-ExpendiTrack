@@ -1,6 +1,8 @@
 import React from 'react';
+import {useTranslation} from "react-i18next";
 
-const BasicModal = ({ show, handleClose, children, title }) => {
+const BasicModal = ({ show, handleClose, children, title}) => {
+    const {t} =useTranslation("global")
 
     if (!show) {
         return null;
@@ -20,7 +22,7 @@ const BasicModal = ({ show, handleClose, children, title }) => {
                         {children}
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-primary" onClick={handleClose}>Close</button>
+                        <button type="button" className="btn btn-primary" onClick={handleClose}>{t("app.modalClose")}</button>
                     </div>
                 </div>
             </div>

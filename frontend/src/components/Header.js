@@ -2,13 +2,25 @@ import React, { useState } from 'react';
 import Nav from "./Nav";
 import LogoutComponent from "./LogoutComponent";
 import {useUserContext} from "../contexts/UserContext";
-
+import {useTranslation} from "react-i18next";
+import i18n from "i18next";
 const Header = () => {
 
     // State to hold the search query
     const [searchQuery, setSearchQuery] = useState('');
 
     const { user } = useUserContext(); // Use the useContext hook to access the current user
+    const{t} = useTranslation("global");
+    const currentLang = i18n.language;
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng).then(() => {
+            localStorage.setItem('i18nextLng', lng);
+            // window.location.reload();
+        }).catch(err => {
+            console.error('Error changing language:', err);
+        });
+    };
+
 
 
     // Handler to update the search query state
@@ -21,18 +33,25 @@ const Header = () => {
         <header>
             <div id="wb-bnr" className="container">
                 <div className="row">
-
-                    {/* Language selection section */}
                     <section id="wb-lng" className="col-xs-3 col-sm-12 pull-right text-right">
                         <h2 className="wb-inv">Language selection</h2>
                         <ul className="list-inline mrgn-bttm-0">
-                            <li>
-                                <a lang="fr" hrefLang="fr" href="content-fr.html">
-                                    <span className="hidden-xs" translate="no">Français</span>
-                                    <abbr title="Français" translate="no"
-                                          className="visible-xs h3 mrgn-tp-sm mrgn-bttm-0 text-uppercase">fr</abbr>
-                                </a>
-                            </li>
+                            {currentLang === 'en' && (
+                                <li>
+                                    <a href="/#" onClick={(e) => {
+                                        e.preventDefault();
+                                        changeLanguage('fr');
+                                    }}>Français</a>
+                                </li>
+                            )}
+                            {currentLang === 'fr' && (
+                                <li>
+                                    <a href="/#" onClick={(e) => {
+                                        e.preventDefault();
+                                        changeLanguage('en');
+                                    }}>English</a>
+                                </li>
+                            )}
                         </ul>
                     </section>
 
@@ -58,7 +77,7 @@ const Header = () => {
                                 <label htmlFor="wb-srch-q" className="wb-inv">Search Canada.ca</label>
                                 <input id="wb-srch-q" list="wb-srch-q-ac" className="wb-srch-q form-control" name="q"
                                        type="search" value={searchQuery} size="34" maxLength="170"
-                                       placeholder="Search Canada.ca"
+                                       placeholder={t("app.search")}
                                        onChange={handleSearchChange}/>
                                 <datalist id="wb-srch-q-ac"></datalist>
                             </div>
@@ -86,7 +105,7 @@ const Header = () => {
                                 className="wb-inv">Main </span>Menu <span
                                 className="expicon glyphicon glyphicon-chevron-down"></span></button>
                             <ul role="menu" aria-orientation="vertical"
-                                data-ajax-replace="https://www.canada.ca/content/dam/canada/sitemenu/sitemenu-v2-en.html">
+                                data-ajax-replace={t("app.menuLink")}>
                                 <li role="presentation"><a role="menuitem"
                                                            href="https://www.canada.ca/en/services/jobs.html">Jobs and
                                     the

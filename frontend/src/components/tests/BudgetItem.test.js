@@ -6,11 +6,17 @@ import { UserContext } from '../../contexts/UserContext';
 import { ExpenseContext } from '../../contexts/ExpenseContext';
 import { useBudgetContext } from "../../contexts/BudgetContext";
 import userEvent from "@testing-library/user-event";
+import i18next from "i18next";
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
+import { I18nextProvider } from 'react-i18next';
 
 const mockRemoveBudget = jest.fn();
 const mockResetError = jest.fn();
 const mockEnableFormPopulation = jest.fn();
 // const mockDisableFormPopulation = jest.fn();
+
+
 
 // Mock the useBudgetContext hook
 jest.mock("../../contexts/BudgetContext", () => ({
@@ -57,6 +63,18 @@ const mockAnotherExpense = [
     }
 ];
 
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
+});
+
 const renderWithProviders = (ui, { user = mockUser, expenses = mockExpenses, budget = mockBudget } = {}) => {
     useBudgetContext.mockReturnValue({
         removeBudget: mockRemoveBudget,
@@ -81,11 +99,15 @@ describe('BudgetItem', () => {
 
     // Display Budget Details and Calculate Remaining Budget
     it('renders budget information and calculations correctly', () => {
-        renderWithProviders(<BudgetItem budget={mockBudget} />);
+        renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+                <BudgetItem budget={mockBudget} />
+            </I18nextProvider>
+        );
 
         // Assertions
         expect(screen.getByText(`Budget Name: ${mockBudget.budgetDescription}`)).toBeInTheDocument();
-        expect(screen.getByText(`Budgeted Amount: $${mockBudget.budgetAmount}.00`)).toBeInTheDocument();
+        expect(screen.getByText(`Budget Amount: $${mockBudget.budgetAmount}.00`)).toBeInTheDocument();
         expect(screen.getByText(`Spent: $5.00`)).toBeInTheDocument();
         expect(screen.getByText(/Remaining:/)).toBeInTheDocument();
         expect(screen.getByRole('link')).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
@@ -94,7 +116,11 @@ describe('BudgetItem', () => {
     // Display Overspent Status
     it('displays overspent status when expenses exceed the budget amount', () => {
         const overspentExpenses = [{ ...mockExpenses[0], expensesAmount: 600 }];
-        renderWithProviders(<BudgetItem budget={mockBudget} />, { expenses: overspentExpenses });
+        renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+            <BudgetItem budget={mockBudget} />
+            </I18nextProvider>,
+                { expenses: overspentExpenses });
 
         expect(screen.getByText('Overspent: $100.00')).toBeInTheDocument();
         expect(screen.getByText('Overspent: $100.00').className).toContain('text-danger');
@@ -103,7 +129,11 @@ describe('BudgetItem', () => {
 
     // Display Remaining Status
     it('displays remaining status when expenses are less than the budget amount', () => {
-        renderWithProviders(<BudgetItem budget={mockBudget} />); // Using mockExpenses which are less than budget
+        renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+                <BudgetItem budget={mockBudget} />
+            </I18nextProvider>
+        ); // Using mockExpenses which are less than budget
 
         expect(screen.getByText(/Remaining: \$495.00/)).toBeInTheDocument();
         expect(screen.getByText(/Remaining: \$495.00/).className).toContain('text-success');
@@ -111,7 +141,11 @@ describe('BudgetItem', () => {
 
     // Display Progress Bar
     it('displays progress bar with correct percentage based on expenses', () => {
-        renderWithProviders(<BudgetItem budget={mockBudget} />);
+        renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+                <BudgetItem budget={mockBudget} />
+            </I18nextProvider>
+        );
 
         const progressBar = screen.getByRole('progressbar');
         expect(progressBar).toHaveStyle('width: 1%');
@@ -119,7 +153,11 @@ describe('BudgetItem', () => {
 
     // Navigate to Budget Details
     it('navigates to budget details on clicking "View Details"', () => {
-        renderWithProviders(<BudgetItem budget={mockBudget} />);
+        renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+                <BudgetItem budget={mockBudget} />
+            </I18nextProvider>
+        );
 
         expect(screen.getByRole('link', { name: 'View Details' })).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
     });
@@ -135,9 +173,11 @@ describe('BudgetItem', () => {
     // });
 
     it('shows the edit modal with the correct data when the edit button is clicked', async () => {
-        renderWithProviders(<BudgetItem budget={mockBudget} />);
-
-        // Trigger the action to show the modal
+        const { getByText, getByRole } = renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+                <BudgetItem budget={mockBudget} />
+            </I18nextProvider>
+        );
         await act(async () => {
             userEvent.click(screen.getByText('Edit Budget'));
         });
@@ -153,7 +193,11 @@ describe('BudgetItem', () => {
 
 
     it('shows the delete confirmation modal when the delete button is clicked', async () => {
-        const { getByText, queryByRole } = renderWithProviders(<BudgetItem budget={mockAnotherBudget} />);
+        const { getByText, queryByRole } = renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+                <BudgetItem budget={mockAnotherBudget} />
+            </I18nextProvider>
+        );
         await act(async () => {
             fireEvent.click(screen.getByText('Delete Budget'));
         });
@@ -162,7 +206,11 @@ describe('BudgetItem', () => {
     });
 
     it('calls removeBudget with the correct budgetId on delete confirmation', async () => {
-        renderWithProviders(<BudgetItem budget={mockAnotherBudget} />);
+        renderWithProviders(
+            <I18nextProvider i18n={i18next}>
+                <BudgetItem budget={mockAnotherBudget} />
+            </I18nextProvider>
+        );
 
         // Open the delete confirmation modal
         await act(async () => {

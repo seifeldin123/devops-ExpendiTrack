@@ -44,8 +44,29 @@ export const ExpenseProvider = ({ children }) => {
             setExpenses(prevExpenses => Array.isArray(prevExpenses) ? [...prevExpenses, response] : [response]);
             setError('');
         } catch (error) {
-            const errorMessage = error.message || 'An unexpected error occurred';
-            setError(errorMessage);
+            // const errorMessage = error.message || 'An unexpected error occurred';
+            // setError(errorMessage);
+            console.log(error.message)
+            const language = localStorage.getItem("i18nextLng");
+            let message = '';
+
+            if (error.message === "Invalid input: expenses amount cannot be negative.") {
+                if (language === "en") {
+                    message = error.message;
+                } else if (language === "fr") {
+                    message = "Saisie invalide : le montant des dépenses ne peut pas être négatif.";
+                }
+
+            } else if (error.message === "Invalid input: ExpensesDescription must be alphanumeric") {
+                if (language === "en") {
+                    message = error.message
+                } else if (language === "fr") {
+                    message = "Entrée non valide : BudgetDescription doit être alphanumérique"
+                }
+            } else {
+                message = "An unexpected error occurred";
+            }
+            setError(message);
         }
     }, [userId]); // Removed 'expenses' from the dependency array
 
@@ -58,8 +79,29 @@ export const ExpenseProvider = ({ children }) => {
             setExpenses(updatedExpenses);
             setError('');
         } catch (error) {
-            const errorMessage = error.message || 'An unexpected error occurred';
-            setError(errorMessage);
+            // const errorMessage = error.message || 'An unexpected error occurred';
+            // setError(errorMessage);
+            console.log(error.message)
+            const language = localStorage.getItem("i18nextLng");
+            let message = '';
+
+            if (error.message === "Invalid input: Expenses amount cannot be negative.") {
+                if (language === "en") {
+                    message = error.message;
+                } else if (language === "fr") {
+                    message = "Saisie invalide : le montant des dépenses ne peut pas être négatif.";
+                }
+
+            } else if (error.message === "Invalid input: ExpensesDescription must be alphanumeric") {
+                if (language === "en") {
+                    message = error.message
+                } else if (language === "fr") {
+                    message = "Entrée non valide : BudgetDescription doit être alphanumérique"
+                }
+            } else {
+                message = "An unexpected error occurred";
+            }
+            setError(message);
         }
     }, [expenses, setExpenses, setError]);
 

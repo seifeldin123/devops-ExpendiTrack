@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import {getBudgetsByUserId, createBudget, deleteBudget, updateBudget} from '../services/BudgetService';
 import { useUserContext } from "./UserContext";
 
+
 export const BudgetContext = createContext();
 
 export const useBudgetContext = () => useContext(BudgetContext);
@@ -53,8 +54,31 @@ export const BudgetProvider = ({ children }) => {
             setError('');
 
         } catch (error) {
-            const errorMessage = error.message || 'An unexpected error occurred';
-            setError(errorMessage);
+            console.log(error.message)
+            const language = localStorage.getItem("i18nextLng");
+            let message = '';
+            // if (error.message === "Invalid input: Budget amount cannot be negative or zero."
+            //     && localStorage.getItem("i18nextLng") === "en") {
+            //     setError("asd")
+            // }
+            // const errorMessage = error.message || 'An unexpected error occurred';
+            if (error.message === "Invalid input: Budget amount cannot be negative or zero.") {
+                if (language === "en") {
+                    message = error.message;
+                } else if (language === "fr") {
+                    message = "Saisie non valide: le montant du budget ne peut pas être négatif ou nul.";
+                }
+
+            } else if (error.message === "Invalid input: BudgetDescription must be alphanumeric") {
+                if (language === "en") {
+                    message = error.message
+                } else if (language === "fr") {
+                    message = "Saisie non valide : la description du budget doit être alphanumérique."
+                }
+            } else {
+                message = "An unexpected error occurred";
+            }
+             setError(message);
         }
 
     }, [userId]); // Corrected dependency
@@ -71,8 +95,33 @@ export const BudgetProvider = ({ children }) => {
             );
             setError('');
         } catch (error) {
-            const errorMessage = error.message || 'An unexpected error occurred';
-            setError(errorMessage);
+            // const errorMessage = error.message || 'An unexpected error occurred';
+            // setError(errorMessage);
+            console.log(error.message)
+            const language = localStorage.getItem("i18nextLng");
+            let message = '';
+            // if (error.message === "Invalid input: Budget amount cannot be negative or zero."
+            //     && localStorage.getItem("i18nextLng") === "en") {
+            //     setError("asd")
+            // }
+            // const errorMessage = error.message || 'An unexpected error occurred';
+            if (error.message === "Invalid input: Budget amount cannot be negative or zero.") {
+                if (language === "en") {
+                    message = error.message;
+                } else if (language === "fr") {
+                    message = "Saisie non valide: le montant du budget ne peut pas être négatif ou nul.";
+                }
+
+            } else if (error.message === "Invalid input: BudgetDescription must be alphanumeric") {
+                if (language === "en") {
+                    message = error.message
+                } else if (language === "fr") {
+                    message = "Saisie non valide : la description du budget doit être alphanumérique."
+                }
+            } else {
+                message = "An unexpected error occurred";
+            }
+            setError(message);
         }
     }, [setBudgets, setError]);
 
@@ -82,6 +131,7 @@ export const BudgetProvider = ({ children }) => {
             setBudgets(prevBudgets => prevBudgets.filter(budget => budget.budgetId !== budgetId));
             setError('');
         } catch (error) {
+
             const errorMessage = error.message || 'An unexpected error occurred';
             setError(errorMessage);
         }
