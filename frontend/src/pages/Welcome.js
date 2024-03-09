@@ -4,7 +4,9 @@ import {useTranslation} from "react-i18next";
 
 const Welcome = () => {
     const navigate = useNavigate();
-    const {t} = useTranslation("global")
+    // const {t} = useTranslation("global")
+    const { t } = useTranslation();
+
 
     // Function to navigate to the login page
     const handleLoginClick = () => {
@@ -28,7 +30,7 @@ const Welcome = () => {
                         </button>
                     </li>
                     <li>
-                        <button onClick={handleSignupClick} className="btn btn-call-to-action" type="button">
+                        <button onClick={handleSignupClick} data-testid="createAccountButton" className="btn btn-call-to-action" type="button">
                             <span className="glyphicon glyphicon-user"></span>&nbsp; &nbsp; {t("app.create-new-account")}
                         </button>
                     </li>

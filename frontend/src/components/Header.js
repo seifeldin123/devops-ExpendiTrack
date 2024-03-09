@@ -3,26 +3,28 @@ import Nav from "./Nav";
 import LogoutComponent from "./LogoutComponent";
 import {useUserContext} from "../contexts/UserContext";
 import {useTranslation} from "react-i18next";
-import i18n from "i18next";
+// import i18n from "i18next";
 const Header = () => {
 
     // State to hold the search query
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { user } = useUserContext(); // Use the useContext hook to access the current user
-    const{t} = useTranslation("global");
-    const currentLang = i18n.language;
+    const { user, setLanguage } = useUserContext(); // Access language and setLanguage from context
+
+
+    // const { user } = useUserContext(); // Use the useContext hook to access the current user
+    // const{t} = useTranslation("global");
+    const { t, i18n } = useTranslation();
+    // This function changes the language using i18next and updates the context
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng).then(() => {
-            localStorage.setItem('i18nextLng', lng);
+            // Update language in context instead of localStorag
+            setLanguage(lng);
             // window.location.reload();
         }).catch(err => {
             console.error('Error changing language:', err);
         });
     };
-
-
-
 
     // Handler to update the search query state
     const handleSearchChange = (event) => {
@@ -35,9 +37,10 @@ const Header = () => {
             <div id="wb-bnr" className="container">
                 <div className="row">
                     <section id="wb-lng" className="col-xs-3 col-sm-12 pull-right text-right">
+                        {/* Language switch logic */}
                         <h2 className="wb-inv">Language selection</h2>
                         <ul className="list-inline mrgn-bttm-0">
-                            {currentLang === 'en' && (
+                            {i18n.language === 'en' && (
                                 <li>
                                     <a href="/#" onClick={(e) => {
                                         e.preventDefault();
@@ -45,7 +48,7 @@ const Header = () => {
                                     }}>Français</a>
                                 </li>
                             )}
-                            {currentLang === 'fr' && (
+                            {i18n.language === 'fr' && (
                                 <li>
                                     <a href="/#" onClick={(e) => {
                                         e.preventDefault();

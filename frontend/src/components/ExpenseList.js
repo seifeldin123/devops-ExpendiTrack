@@ -10,7 +10,9 @@ const ExpenseList = React.memo(({ expenses, budgets }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const { removeExpense, resetError } = useExpenseContext();
-    const {t, i18n}=useTranslation("global")
+    // const {t, i18n}=useTranslation("global")
+    const { t, i18n } = useTranslation();
+
     useEffect(() => {
     }, [i18n.language]);
 
@@ -64,7 +66,7 @@ const ExpenseList = React.memo(({ expenses, budgets }) => {
                                 <div className="card-body">
                                     <h5 className="card-title" data-testid="expense-title-test-id"><strong>{t("app.add-expenses-add")}: </strong>{expense.expensesDescription}</h5>
                                     <p className="card-text"  data-testid="expense-amount-test-id"><strong>{t("app.add-expenses-amount")}: </strong>{formatCurrency(expense.expensesAmount)}</p>
-                                    <p className="card-text"><strong>{t("app.add-expenses-date")}: </strong>{formatDate(expense.expensesDate, localStorage.getItem("i18nextLng") === "en" ? "en-US" : "fr-FR")}</p>
+                                    <p className="card-text"><strong>{t("app.add-expenses-date")}: </strong>{formatDate(expense.expensesDate, i18n.language === "en" ? "en-US" : "fr-FR")}</p>
                                     <p className="card-text"><strong>{t("app.add-budget-budget-name")}: </strong>{expense.budget?.budgetDescription || 'No Budget'}</p>
                                     <div className="text-right">
 

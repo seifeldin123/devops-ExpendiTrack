@@ -9,8 +9,10 @@ export const useBudgetContext = () => useContext(BudgetContext);
 
 export const BudgetProvider = ({ children }) => {
     const [budgets, setBudgets] = useState([]);
-    const { user } = useUserContext();
+    // const { user } = useUserContext();
     const [error, setError] = useState('');
+    const { user, language } = useUserContext();
+
     const userId = user?.id;
     const [shouldPopulateForm, setShouldPopulateForm] = useState(false);
 
@@ -55,7 +57,7 @@ export const BudgetProvider = ({ children }) => {
 
         } catch (error) {
             console.log(error.message)
-            const language = localStorage.getItem("i18nextLng");
+            // const language = localStorage.getItem("i18nextLng");
             let message = '';
             // if (error.message === "Invalid input: Budget amount cannot be negative or zero."
             //     && localStorage.getItem("i18nextLng") === "en") {
@@ -87,7 +89,7 @@ export const BudgetProvider = ({ children }) => {
              setError(message);
         }
 
-    }, [userId]); // Corrected dependency
+    }, [userId, language]); // Corrected dependency
 
     const updateExistingBudget = useCallback(async (budgetId, budgetData) => {
         if (!budgetId) {
@@ -104,7 +106,7 @@ export const BudgetProvider = ({ children }) => {
             // const errorMessage = error.message || 'An unexpected error occurred';
             // setError(errorMessage);
             console.log(error.message)
-            const language = localStorage.getItem("i18nextLng");
+            // const language = localStorage.getItem("i18nextLng");
             let message = '';
             // if (error.message === "Invalid input: Budget amount cannot be negative or zero."
             //     && localStorage.getItem("i18nextLng") === "en") {
@@ -129,7 +131,7 @@ export const BudgetProvider = ({ children }) => {
             }
             setError(message);
         }
-    }, [setBudgets, setError]);
+    }, [setBudgets, language, setError]);
 
     const removeBudget = useCallback(async (budgetId) => {
         try {

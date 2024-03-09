@@ -5,7 +5,9 @@ import {useTranslation} from "react-i18next";
 
 
 const LogoutComponent = () => {
-    const {t} = useTranslation("global")
+    // const {t} = useTranslation("global")
+    const { t, i18n } = useTranslation();
+
     // Access setUser function from UserContext and navigation from React Router
     const { setUser } = useUserContext();
     const navigate = useNavigate();

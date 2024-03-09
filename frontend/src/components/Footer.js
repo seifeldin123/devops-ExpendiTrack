@@ -2,7 +2,9 @@ import React from 'react';
 import {useTranslation} from "react-i18next";
 
 const Footer = () => {
-    const {t} = useTranslation("global");
+    // const {t} = useTranslation("global");
+    const { t, i18n } = useTranslation();
+
     return (
         <footer id="wb-info">
             <h2 className="wb-inv">About this site</h2>

@@ -10,7 +10,9 @@ import {useTranslation} from "react-i18next";
 
 const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetDescription, setBudgetDescription] = useState('');
-    const{t} = useTranslation("global");
+    // const{t} = useTranslation("global");
+    const { t, i18n } = useTranslation();
+
     const [budgetAmount, setBudgetAmount] = useState('');
     const { addNewBudget, updateExistingBudget, fetchBudgets, setError, error, resetError } = useBudgetContext();
     const { user } = useUserContext();
@@ -81,7 +83,6 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
             } else {
                 setError(t("app.errorOccueredCreatedBudget"));
             }
-            // Don't call resetError() here as it would clear the error you've just set
             resetFormFields(); // It's okay to reset the form fields
         }
         disableFormPopulation(); // Add this line
@@ -170,7 +171,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                             </button>
                         ) : (
                             <div className="mrgn-bttm-md">
-                                <button type="submit" className="btn-lg btn-default">
+                                <button type="submit" className="btn-lg btn-default" data-testid="submitBudgetButton">
                                     <span className="glyphicon glyphicon-plus"></span>
                                     &nbsp;{t("app.add-budget-create-budget-title")}
                                 </button>

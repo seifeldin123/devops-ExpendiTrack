@@ -13,7 +13,9 @@ const BudgetItem = ({ budget }) => {
     const { user } = useUserContext();
     const { expenses } = useExpenseContext();
     const { removeBudget, fetchBudgets, resetError } = useBudgetContext();
-    const {t} = useTranslation("global");
+    // const {t} = useTranslation("global");
+    const { t, i18n } = useTranslation();
+
 
     const { enableFormPopulation } = useBudgetContext();
 

@@ -8,7 +8,9 @@ export const useExpenseContext = () => useContext(ExpenseContext);
 
 export const ExpenseProvider = ({ children }) => {
     const [expenses, setExpenses] = useState([]);
-    const { user } = useUserContext();
+    // const { user } = useUserContext();
+    const { user, language } = useUserContext();
+
     const [error, setError] = useState('');
     const userId = user?.id; // Extract userId for dependency tracking
 
@@ -47,7 +49,7 @@ export const ExpenseProvider = ({ children }) => {
             // const errorMessage = error.message || 'An unexpected error occurred';
             // setError(errorMessage);
             console.log(error.message)
-            const language = localStorage.getItem("i18nextLng");
+            // const language = localStorage.getItem("i18nextLng");
             let message = '';
 
             if (error.message === "Invalid input: expenses amount cannot be negative.") {
@@ -74,7 +76,7 @@ export const ExpenseProvider = ({ children }) => {
             }
             setError(message);
         }
-    }, [userId]); // Removed 'expenses' from the dependency array
+    }, [userId, language]); // Removed 'expenses' from the dependency array
 
     const updateExistingExpense = useCallback(async (expenseId, expenseData) => {
         try {
@@ -88,7 +90,7 @@ export const ExpenseProvider = ({ children }) => {
             // const errorMessage = error.message || 'An unexpected error occurred';
             // setError(errorMessage);
             console.log(error.message)
-            const language = localStorage.getItem("i18nextLng");
+            // const language = localStorage.getItem("i18nextLng");
             let message = '';
 
             if (error.message === "Invalid input: Expenses amount cannot be negative.") {
@@ -109,7 +111,7 @@ export const ExpenseProvider = ({ children }) => {
             }
             setError(message);
         }
-    }, [expenses, setExpenses, setError]);
+    }, [expenses, language, setExpenses, setError]);
 
     const removeExpense = useCallback(async (expenseId) => {
 

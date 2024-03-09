@@ -11,7 +11,9 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [selectedBudgetId, setSelectedBudgetId] = useState('');
     const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses } = useExpenseContext();
     const { user } = useUserContext(); // Get the current user
-    const{t}=useTranslation("global")
+    // const{t}=useTranslation("global")
+    const { t, i18n } = useTranslation();
+
 
     const [date, setDate] = useState(() => {
         const today = new Date();

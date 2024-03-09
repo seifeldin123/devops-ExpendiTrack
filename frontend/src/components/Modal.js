@@ -2,7 +2,9 @@ import React from 'react';
 import {useTranslation} from "react-i18next";
 
 const BasicModal = ({ show, handleClose, children, title}) => {
-    const {t} =useTranslation("global")
+    // const {t} =useTranslation("global")
+    const { t, i18n } = useTranslation();
+
 
     if (!show) {
         return null;

@@ -5,7 +5,9 @@ import {useTranslation} from "react-i18next";
 
 const Nav = () => {
     const {user} = useUserContext();
-    const{t} = useTranslation("global")
+    // const{t} = useTranslation("global")
+    const { t, i18n } = useTranslation();
+
 
     return (
         <nav id="wb-bc" property="breadcrumb">

@@ -13,7 +13,9 @@ const Dashboard = () => {
     const { user } = useUserContext();
     const { budgets, fetchBudgets } = useBudgetContext();
     const { expenses, fetchExpenses } = useExpenseContext();
-    const{t} = useTranslation("global")
+    // const{t} = useTranslation("global")
+    const { t, i18n } = useTranslation();
+
 
     useEffect(() => {
         if (user && user.id) {

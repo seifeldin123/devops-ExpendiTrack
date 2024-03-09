@@ -3,7 +3,9 @@ import BudgetItem from './BudgetItem';
 import {useTranslation} from "react-i18next";
 
 const BudgetList = React.memo(({ budgets, onEditBudget }) => {
-    const {t}=useTranslation("global")
+    // const {t}=useTranslation("global")
+    const { t, i18n } = useTranslation();
+
     if (!Array.isArray(budgets) || budgets.length === 0) {
         return (
             <div >

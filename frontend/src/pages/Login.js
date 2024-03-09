@@ -10,7 +10,9 @@ const Login = () => {
     const { setUser } = useUserContext();
     const navigate = useNavigate(); // Use navigate for redirection after login
     const [error, setError] = useState(''); // State to hold error messages
-    const {t} = useTranslation("global")
+    // const {t} = useTranslation("global")
+    const { t, i18n } = useTranslation();
+
 
     // Modified to accept the event argument
     const handleLogin = async (event) => {
