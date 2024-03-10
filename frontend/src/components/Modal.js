@@ -1,17 +1,19 @@
 import React from 'react';
 import {useTranslation} from "react-i18next";
 
-const BasicModal = ({ show, handleClose, children, title}) => {
+const BasicModal = ({ show, handleClose, children, title, modalType }) => {
     // const {t} =useTranslation("global")
     const { t, i18n } = useTranslation();
-
 
     if (!show) {
         return null;
     }
 
+    // Determine data-testid based on modalType
+    const modalTestId = modalType ? `modal-${modalType}` : 'modal-default';
+
     return (
-        <div className={`modal show fade modal-backdrop-custom ${show ? '' : 'd-none'}`} tabIndex="-1" role="dialog">
+        <div className={`modal show fade modal-backdrop-custom ${show ? '' : 'd-none'}`} tabIndex="-1" role="dialog"  data-testid={modalTestId}>
             <div className="modal-dialog modal-dialog-centered modal-dialog-custom" role="document">
                 <div className="modal-content">
                     <div className="modal-header modal-header-custom">

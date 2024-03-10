@@ -9,7 +9,9 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const {t} = useTranslation("global");
+    // const {t} = useTranslation("global");
+    const { t, i18n } = useTranslation();
+
 
     const {setUser} = useUserContext();
 

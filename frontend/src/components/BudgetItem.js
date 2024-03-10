@@ -97,8 +97,8 @@ const BudgetItem = ({ budget }) => {
                     <h5 className="card-title" data-testid="budget-title-test-id"><strong >{t("app.add-budget-budget-name")}: {budget.budgetDescription}</strong></h5>
                     <p className="card-text"><strong>
                         {t("app.add-budget-amount")}: {formatCurrency(budget.budgetAmount)}</strong></p>
-                    <p className="card-text"><strong>{t("app.budgetItem-spent")}: {formatCurrency(totalSpent)}</strong></p>
-                    <p className={`card-text`}>
+                    <p className="card-text total-spent"><strong>{t("app.budgetItem-spent")}: {formatCurrency(totalSpent)}</strong></p>
+                    <p className={`card-text remaining`}>
                         <strong
                             className={`${remaining < 0 ? 'text-danger' : 'text-success'}`}>
                             {remaining < 0 ?

@@ -7,7 +7,8 @@ async function signupAndLogin(driver) {
     await driver.get('http://localhost:3000/');
 
     // Click on the "Create a New Account" button to navigate to the signup page
-    const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+    // const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+    const createAccountButton = await driver.findElement(By.css('[data-testid="createAccountButton"]'));
     await driver.executeScript("arguments[0].click();", createAccountButton);
 
     // Wait for navigation to the signup page
@@ -70,7 +71,8 @@ async function fillBudgetFormInModal(driver, name, amount) {
 
 // Helper function to submit the create budget form and check for an error message
 async function submitFormAndCheckError(driver, expectedError) {
-    const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Budget')]"));
+
+    const submitButton = await driver.findElement(By.css('[data-testid="submitBudgetButton"]'));
     await submitButton.click();
 
     await driver.wait(until.elementLocated(By.css('.alert.alert-danger')), 5000);
@@ -82,7 +84,7 @@ async function submitFormAndCheckError(driver, expectedError) {
 
 // Helper function to submit the update budget form and check for an error message
 async function submitUpdateFormAndCheckError(driver, expectedError) {
-    const updateButton = await driver.findElement(By.xpath("//button[contains(text(), 'Update Budget')]"));
+    const updateButton = await driver.findElement(By.css('[data-testid="updateBudgetButton"]'));
     await updateButton.click();
 
     await driver.wait(until.elementLocated(By.css('.alert.alert-danger')), 5000);
@@ -119,7 +121,7 @@ async function createBudget(driver, budgetName, budgetAmount) {
     await fillBudgetForm(driver, budgetName, budgetAmount);
 
     // Submit the budget form
-    const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Budget')]"));
+    const submitButton = await driver.findElement(By.css('[data-testid="submitBudgetButton"]'));
     await submitButton.click();
 
     // Wait for and verify the success message
@@ -143,7 +145,7 @@ async function createExpense(driver, description, amount, budgetName) {
     await driver.findElement(By.id('budget-category')).sendKeys(budgetName);
 
     // Submit the expense form
-    const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Expense')]"));
+    const submitButton = await driver.findElement(By.css('[data-testid="create-expense"]'));
     await submitButton.click();
 
     // Wait for and verify the success message
@@ -181,7 +183,7 @@ describe('Budget Creation Tests - Invalid Data Scenarios', () => {
         await fillBudgetForm(driver, 'Groceries', '300');
 
         // Submit form
-        const submitButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create Budget')]"));
+        const submitButton = await driver.findElement(By.css('[data-testid="submitBudgetButton"]'));
         await submitButton.click();
 
         // Then, attempt to create another budget with the same name
@@ -306,7 +308,7 @@ describe('Budget Editing Tests - Valid Data Scenarios', () => {
         await fillBudgetFormInModal(driver, 'Updated Transportation', '400');
 
         // Submit the update budget form
-        const updateButton = await driver.findElement(By.xpath("//button[contains(text(), 'Update Budget')]"));
+        const updateButton = await driver.findElement(By.css('[data-testid="updateBudgetButton"]'));
         await updateButton.click();
 
         // Verify success message for the updated budget
@@ -375,14 +377,22 @@ describe('Budget Calculation Tests', () => {
         await fillBudgetFormInModal(driver, 'Updated Food', '100'); // Setting budget amount less than existing expenses
 
         // Submit the form
-        const updateButton = await driver.findElement(By.xpath("//button[contains(text(), 'Update Budget')]"));
+        const updateButton = await driver.findElement(By.css('[data-testid="updateBudgetButton"]'));
         await updateButton.click();
 
         // Wait for the warning modal to appear
-        const warningModal = await driver.wait(until.elementLocated(By.css('.modal')), 5000);
+        const warningModal = await driver.findElement(By.css('[data-testid="modal-budget-warning"]'));
         expect(warningModal).toBeDefined();
 
-        const modalBody = await driver.wait(until.elementLocated(By.css('.modal-body')), 5000);
+        // Enhance wait to ensure the modal body text includes the expected message
+        await driver.wait(async () => {
+            const modalBody = await driver.findElement(By.css('#updating-budget-warning'));
+            const modalBodyText = await modalBody.getText();
+            return modalBodyText.includes('Updating this budget to $100.00 is less than the total expenses of $250.00. Do you want to proceed?');
+        }, 5000); // Wait up to 10 seconds for the condition to be true
+
+        // After the wait, retrieve the text again for the assertion
+        const modalBody = await driver.findElement(By.css('#updating-budget-warning'));
         const modalBodyText = await modalBody.getText();
         expect(modalBodyText).toContain('Updating this budget to $100.00 is less than the total expenses of $250.00. Do you want to proceed?');
 

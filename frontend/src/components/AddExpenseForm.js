@@ -231,7 +231,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                         </div>
 
                         {existingExpense ? (
-                            <button type="submit" className="btn-lg btn-success">
+                            <button type="submit" className="btn-lg btn-success" data-testid="updateExpenseButton">
                                 <span className="glyphicon glyphicon-floppy-save"></span>
                                 &nbsp; {t("app.add-expenses-update")}
                             </button>

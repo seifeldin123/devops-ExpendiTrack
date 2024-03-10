@@ -165,7 +165,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                             />
                         </div>
                         {existingBudget ? (
-                            <button type="submit" className="btn-lg btn-success">
+                            <button type="submit" className="btn-lg btn-success" data-testid="updateBudgetButton">
                                 <span className="glyphicon glyphicon-floppy-save"></span>
                                 &nbsp; {t("app.budgetItem-edit")}
                             </button>
@@ -201,9 +201,10 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                             show={showWarningModal}
                             handleClose={enhancedOnClose}
                             title="Warning"
+                            modalType="budget-warning"
                         >
                             <p>
-                                <strong>{`${t("app.add-budget-warning-1")} ${formatCurrency(parseFloat(budgetAmount))} ${t("app.add-budget-warning-2")} ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. ${t("app.add-budget-warning-3")}`}</strong>
+                                <strong id="updating-budget-warning" >{`${t("app.add-budget-warning-1")} ${formatCurrency(parseFloat(budgetAmount))} ${t("app.add-budget-warning-2")} ${formatCurrency(calculateTotalSpent(expenses, existingBudget?.budgetId))}. ${t("app.add-budget-warning-3")}`}</strong>
                             </p>
 
                             <div>
