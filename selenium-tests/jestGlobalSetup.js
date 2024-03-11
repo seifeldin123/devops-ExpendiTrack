@@ -4,7 +4,7 @@ const axios = require('axios');
 
 function startSpringBootApplication() {
     return new Promise((resolve, reject) => {
-        const mvn = exec("mvn spring-boot:run", { cwd: "../backend" });
+        const mvn = exec("mvn spring-boot:run -Dspring-boot.run.profiles=test", { cwd: "../backend" });
 
         mvn.stdout.on('data', (data) => {
             console.log(data); // Optionally log output for debugging
