@@ -6,11 +6,8 @@ import { useExpenseContext } from '../contexts/ExpenseContext';
 import BasicModal from "./Modal";
 import {useTranslation} from "react-i18next";
 
-
-
 const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [budgetDescription, setBudgetDescription] = useState('');
-    // const{t} = useTranslation("global");
     const { t, i18n } = useTranslation();
 
     const [budgetAmount, setBudgetAmount] = useState('');
@@ -22,6 +19,9 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
     const [showWarningModal, setShowWarningModal] = useState(false);
 
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+    useEffect(() => {
+    }, [i18n.language]);
 
     // Adjusted to include resetError call on close
     const enhancedOnClose = () => {
@@ -70,20 +70,9 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
             setShowSuccessAlert(true);
             setTimeout(() => setShowSuccessAlert(false), 5000); // Show success message
         } catch (error) {
-            console.log('Error caught in submitBudget:', error);
-            setError('Test error');
-
-            alert('Check the console for the error log.');
-            // First, check if the specific error condition is met
-            if (error.message === "Invalid input: Budget amount cannot be negative or zero.") {
-                setError(t("app.invalidBudgetInput"));
-            } else if (error.message ==="BudgetDescription must be alphanumeric") {
-                // If not, set a generic error message
-                setError(t("app.budgetDescriptionError"))
-            } else {
-                setError(t("app.errorOccueredCreatedBudget"));
-            }
-            resetFormFields(); // It's okay to reset the form fields
+            setError(error);
+            resetError();
+            resetFormFields(); // Reset the form fields on unsuccessful submission
         }
         disableFormPopulation(); // Add this line
     };

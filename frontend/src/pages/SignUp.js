@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {createUser} from '../services/UserService';
 import {useUserContext} from '../contexts/UserContext';
 import {useNavigate} from 'react-router-dom';
@@ -9,14 +9,36 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    // const {t} = useTranslation("global");
-    const { t, i18n } = useTranslation();
-
-
     const {setUser} = useUserContext();
 
-    // Define local variable error;
-    // if (error ===
+    const { t, i18n } = useTranslation();
+
+    // Update to hold the error message key instead of the translated message
+    const [errorKey, setErrorKey] = useState('');
+
+    const errorMapping = {
+        "Invalid input: Invalid email format": "app.creationFailed",
+        "A user with the provided name or email already exists.": "app.userExist",
+        "An error occurred during the signup process. Please try again later.": "app.signupError",
+    };
+
+    useEffect(() => {
+        const handleLanguageChange = () => {
+            // When the language changes, update the error message if there's an error key set
+            if (errorKey) {
+                setError(t(errorKey));
+            }
+        };
+
+        // Listen for language changes
+        i18n.on('languageChanged', handleLanguageChange);
+
+        // Cleanup function to remove the event listener
+        return () => {
+            i18n.off('languageChanged', handleLanguageChange);
+        };
+    }, [i18n, errorKey, t]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,31 +49,10 @@ const SignUp = () => {
             setUser(user); // Set the user in context
             navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
         } catch (error) {
-            console.log(error.message)
-            // Extract and set only the error message to display it correctly
-            // const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
-            // setError(errorMessage);
-            // console.log(errorMessage, localStorage.getItem("i18nextLng"))
-            // if (errorMessage) {
-            //     setError(errorMessage);
-            //
-            // }
-        // else
-            if (error.message === "Invalid input: Invalid email format") {
-                setError(t("app.creationFailed"));
-            } else if (error.message === "A user with the provided name or email already exists.") {
-                setError(t("app.userExist"))
-            }
-            else if (error.message === "An error occurred during the signup process. Please try again later.") {
-                setError(t("app.signupError"));
-            } else {
-                setError(t("app.unexpectedError"))
-            }
-
-
-
+            const key = errorMapping[error.message] || "app.unexpectedError"; // Fallback to a generic error message
+            setErrorKey(key); // Update the errorKey state
+            setError(t(key)); // Also update the error message immediately
         }
-
     };
 
     return (

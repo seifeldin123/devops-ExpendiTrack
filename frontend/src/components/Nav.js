@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import {useUserContext} from '../contexts/UserContext';
 import {useTranslation} from "react-i18next";
 
 const Nav = () => {
     const {user} = useUserContext();
-    // const{t} = useTranslation("global")
     const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
 
 
     return (

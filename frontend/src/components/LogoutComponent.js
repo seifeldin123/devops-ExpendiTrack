@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../contexts/UserContext';
 import {useTranslation} from "react-i18next";
 
 
 const LogoutComponent = () => {
-    // const {t} = useTranslation("global")
     const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
 
     // Access setUser function from UserContext and navigation from React Router
     const { setUser } = useUserContext();

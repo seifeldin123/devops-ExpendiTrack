@@ -3,13 +3,21 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AddBudgetForm from '../AddBudgetForm'; // Adjust the import path as necessary
 import { useBudgetContext } from '../../contexts/BudgetContext';
-import {UserContext, useUserContext} from '../../contexts/UserContext';
-import i18next from "i18next";
-import { I18nextProvider } from 'react-i18next';
-import {BrowserRouter as Router} from "react-router-dom";
-import Header from "../Header";
-import en from "../../translations/en/common.json";
-import fr from "../../translations/fr/common.json";
+import {useUserContext} from '../../contexts/UserContext';
+
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (str) => str,
+        i18n: {
+            changeLanguage: jest.fn(),
+            language: 'en',
+        },
+    }),
+    initReactI18next: {
+        type: '3rdParty',
+        init: jest.fn(),
+    },
+}));
 
 // Mock the BudgetContext and UserContext hooks
 jest.mock('../../contexts/BudgetContext', () => ({
@@ -22,22 +30,11 @@ jest.mock('../../contexts/ExpenseContext', () => ({
     })),
 }));
 
-
 jest.mock('../../contexts/UserContext', () => ({
     useUserContext: jest.fn(),
 }));
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
-        },
-        fr: {
-            global: fr
-        },
-    }
-});
+
 describe('AddBudgetForm', () => {
     // Define mock functions
     let mockAddNewBudget;
@@ -81,9 +78,7 @@ describe('AddBudgetForm', () => {
 
     it('renders correctly', () => {
         render(
-            <I18nextProvider i18n={i18next}>
                 <AddBudgetForm />
-            </I18nextProvider>
         );
         expect(screen.getByPlaceholderText('e.g., Groceries')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('e.g., 500')).toBeInTheDocument();
@@ -95,9 +90,7 @@ describe('AddBudgetForm', () => {
         mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
 
         render(
-            <I18nextProvider i18n={i18next}>
                 <AddBudgetForm />
-            </I18nextProvider>
         );
 
         // Simulate form submission
@@ -124,9 +117,7 @@ describe('AddBudgetForm', () => {
         mockUpdateExistingBudget.mockResolvedValueOnce(); // Simulate successful budget update
 
         render(
-            <I18nextProvider i18n={i18next}>
             <AddBudgetForm existingBudget={existingBudget} />
-            </I18nextProvider>
         );
 
         // Change the budget description and amount
@@ -150,9 +141,7 @@ describe('AddBudgetForm', () => {
         mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
 
         render(
-            <I18nextProvider i18n={i18next}>
                 <AddBudgetForm />
-            </I18nextProvider>
         );
 
         // Fill out and submit the form
@@ -183,9 +172,7 @@ describe('AddBudgetForm', () => {
         }));
 
         render(
-            <I18nextProvider i18n={i18next}>
                 <AddBudgetForm />
-            </I18nextProvider>
         );
 
         // Error message should be displayed from context

@@ -1,10 +1,12 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import BudgetItem from './BudgetItem';
 import {useTranslation} from "react-i18next";
 
 const BudgetList = React.memo(({ budgets, onEditBudget }) => {
-    // const {t}=useTranslation("global")
     const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
 
     if (!Array.isArray(budgets) || budgets.length === 0) {
         return (
