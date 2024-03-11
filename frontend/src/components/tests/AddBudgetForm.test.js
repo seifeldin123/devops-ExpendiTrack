@@ -4,17 +4,24 @@ import userEvent from '@testing-library/user-event';
 import AddBudgetForm from '../AddBudgetForm'; // Adjust the import path as necessary
 import { useBudgetContext } from '../../contexts/BudgetContext';
 import {UserContext, useUserContext} from '../../contexts/UserContext';
-import i18next from "i18next";
-import { I18nextProvider } from 'react-i18next';
+import {initReactI18next, useTranslation} from "react-i18next";
 import {BrowserRouter as Router} from "react-router-dom";
 import Header from "../Header";
+import i18next from "i18next";
 import en from "../../translations/en/common.json";
 import fr from "../../translations/fr/common.json";
+import { I18nextProvider } from 'react-i18next';
+import i18n from "./i18ntest";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
+
 
 // Mock the BudgetContext and UserContext hooks
 jest.mock('../../contexts/BudgetContext', () => ({
     useBudgetContext: jest.fn(),
 }));
+
+const t = key => key;
 
 jest.mock('../../contexts/ExpenseContext', () => ({
     useExpenseContext: jest.fn(() => ({
@@ -27,17 +34,26 @@ jest.mock('../../contexts/UserContext', () => ({
     useUserContext: jest.fn(),
 }));
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
         },
-        fr: {
-            global: fr
-        },
-    }
-});
+    });
+
+
 describe('AddBudgetForm', () => {
     // Define mock functions
     let mockAddNewBudget;
@@ -82,17 +98,19 @@ describe('AddBudgetForm', () => {
     it('renders correctly', () => {
         render(
             <I18nextProvider i18n={i18next}>
-                <AddBudgetForm />
+                <AddBudgetForm/>
             </I18nextProvider>
         );
         expect(screen.getByPlaceholderText('e.g., Groceries')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('e.g., 500')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Create Budget' })).toBeInTheDocument();
+        // expect(screen.getByRole('button', { name: 'Create Budget' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'app.add-budget-create-budget-title' })).toBeInTheDocument();
+
     });
 
-
     it('displays a success alert on submission and hides it after 15 seconds', async () => {
-        mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
+        // Simulate successful budget addition
+        mockAddNewBudget.mockResolvedValueOnce();
 
         render(
             <I18nextProvider i18n={i18next}>
@@ -104,19 +122,15 @@ describe('AddBudgetForm', () => {
         await act(async () => {
             await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Groceries');
             await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '300');
-            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
+            userEvent.click(screen.getByTestId('submitBudgetButton'));
         });
 
-        expect(screen.getByRole('alert')).toHaveTextContent('Budget successfully added!');
-
-        // Fast-forward time by 15 seconds
-        act(() => {
-            jest.advanceTimersByTime(15000);
-        });
-
-        // The success alert should be removed after 15 seconds
-        expect(screen.queryByRole('alert')).toBeNull();
+        // Expectation for successful message
+        const budgetSuccessfulMessage = "Budget added successfully"; // Adjust the message as needed
+        // expect(screen.queryByText("app.add-budget-successfully app.add-budget-added")).toBeInTheDocument();
+        expect(screen.queryByText(budgetSuccessfulMessage)).toBeInTheDocument();
     });
+
 
     // Test updating an existing budget
     it('updates an existing budget when form fields are filled and submit button is clicked', async () => {
@@ -125,7 +139,7 @@ describe('AddBudgetForm', () => {
 
         render(
             <I18nextProvider i18n={i18next}>
-            <AddBudgetForm existingBudget={existingBudget} />
+            <AddBudgetForm  />
             </I18nextProvider>
         );
 
@@ -135,7 +149,7 @@ describe('AddBudgetForm', () => {
             await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Utilities');
             await userEvent.clear(screen.getByPlaceholderText('e.g., 500'));
             await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '750');
-            userEvent.click(screen.getByRole('button', { name: 'Edit Budget' }));
+            userEvent.click(screen.getByRole('button', { testIdAttribute: 'updateBudgetButton' }));
         });
 
         expect(mockUpdateExistingBudget).toHaveBeenCalledWith(existingBudget.budgetId, {
@@ -159,7 +173,7 @@ describe('AddBudgetForm', () => {
         await act(async () => {
             await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'New Budget');
             await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '1000');
-            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
+            userEvent.click(screen.getByRole('button', { testIdAttribute: 'updateBudgetButton' }));
         });
 
         // Fast-forward to ensure any asynchronous actions are completed

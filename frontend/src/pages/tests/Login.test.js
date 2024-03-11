@@ -76,7 +76,8 @@ describe('LoginComponent', () => {
         renderComponent();
 
         // Simulate a click on the "Sign up here" button
-        fireEvent.click(screen.getByText(/Sign up here/i));
+        fireEvent.click(screen.getByRole('button', { name: "app.sign-up-here" }));
+        // fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
         // Assert that navigate was called with '/signup'
         expect(navigateMock).toHaveBeenCalledWith('/signup');
@@ -111,7 +112,7 @@ describe('LoginComponent', () => {
         fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
         await waitFor(() => {
-            expect(screen.getByText(/Login failed/)).toBeInTheDocument();
+            expect(screen.getByText(/app.loginFailed/)).toBeInTheDocument();
         });
     });
 

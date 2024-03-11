@@ -74,6 +74,6 @@ describe('Dashboard Component', () => {
         });
 
         // Validate if the user's name is rendered
-        expect(screen.getByText('Welcome, Harmeet!')).toBeInTheDocument();
+        expect(screen.getByText(`app.dashboard-welcome, ${mockUser.name}!`)).toBeInTheDocument();
     });
 });

@@ -5,6 +5,7 @@ import {calculateTotalSpent, formatCurrency} from "../helpers/HelperFunctions";
 import { useExpenseContext } from '../contexts/ExpenseContext';
 import BasicModal from "./Modal";
 import {useTranslation} from "react-i18next";
+import {withTranslation} from "react-i18next";
 
 
 

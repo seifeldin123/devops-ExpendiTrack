@@ -53,7 +53,7 @@ describe('SignUpForm', () => {
         // Assert that the Name and Email input fields, and the Sign Up button are rendered
         expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /app.Sign-up-sign-up/i })).toBeInTheDocument();
     });
 
     it('allows entering name and email', () => {
@@ -72,7 +72,7 @@ describe('SignUpForm', () => {
         renderComponent();
 
         // Simulate a click on the "Login here" button
-        fireEvent.click(screen.getByText(/Login here/i));
+        fireEvent.click(screen.getByText(/app.Sign-up-login-here/i));
 
         // Assert that navigate was called with '/login'
         expect(navigateMock).toHaveBeenCalledWith('/login');
