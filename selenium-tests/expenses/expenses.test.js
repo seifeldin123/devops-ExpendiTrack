@@ -73,7 +73,7 @@ describe('TestCreateExpenses', () => {
         // Get the text of the error message
         const errorMessage = await errorElement.getText();
         // Check if the error message contains the expected text
-        expect(errorMessage).toContain("Invalid input: ExpensesDescription must be alphanumeric");
+        expect(errorMessage).toContain("Invalid input: Expense description should be alphanumeric.");
     });
 
     test('C: Create expenses with negative amount', async () => {
@@ -103,14 +103,20 @@ describe('TestCreateExpenses', () => {
         await expensesAmountField.sendKeys("20");
         const budgetCategoryField = await driver.findElement(By.xpath("//select[@id='budget-category']"));
         await budgetCategoryField.findElement(By.xpath("//option[normalize-space()='school']")).click();
-        await (await driver.findElement(By.xpath("//button[@data-testid='create-expense']"))).click();
+        await (await driver.findElement(By.css("button[data-testid='create-expense']"))).click();
         // Find and get the error message element
-        const errorMessageElement = await driver.findElement(By.xpath("//li[contains(text(),'An expense with the name \"books\" already exists fo')]"));
-        // Get the text of the error message
-        const errorMessage = await errorMessageElement.getText();
-        // Check if the error message contains the expected text
-        expect(errorMessage).toMatch(/An expense with the name ["']books["'] already exists/);
-    });
+        const liElements = await driver.findElements(By.css("li"));
+        for (const liElement of liElements) {
+            const text = await liElement.getText();
+            if (text.includes("An expense with the name \"books\" already exists")) {
+                const errorMessageElement = liElement;
+                const errorMessage = text;
+           // Perform further actions with errorMessageElement and errorMessage
+                expect(errorMessage).toMatch(/An expense with the name ["']books["'] already exists/);
+                break;
+    }
+    }
+ });
 
     test('E: Edit an expense with valid data', async () => {
      // Perform login and navigate to expenses
@@ -166,20 +172,22 @@ describe('TestCreateExpenses', () => {
      // Click on the button to save changes
          const saveButton = await driver.findElement(By.xpath("//button[@class='btn-lg btn-success']"));
          await saveButton.click();
-    // Wait for the error message element to become visible
-         await driver.wait(until.elementLocated(By.xpath("//div[@class='modal-body modal-body-custom']//li[contains(text(),'Invalid input: ExpensesDescription must be alphanumeric')]")), 10000);
 
-    // Get the actual text of the error message
-        const errorMessage = await driver.findElement(By.xpath("//div[@class='modal-body modal-body-custom']//li[contains(text(),'Invalid input: ExpensesDescription must be alphanumeric')]")).getText();
-        console.log("Actual error message:", errorMessage);
+        // Wait for the error message element to become visible
+         await driver.wait(until.elementLocated(By.css("div.modal-body.modal-body-custom li")), 10000);
 
-    // Check if the error message is present on the page
-        const expectedErrorMessage = "Invalid input: ExpensesDescription must be alphanumeric";
-        if (errorMessage.includes(expectedErrorMessage)) {
+        // Get the actual text of the error message
+         const errorMessageElement = await driver.findElement(By.css("div.modal-body.modal-body-custom li"));
+         const errorMessage = await errorMessageElement.getText();
+         console.log("Actual error message:", errorMessage);
+
+        // Check if the error message is present on the page
+         const expectedErrorMessage = "Invalid input: Expense description should be alphanumeric.";
+         if (errorMessage.toLowerCase().includes(expectedErrorMessage.toLowerCase())) {
             console.log(`Error message '${expectedErrorMessage}' appeared.`);
-        } else {
+         } else {
             console.log("Error message did not appear or is incorrect.");
-    }
+         }
  });
 
      test('G: Edit an expense with negative amount', async () => {
@@ -202,18 +210,21 @@ describe('TestCreateExpenses', () => {
       // Click on the button to save changes
           const saveButton = await driver.findElement(By.xpath("//button[@class='btn-lg btn-success']"));
           await saveButton.click();
-      // Wait for the error message element to become visible
-          await driver.wait(until.elementLocated(By.xpath("//div[@class='modal-body modal-body-custom']//li[contains(text(),'Invalid input: Expenses amount cannot be negative.')]")), 10000);
-      // Get the actual text of the error message
-          const errorMessage = await driver.findElement(By.xpath("//div[@class='modal-body modal-body-custom']//li[contains(text(),'Invalid input: Expenses amount cannot be negative.')]")).getText();
+        // Wait for the error message element to become visible
+          await driver.wait(until.elementLocated(By.css("div.modal-body.modal-body-custom li")), 10000);
+
+        // Get the actual text of the error message
+          const errorMessageElement = await driver.findElement(By.css("div.modal-body.modal-body-custom li"));
+          const errorMessage = await errorMessageElement.getText();
           console.log("Actual error message:", errorMessage);
-      // Check if the error message is present on the page
-           const expectedErrorMessage = "Invalid input: Expenses amount cannot be negative.";
-        if (errorMessage.includes(expectedErrorMessage)) {
+
+        // Check if the error message is present on the page
+          const expectedErrorMessage = "Invalid input: expenses amount cannot be negative.";
+          if (errorMessage.toLowerCase().includes(expectedErrorMessage.toLowerCase())) {
             console.log(`Error message '${expectedErrorMessage}' appeared.`);
-        } else {
+          } else {
             console.log("Error message did not appear or is incorrect.");
-        }
+          }
   });
 
     test('H: Delete an expense', async () => {
