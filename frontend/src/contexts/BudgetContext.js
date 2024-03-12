@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import {getBudgetsByUserId, createBudget, deleteBudget, updateBudget} from '../services/BudgetService';
 import { useUserContext } from "./UserContext";
+import {useTranslation} from "react-i18next";
 
 
 export const BudgetContext = createContext();
@@ -9,9 +10,38 @@ export const useBudgetContext = () => useContext(BudgetContext);
 
 export const BudgetProvider = ({ children }) => {
     const [budgets, setBudgets] = useState([]);
-    // const { user } = useUserContext();
+    const { user } = useUserContext();
     const [error, setError] = useState('');
-    const { user, language } = useUserContext();
+
+    const { t, i18n } = useTranslation();
+
+    // Update to hold the error message key instead of the translated message
+    const [errorKey, setErrorKey] = useState('');
+
+    const [dynamicErrorContent, setDynamicErrorContent] = useState({});
+
+    const errorMapping = useMemo(() => ({
+        "Invalid input: Budget amount cannot be negative or zero.": "app.invalidBudgetInput",
+        "Invalid input: BudgetDescription must be alphanumeric": "app.budgetDescriptionError",
+        "unexpectedError": "app.unexpectedError",
+    }), []);
+
+    useEffect(() => {
+        const handleLanguageChange = () => {
+            // Check if there's an error key set and if dynamic content is needed
+            if (errorKey && Object.keys(dynamicErrorContent).length > 0) {
+                setError(t(errorKey, dynamicErrorContent));
+            }
+        };
+
+        // Listen for language changes
+        i18n.on('languageChanged', handleLanguageChange);
+
+        // Cleanup function to remove the event listener
+        return () => {
+            i18n.off('languageChanged', handleLanguageChange);
+        };
+    }, [i18n, errorKey, dynamicErrorContent, t]);
 
     const userId = user?.id;
     const [shouldPopulateForm, setShouldPopulateForm] = useState(false);
@@ -56,40 +86,24 @@ export const BudgetProvider = ({ children }) => {
             setError('');
 
         } catch (error) {
-            console.log(error.message)
-            // const language = localStorage.getItem("i18nextLng");
-            let message = '';
-            // if (error.message === "Invalid input: Budget amount cannot be negative or zero."
-            //     && localStorage.getItem("i18nextLng") === "en") {
-            //     setError("asd")
-            // }
-            // const errorMessage = error.message || 'An unexpected error occurred';
-            if (error.message === "Invalid input: Budget amount cannot be negative or zero.") {
-                if (language === "en") {
-                    message = error.message;
-                } else if (language === "fr") {
-                    message = "Saisie non valide: le montant du budget ne peut pas être négatif ou nul.";
-                }
+            if (error.message.startsWith("A budget with the name")) {
+                // Extract the dynamic budget name from the error message
+                const budgetNameMatch = error.message.match(/"([^"]+)"/);
+                const budgetName = budgetNameMatch ? budgetNameMatch[1] : "Unknown";
 
-            } else if (error.message === "Invalid input: BudgetDescription must be alphanumeric") {
-                if (language === "en") {
-                    message = error.message
-                } else if (language === "fr") {
-                    message = "Saisie non valide : la description du budget doit être alphanumérique."
-                }
-            } else if (error.message.startsWith("A budget with the name")) {
-                if(language ==="en") {
-                    message = error.message
-                } else {
-                    message = "Un budget avec ce nom existe déjà."
-                }
+                // Use a dynamic key or a placeholder message in translations
+                setDynamicErrorContent({ name: budgetName });
+                setErrorKey("app.budgetExistsError"); // Assume this is a generic key in translations
+                setError(t("app.budgetExistsError", { name: budgetName }));
             } else {
-                message = "An unexpected error occurred";
+                // Handle other errors as before
+                const key = errorMapping[error.message] || "app.unexpectedError";
+                setErrorKey(key);
+                setError(t(key));
             }
-             setError(message);
         }
 
-    }, [userId, language]); // Corrected dependency
+    }, [userId, errorMapping, t]); // Corrected dependency
 
     const updateExistingBudget = useCallback(async (budgetId, budgetData) => {
         if (!budgetId) {
@@ -103,35 +117,23 @@ export const BudgetProvider = ({ children }) => {
             );
             setError('');
         } catch (error) {
-            // const errorMessage = error.message || 'An unexpected error occurred';
-            // setError(errorMessage);
-            console.log(error.message)
-            // const language = localStorage.getItem("i18nextLng");
-            let message = '';
-            // if (error.message === "Invalid input: Budget amount cannot be negative or zero."
-            //     && localStorage.getItem("i18nextLng") === "en") {
-            //     setError("asd")
-            // }
-            // const errorMessage = error.message || 'An unexpected error occurred';
-            if (error.message === "Invalid input: Budget amount cannot be negative or zero.") {
-                if (language === "en") {
-                    message = error.message;
-                } else if (language === "fr") {
-                    message = "Saisie non valide: le montant du budget ne peut pas être négatif ou nul.";
-                }
+            if (error.message.startsWith("A budget with the name")) {
+                // Extract the dynamic budget name from the error message
+                const budgetNameMatch = error.message.match(/"([^"]+)"/);
+                const budgetName = budgetNameMatch ? budgetNameMatch[1] : "Unknown";
 
-            } else if (error.message === "Invalid input: BudgetDescription must be alphanumeric") {
-                if (language === "en") {
-                    message = error.message
-                } else if (language === "fr") {
-                    message = "Saisie non valide : la description du budget doit être alphanumérique."
-                }
+                // Use a dynamic key or a placeholder message in translations
+                setDynamicErrorContent({ name: budgetName });
+                setErrorKey("app.budgetExistsError"); // Assume this is a generic key in translations
+                setError(t("app.budgetExistsError", { name: budgetName }));
             } else {
-                message = "An unexpected error occurred";
+                // Handle other errors as before
+                const key = errorMapping[error.message] || "app.unexpectedError";
+                setErrorKey(key);
+                setError(t(key));
             }
-            setError(message);
         }
-    }, [setBudgets, language, setError]);
+    }, [setBudgets, setError, errorMapping, t]);
 
     const removeBudget = useCallback(async (budgetId) => {
         try {

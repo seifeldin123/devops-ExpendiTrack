@@ -25,6 +25,5 @@ export const formatDate = (dateString, language) => {
         month: 'long',
         day: 'numeric'
     });
-    console.log(formatter.format(date));
     return formatter.format(date);
 };

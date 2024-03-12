@@ -9,10 +9,12 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [selectedBudgetId, setSelectedBudgetId] = useState('');
-    const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses } = useExpenseContext();
+    const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses, setError } = useExpenseContext();
     const { user } = useUserContext(); // Get the current user
-    // const{t}=useTranslation("global")
     const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
 
 
     const [date, setDate] = useState(() => {
@@ -69,8 +71,8 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
             setTimeout(() => setShowSuccessAlert(false), 5000); // Adjust duration as needed
             fetchExpenses(user.id); // Refresh expense list
             setSelectedBudgetId(budgets.length > 0 ? budgets[0].budgetId.toString() : '');
-        } catch (serverError) {
-            console.log(error)
+        } catch (error) {
+            setError(error);
             setShowSuccessAlert(false);
             resetError();
         }

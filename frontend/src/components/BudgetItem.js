@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import { useUserContext } from "../contexts/UserContext";
 import { calculateTotalSpent, formatCurrency } from "../helpers/HelperFunctions";
@@ -8,14 +8,14 @@ import AddBudgetForm from './AddBudgetForm';
 import { useBudgetContext } from "../contexts/BudgetContext";
 import {useTranslation} from "react-i18next";
 
-
 const BudgetItem = ({ budget }) => {
     const { user } = useUserContext();
     const { expenses } = useExpenseContext();
     const { removeBudget, fetchBudgets, resetError } = useBudgetContext();
-    // const {t} = useTranslation("global");
-    const { t, i18n } = useTranslation();
+    const { t, i18n} = useTranslation();
 
+    useEffect(() => {
+    }, [i18n.language]);
 
     const { enableFormPopulation } = useBudgetContext();
 
@@ -62,7 +62,6 @@ const BudgetItem = ({ budget }) => {
 
     const handleEditClick = () => {
         resetError(); // Assuming resetError() is available and resets the global error state
-        console.log(typeof enableFormPopulation); // Should log "function"
         enableFormPopulation();
         setShowEditModal(true);
     };

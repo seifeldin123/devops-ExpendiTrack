@@ -7,7 +7,6 @@ export const createBudget = (budgetData) => {
         .then(response => response.data)
         .catch(error => {
             // Throw an error directly with either the specific error message or a generic one
-            // console.log(error.response?.data);
             throw new Error(error.response?.data|| 'An error occurred while creating the budget. Please try again later.');
         });
 };

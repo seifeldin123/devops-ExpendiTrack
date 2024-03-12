@@ -9,19 +9,15 @@ const Header = () => {
     // State to hold the search query
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { user, setLanguage } = useUserContext(); // Access language and setLanguage from context
+    // const { user, setLanguage } = useUserContext(); // Access language and setLanguage from context
 
+    const { user } = useUserContext(); // Use the useContext hook to access the current user
 
-    // const { user } = useUserContext(); // Use the useContext hook to access the current user
-    // const{t} = useTranslation("global");
     const { t, i18n } = useTranslation();
-    // This function changes the language using i18next and updates the context
+
+    // This function changes the language using i18next
     const changeLanguage = (lng) => {
-        i18n.changeLanguage(lng).then(() => {
-            // Update language in context instead of localStorag
-            setLanguage(lng);
-            // window.location.reload();
-        }).catch(err => {
+        i18n.changeLanguage(lng).catch(err => {
             console.error('Error changing language:', err);
         });
     };

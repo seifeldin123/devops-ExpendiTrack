@@ -28,7 +28,6 @@ jest.mock('../../contexts/ExpenseContext', () => ({
     })),
 }));
 
-
 jest.mock('../../contexts/UserContext', () => ({
     useUserContext: jest.fn(),
 }));
@@ -51,7 +50,6 @@ i18next
             escapeValue: false, // react already safes from xss
         },
     });
-
 
 describe('AddBudgetForm', () => {
     // Define mock functions
@@ -99,6 +97,7 @@ describe('AddBudgetForm', () => {
             <I18nextProvider i18n={i18next}>
                 <AddBudgetForm/>
             </I18nextProvider>
+
         );
         expect(screen.getByPlaceholderText('e.g., Groceries')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('e.g., 500')).toBeInTheDocument();
@@ -111,9 +110,7 @@ describe('AddBudgetForm', () => {
         mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
 
         render(
-            <I18nextProvider i18n={i18next}>
                 <AddBudgetForm />
-            </I18nextProvider>
         );
 
         // Simulate form submission
@@ -166,9 +163,7 @@ describe('AddBudgetForm', () => {
         mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
 
         render(
-            <I18nextProvider i18n={i18next}>
                 <AddBudgetForm />
-            </I18nextProvider>
         );
 
         // Fill out and submit the form
@@ -199,9 +194,7 @@ describe('AddBudgetForm', () => {
         }));
 
         render(
-            <I18nextProvider i18n={i18next}>
                 <AddBudgetForm />
-            </I18nextProvider>
         );
 
         // Error message should be displayed from context

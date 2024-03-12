@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useTranslation} from "react-i18next";
 
 const BasicModal = ({ show, handleClose, children, title, modalType }) => {
-    // const {t} =useTranslation("global")
     const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
 
     if (!show) {
         return null;

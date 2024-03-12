@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { findUser } from '../services/UserService';
 import { useUserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
@@ -10,14 +10,33 @@ const Login = () => {
     const { setUser } = useUserContext();
     const navigate = useNavigate(); // Use navigate for redirection after login
     const [error, setError] = useState(''); // State to hold error messages
-    // const {t} = useTranslation("global")
     const { t, i18n } = useTranslation();
+    const [errorKey, setErrorKey] = useState(''); // New state to keep track of the error message key
+
+
+    useEffect(() => {
+        const updateErrorBasedOnLanguage = () => {
+            // Only update the error if there's a previously set error key
+            if (errorKey) {
+                setError(t(errorKey));
+            }
+        };
+
+        i18n.on('languageChanged', updateErrorBasedOnLanguage);
+
+        // Cleanup to remove the listener
+        return () => {
+            i18n.off('languageChanged', updateErrorBasedOnLanguage);
+        };
+    }, [errorKey, i18n, t]);
 
 
     // Modified to accept the event argument
     const handleLogin = async (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
         setError(''); // Clear previous errors
+        setErrorKey(''); // Clear previous error keys
+
         if (!username.trim() || !email.trim()) {
             setError('Please enter both username and email'); // Set error
             return;
@@ -30,18 +49,16 @@ const Login = () => {
                 navigate('/dashboard'); // Navigate to the Dashboard upon successful login
             }
             else {
-                // The user does not exist, so inform them of a failed login attempt
-                setError(t("app.loginFailed"));
+                // For predefined error messages, set the key and then set the error using the key
+                const loginErrorKey = "app.loginFailed";
+                setErrorKey(loginErrorKey); // Set the error key
+                setError(t(loginErrorKey)); // Set the localized error message
             }
 
         } catch (error) {
-            // else if (errorMessage.message==="Server error occurred. Please try again later." ) {
-            //     setError(t("app.serverError"))
-            // }
-            if (error.message==="Server error occurred. Please try again later.") {
-                setError(t("app.serverError"))
-            }
-
+            const serverErrorKey = "app.serverError";
+            setErrorKey(serverErrorKey); // Update the error key state
+            setError(t(serverErrorKey)); // Set the error message to server error
         }
     };
 

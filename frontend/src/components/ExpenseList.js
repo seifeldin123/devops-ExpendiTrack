@@ -10,7 +10,6 @@ const ExpenseList = React.memo(({ expenses, budgets }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const { removeExpense, resetError } = useExpenseContext();
-    // const {t, i18n}=useTranslation("global")
     const { t, i18n } = useTranslation();
 
     useEffect(() => {

@@ -1,10 +1,4 @@
 import axios from 'axios';
-// import i18n from "i18next";
-// import {useTranslation} from "react-i18next";
-import '../i18n';
-
-// const {t} = useTranslation("global")
-
 
 const API_URL = 'http://localhost:8080/users';
 

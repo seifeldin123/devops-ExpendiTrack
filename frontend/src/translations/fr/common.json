@@ -134,6 +134,9 @@
     "unexpectedError" : "Une erreur inattendue est apparue",
     "errorOccueredCreatedBudget": "Une erreur s'est produite lors de la création du budget. Veuillez réessayer plus tard.",
     "budgetDescriptionError": "Saisie non valide : la description du budget doit être alphanumérique.",
-    "userExist" : "Un utilisateur avec le nom ou l'adresse e-mail fourni existe déjà."
+    "expenseDescriptionError": "Saisie invalide : la description de la dépense doit être alphanumérique.",
+    "userExist" : "Un utilisateur avec le nom ou l'adresse e-mail fourni existe déjà.",
+    "budgetExistsError": "Un budget avec le nom '{{name}}' existe déjà pour cet utilisateur.",
+    "expenseExistsError": "Un dépense avec le nom '{{name}}' existe déjà pour cet utilisateur."
   }
 }

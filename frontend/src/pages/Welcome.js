@@ -1,11 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useTranslation} from "react-i18next";
 
 const Welcome = () => {
     const navigate = useNavigate();
-    // const {t} = useTranslation("global")
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
 
 
     // Function to navigate to the login page

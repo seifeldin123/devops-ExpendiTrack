@@ -175,7 +175,7 @@ describe('Budget Creation Tests - Invalid Data Scenarios', () => {
 
     it('Create Budget with Non-Alphanumeric Name', async () => {
         await fillBudgetForm(driver, '$$$ Party Funds $$$', '500');
-        await submitFormAndCheckError(driver, 'BudgetDescription must be alphanumeric');
+        await submitFormAndCheckError(driver, 'Budget description should be alphanumeric');
     });
 
     it('Create Budget with Duplicate Name for the Same User', async () => {
@@ -188,7 +188,7 @@ describe('Budget Creation Tests - Invalid Data Scenarios', () => {
 
         // Then, attempt to create another budget with the same name
         await fillBudgetForm(driver, 'Groceries', '300');
-        await submitFormAndCheckError(driver, 'A budget with the name "Groceries" already exists for this user');
+        await submitFormAndCheckError(driver, "A budget with the name 'Groceries' already exists for this user.");
     });
 });
 
@@ -267,7 +267,7 @@ describe('Budget Editing Tests - Invalid Data Scenarios', () => {
         await fillBudgetFormInModal(driver, '$$$ Party Funds $$$', '500');
 
         // Submit the form and check for error
-        await submitUpdateFormAndCheckError(driver, 'BudgetDescription must be alphanumeric');
+        await submitUpdateFormAndCheckError(driver, 'Budget description should be alphanumeric');
 
         // Close the edit budget modal
         const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
