@@ -135,7 +135,7 @@
     "errorOccueredCreatedBudget": "An error occurred while creating the budget. Please try again later.",
     "budgetDescriptionError": "Invalid input: Budget description should be alphanumeric.",
     "expenseDescriptionError": "Invalid input: Expense description should be alphanumeric.",
-    "userExist" : "A user with the provided name or email already exists.",
+    "userExist" : "An account with these credentials already exists.",
     "budgetExistsError": "A budget with the name '{{name}}' already exists for this user.",
     "expenseExistsError": "An expense with the name '{{name}}' already exists for this user."
 

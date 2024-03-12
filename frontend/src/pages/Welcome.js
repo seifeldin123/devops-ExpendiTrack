@@ -27,7 +27,7 @@ const Welcome = () => {
             <nav aria-label="Main navigation">
                 <ul style={{ listStyleType: 'none', padding: 0 }}>
                     <li>
-                        <button onClick={handleLoginClick} className="btn btn-call-to-action" type="button">
+                        <button onClick={handleLoginClick} data-testid="loginButton" className="btn btn-call-to-action" type="button">
                             <span className="glyphicon glyphicon-log-in"></span>&nbsp; &nbsp; {t("app.login-button")}
                         </button>
                     </li>

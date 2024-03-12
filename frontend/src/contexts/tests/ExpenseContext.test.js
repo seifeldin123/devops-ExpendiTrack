@@ -7,9 +7,33 @@ import { useUserContext } from '../UserContext';
 import * as ExpenseService from '../../services/ExpenseService';
 import ExpenseList from "../../components/ExpenseList";
 import {BrowserRouter} from "react-router-dom";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
+import i18n from "i18next";
+import {I18nextProvider, initReactI18next} from "react-i18next";
+import i18next from "i18next";
 
 jest.mock('../UserContext');
 jest.mock('../../services/ExpenseService');
+
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18n
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
+        },
+    });
 
 describe('ExpenseContext Integration Tests', () => {
 
@@ -55,9 +79,11 @@ describe('ExpenseContext Integration Tests', () => {
 
         await act(async () => {
             render(
+                <I18nextProvider i18n={i18next}>
                 <ExpenseProvider>
                     <TestComponent />
                 </ExpenseProvider>
+                </I18nextProvider>
             );
         });
 
@@ -94,9 +120,11 @@ describe('ExpenseContext Integration Tests', () => {
 
         await act(async () => {
             render(
-                <ExpenseProvider>
-                    <TestComponent />
-                </ExpenseProvider>
+                <I18nextProvider i18n={i18next}>
+                    <ExpenseProvider>
+                        <TestComponent />
+                    </ExpenseProvider>
+                </I18nextProvider>
             );
         });
 
@@ -121,9 +149,11 @@ describe('ExpenseContext Integration Tests', () => {
 
         await act(async () => {
             render(
-                <ExpenseProvider>
-                    <TestComponent />
-                </ExpenseProvider>
+                <I18nextProvider i18n={i18next}>
+                    <ExpenseProvider>
+                        <TestComponent />
+                    </ExpenseProvider>
+                </I18nextProvider>
             );
         });
 
@@ -159,11 +189,13 @@ describe('ExpenseContext Integration Tests', () => {
         // Render component within the ExpenseProvider
         await act(async () => {
             render(
+                <I18nextProvider i18n={i18next}>
                 <ExpenseProvider>
                     <BrowserRouter>
                         <TestComponent />
                     </BrowserRouter>
                 </ExpenseProvider>
+                </I18nextProvider>
             );
         });
 
@@ -211,11 +243,13 @@ describe('ExpenseContext Integration Tests', () => {
         // Render component within the ExpenseProvider
         await act(async () => {
             render(
-                <BrowserRouter>
+                <I18nextProvider i18n={i18next}>
                     <ExpenseProvider>
-                        <TestComponent />
+                        <BrowserRouter>
+                            <TestComponent />
+                        </BrowserRouter>
                     </ExpenseProvider>
-                </BrowserRouter>
+                </I18nextProvider>
             );
         });
 

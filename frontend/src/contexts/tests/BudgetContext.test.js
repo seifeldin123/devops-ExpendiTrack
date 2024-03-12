@@ -10,6 +10,11 @@ import { BudgetProvider, useBudgetContext } from '../BudgetContext';
 import * as BudgetService from '../../services/BudgetService';
 import BudgetList from "../../components/BudgetList";
 import {BrowserRouter} from "react-router-dom";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
+import i18n from "i18next";
+import {I18nextProvider, initReactI18next} from "react-i18next";
+import i18next from "i18next";
 
 jest.mock('../../contexts/UserContext', () => ({
     useUserContext: () => ({ user: { id: 1, name: 'Test User' } }),
@@ -23,6 +28,24 @@ jest.mock('../../contexts/ExpenseContext', () => ({
     }),
 }));
 
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18n
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
+        },
+    });
 
 describe('BudgetContext Integration Tests', () => {
 
@@ -69,9 +92,11 @@ describe('BudgetContext Integration Tests', () => {
 
         await act(async () => {
             render(
+                <I18nextProvider i18n={i18next}>
                 <BudgetProvider>
                     <TestComponent />
                 </BudgetProvider>
+                </I18nextProvider>
             );
         });
 
@@ -98,9 +123,11 @@ describe('BudgetContext Integration Tests', () => {
 
         await act(async () => {
             renderResult = render(
-                <BudgetProvider>
-                    <TestComponent />
-                </BudgetProvider>
+                <I18nextProvider i18n={i18next}>
+                    <BudgetProvider>
+                        <TestComponent />
+                    </BudgetProvider>
+                </I18nextProvider>
             );
         });
 
@@ -130,9 +157,11 @@ describe('BudgetContext Integration Tests', () => {
 
         await act(async () => {
             render(
-                <BudgetProvider>
-                    <TestComponent/>
-                </BudgetProvider>
+                <I18nextProvider i18n={i18next}>
+                    <BudgetProvider>
+                        <TestComponent />
+                    </BudgetProvider>
+                </I18nextProvider>
             );
         });
 
@@ -182,11 +211,13 @@ describe('BudgetContext Integration Tests', () => {
         // Render the component within the BudgetProvider
         await act(async () => {
             render(
+                <I18nextProvider i18n={i18next}>
                 <BrowserRouter>
                     <BudgetProvider>
                         <TestComponent />
                     </BudgetProvider>
                 </BrowserRouter>
+                </I18nextProvider>
             );
         });
 
@@ -229,9 +260,11 @@ describe('BudgetContext Integration Tests', () => {
 
         await act(async () => {
             render(
-                <BudgetProvider>
-                    <TestComponent />
-                </BudgetProvider>
+                <I18nextProvider i18n={i18next}>
+                    <BudgetProvider>
+                        <TestComponent />
+                    </BudgetProvider>
+                </I18nextProvider>
             );
         });
 

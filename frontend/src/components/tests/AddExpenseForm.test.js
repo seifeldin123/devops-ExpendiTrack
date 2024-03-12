@@ -26,6 +26,8 @@ jest.mock('../../contexts/UserContext', () => ({
     }),
 }));
 
+const mockSetError = jest.fn();
+
 const resources = {
     en: {
         translation: enTranslations,
@@ -165,20 +167,20 @@ describe('AddExpenseForm Tests', () => {
 
     it('displays an error message when there is a server error during submission', async () => {
         const testErrorMessage = 'Invalid input: expenses amount cannot be negative.';
+
         render(
-
-                <ExpenseContext.Provider value={{
-                    addNewExpense: mockAddNewExpense.mockRejectedValue(new Error(testErrorMessage)),
-                    expenses: [],
-                    error: testErrorMessage,
-                    resetError: mockResetError,
-                    fetchExpenses: mockFetchExpenses,
-                }}>
-                    <I18nextProvider i18n={i18next}>
+            <ExpenseContext.Provider value={{
+                addNewExpense: mockAddNewExpense.mockRejectedValue(new Error(testErrorMessage)),
+                expenses: [],
+                error: testErrorMessage, // Here you're setting error as a string, which is fine for displaying, but ensure setError correctly updates this value if it's used dynamically
+                resetError: mockResetError,
+                fetchExpenses: mockFetchExpenses,
+                setError: mockSetError, // Provide the mock setError function
+            }}>
+                <I18nextProvider i18n={i18next}>
                     <AddExpenseForm budgets={mockBudgets} />
-                    </I18nextProvider>
-                </ExpenseContext.Provider>
-
+                </I18nextProvider>
+            </ExpenseContext.Provider>
         );
 
         fireEvent.change(screen.getByTestId('budget-category'), { target: { value: '2' } });
@@ -191,6 +193,7 @@ describe('AddExpenseForm Tests', () => {
         });
 
         expect(screen.getByText(testErrorMessage)).toBeInTheDocument();
+        expect(mockSetError).toHaveBeenCalledWith(expect.objectContaining({ message: testErrorMessage }));
     });
 
     it('resets the form fields after a successful expense submission', async () => {
