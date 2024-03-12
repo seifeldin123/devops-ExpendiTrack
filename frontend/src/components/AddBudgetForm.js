@@ -41,7 +41,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
 
     // Populate form when existingBudget is provided
     useEffect(() => {
-        if (existingBudget && shouldPopulateForm) {
+        if (existingBudget) {
             setBudgetDescription(existingBudget.budgetDescription);
             setBudgetAmount(existingBudget.budgetAmount);
             disableFormPopulation(); // Prevent further population until enabled again

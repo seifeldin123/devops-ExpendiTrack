@@ -11,7 +11,6 @@ import i18next from "i18next";
 import en from "../../translations/en/common.json";
 import fr from "../../translations/fr/common.json";
 import { I18nextProvider } from 'react-i18next';
-import i18n from "./i18ntest";
 import enTranslations from "../../translations/en/common.json";
 import frTranslations from "../../translations/fr/common.json";
 
@@ -104,13 +103,12 @@ describe('AddBudgetForm', () => {
         expect(screen.getByPlaceholderText('e.g., Groceries')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('e.g., 500')).toBeInTheDocument();
         // expect(screen.getByRole('button', { name: 'Create Budget' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'app.add-budget-create-budget-title' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Create Budget' })).toBeInTheDocument();
 
     });
 
     it('displays a success alert on submission and hides it after 15 seconds', async () => {
-        // Simulate successful budget addition
-        mockAddNewBudget.mockResolvedValueOnce();
+        mockAddNewBudget.mockResolvedValueOnce(); // Simulate successful budget addition
 
         render(
             <I18nextProvider i18n={i18next}>
@@ -122,15 +120,19 @@ describe('AddBudgetForm', () => {
         await act(async () => {
             await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Groceries');
             await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '300');
-            userEvent.click(screen.getByTestId('submitBudgetButton'));
+            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
         });
 
-        // Expectation for successful message
-        const budgetSuccessfulMessage = "Budget added successfully"; // Adjust the message as needed
-        // expect(screen.queryByText("app.add-budget-successfully app.add-budget-added")).toBeInTheDocument();
-        expect(screen.queryByText(budgetSuccessfulMessage)).toBeInTheDocument();
-    });
+        expect(screen.getByRole('alert')).toHaveTextContent('Budget successfully added!');
 
+        // Fast-forward time by 15 seconds
+        act(() => {
+            jest.advanceTimersByTime(15000);
+        });
+
+        // The success alert should be removed after 15 seconds
+        expect(screen.queryByRole('alert')).toBeNull();
+    });
 
     // Test updating an existing budget
     it('updates an existing budget when form fields are filled and submit button is clicked', async () => {
@@ -139,7 +141,7 @@ describe('AddBudgetForm', () => {
 
         render(
             <I18nextProvider i18n={i18next}>
-            <AddBudgetForm  />
+                <AddBudgetForm existingBudget={existingBudget} />
             </I18nextProvider>
         );
 
@@ -149,7 +151,7 @@ describe('AddBudgetForm', () => {
             await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'Utilities');
             await userEvent.clear(screen.getByPlaceholderText('e.g., 500'));
             await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '750');
-            userEvent.click(screen.getByRole('button', { testIdAttribute: 'updateBudgetButton' }));
+            userEvent.click(screen.getByRole('button', { name: 'Edit Budget' }));
         });
 
         expect(mockUpdateExistingBudget).toHaveBeenCalledWith(existingBudget.budgetId, {
@@ -173,7 +175,7 @@ describe('AddBudgetForm', () => {
         await act(async () => {
             await userEvent.type(screen.getByPlaceholderText('e.g., Groceries'), 'New Budget');
             await userEvent.type(screen.getByPlaceholderText('e.g., 500'), '1000');
-            userEvent.click(screen.getByRole('button', { testIdAttribute: 'updateBudgetButton' }));
+            userEvent.click(screen.getByRole('button', { name: 'Create Budget' }));
         });
 
         // Fast-forward to ensure any asynchronous actions are completed
@@ -207,19 +209,15 @@ describe('AddBudgetForm', () => {
     });
 
     // Test updating form fields when existingBudget prop changes
-    it('updates form fields when existingBudget prop changes', async () => {
-
-        const {rerender} = render(<AddBudgetForm
-            existingBudget={{budgetDescription: 'Groceries', budgetAmount: '500'}}/>);
+    it('updates form fields when existingBudget prop changes', () => {
+        const { rerender } = render(<AddBudgetForm existingBudget={{ budgetDescription: 'Groceries', budgetAmount: '500' }} />);
 
         // Initial values should match the existing budget
-        await waitFor(() => {
-            expect(screen.getByDisplayValue('Groceries')).toBeInTheDocument();
-        });
+        expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('Groceries');
         expect(screen.getByPlaceholderText('e.g., 500').value).toBe('500');
 
         // Rerender with updated props
-        rerender(<AddBudgetForm existingBudget={{budgetDescription: 'Utilities', budgetAmount: '750'}}/>);
+        rerender(<AddBudgetForm existingBudget={{ budgetDescription: 'Utilities', budgetAmount: '750' }} />);
 
         // Form fields should update to reflect the new props
         expect(screen.getByPlaceholderText('e.g., Groceries').value).toBe('Utilities');

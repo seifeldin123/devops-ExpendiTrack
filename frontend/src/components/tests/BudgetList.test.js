@@ -4,22 +4,31 @@ import BudgetList from '../BudgetList';
 import i18next from "i18next";
 import en from "../../translations/en/common.json";
 import fr from "../../translations/fr/common.json";
-import { I18nextProvider } from 'react-i18next';
+import {I18nextProvider, initReactI18next} from 'react-i18next';
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
 // Mock the BudgetItem component
 jest.mock('../BudgetItem', () => (props) => <div data-testid="mock-budget-item">{props.budget.budgetDescription}</div>);
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
         },
-        fr: {
-            global: fr
-        },
-    }
-});
+    });
 describe('BudgetList', () => {
     const mockBudgets = [
         { budgetId: 1, budgetDescription: 'Groceries', budgetAmount: 300 },

@@ -9,12 +9,14 @@ import userEvent from "@testing-library/user-event";
 import i18next from "i18next";
 import en from "../../translations/en/common.json";
 import fr from "../../translations/fr/common.json";
-import { I18nextProvider } from 'react-i18next';
+import {I18nextProvider, initReactI18next} from 'react-i18next';
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
 const mockRemoveBudget = jest.fn();
 const mockResetError = jest.fn();
 const mockEnableFormPopulation = jest.fn();
-// const mockDisableFormPopulation = jest.fn();
+const mockDisableFormPopulation = jest.fn();
 
 
 
@@ -63,24 +65,31 @@ const mockAnotherExpense = [
     }
 ];
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
         },
-        fr: {
-            global: fr
-        },
-    }
-});
+    });
 
 const renderWithProviders = (ui, { user = mockUser, expenses = mockExpenses, budget = mockBudget } = {}) => {
     useBudgetContext.mockReturnValue({
         removeBudget: mockRemoveBudget,
         resetError: mockResetError,
         enableFormPopulation: mockEnableFormPopulation,
-        // disableFormPopulation: mockDisableFormPopulation,
+        disableFormPopulation: mockDisableFormPopulation,
         // Include other context values and functions as needed
     });
 
@@ -162,15 +171,6 @@ describe('BudgetItem', () => {
         expect(screen.getByRole('link', { name: 'View Details' })).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
     });
 
-    // it('shows the edit modal with the correct data when the edit button is clicked', async () => {
-    //
-    //     const { getByText, getByRole } = renderWithProviders(<BudgetItem budget={mockBudget} />);
-    //     await act(async () => {
-    //         await userEvent.click(screen.getByText('Edit Budget'));
-    //     });
-    //     expect(getByRole('dialog')).toHaveTextContent('Edit Budget');
-    //     expect(screen.getByDisplayValue(mockBudget.budgetDescription)).toBeInTheDocument();
-    // });
 
     it('shows the edit modal with the correct data when the edit button is clicked', async () => {
         const { getByText, getByRole } = renderWithProviders(

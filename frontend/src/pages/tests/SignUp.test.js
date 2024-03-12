@@ -4,10 +4,12 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { UserProvider } from '../../contexts/UserContext';
 import SignUp from '../SignUp';
 import { useNavigate } from 'react-router-dom';
-import {I18nextProvider} from "react-i18next";
+import {I18nextProvider, initReactI18next} from "react-i18next";
 import i18next from "i18next";
 import en from "../../translations/en/common.json";
 import fr from "../../translations/fr/common.json";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
 // Mock the useNavigate hook
 jest.mock('react-router-dom', () => ({
@@ -15,18 +17,24 @@ jest.mock('react-router-dom', () => ({
     useNavigate: jest.fn(), // Mock useNavigate
 }));
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
-        },
-        fr: {
-            global: fr
-        },
-    }
-});
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
 
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
+        },
+    });
 describe('SignUpForm', () => {
     let navigateMock;
 
@@ -53,7 +61,7 @@ describe('SignUpForm', () => {
         // Assert that the Name and Email input fields, and the Sign Up button are rendered
         expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /app.Sign-up-sign-up/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument();
     });
 
     it('allows entering name and email', () => {
@@ -72,7 +80,7 @@ describe('SignUpForm', () => {
         renderComponent();
 
         // Simulate a click on the "Login here" button
-        fireEvent.click(screen.getByText(/app.Sign-up-login-here/i));
+        fireEvent.click(screen.getByText(/Login here/i));
 
         // Assert that navigate was called with '/login'
         expect(navigateMock).toHaveBeenCalledWith('/login');

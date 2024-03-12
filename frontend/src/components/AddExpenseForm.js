@@ -121,7 +121,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
                             <div>
                                 <input
-                                    data-testid="expense-description-input"
+                                    data-testid="expense-description"
                                     type="text"
                                     className="form-control"
                                     value={description}

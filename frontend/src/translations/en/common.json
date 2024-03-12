@@ -123,7 +123,7 @@
     "budgeListNotAvailable": "No budgets available",
     "modalClose": "Close",
     "budgetListConfirmDeletion": "Confirm Deletion",
-    "budgetListEdit": "Edit Expense",
+    "budgetListEdit": "Edit Budget",
     "dashaboardLink": "Dashboard",
     "invalidExpenseInput": "Invalid input: expenses amount cannot be negative.",
     "creationFailed": "Invalid input: Invalid email format",

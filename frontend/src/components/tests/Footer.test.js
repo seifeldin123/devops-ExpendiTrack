@@ -5,22 +5,31 @@ import Footer from '../Footer';
 import en from "../../translations/en/common.json";
 import fr from "../../translations/fr/common.json";
 import i18next from "i18next";
-import { I18nextProvider } from 'react-i18next';
+import {I18nextProvider, initReactI18next} from 'react-i18next';
 import {UserContext} from "../../contexts/UserContext";
 import Header from "../Header";
 import {BrowserRouter as Router} from "react-router-dom";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
         },
-        fr: {
-            global: fr
-        },
-    }
-});
+    });
 describe('Footer Component', () => {
 
     expect.extend(toHaveNoViolations);

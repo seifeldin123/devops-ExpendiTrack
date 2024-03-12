@@ -3,22 +3,31 @@ import { render, screen } from '@testing-library/react';
 import App from './App';
 import { UserProvider } from './contexts/UserContext';
 import { BudgetProvider } from './contexts/BudgetContext'; // Import BudgetProvider
-import {I18nextProvider} from "react-i18next";
+import {I18nextProvider, initReactI18next} from "react-i18next";
 import i18next from "i18next";
 import en from "./translations/en/common.json";
 import fr from "./translations/fr/common.json";
+import enTranslations from "./translations/en/common.json";
+import frTranslations from "./translations/fr/common.json";
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
         },
-        fr: {
-            global: fr
-        },
-    }
-});
+    });
 
 describe('App Routing', () => {
     it('renders Login for "/login" route', () => {

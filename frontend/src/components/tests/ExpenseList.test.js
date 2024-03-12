@@ -3,10 +3,12 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ExpenseProvider, removeExpense} from '../../contexts/ExpenseContext';
 import { UserProvider } from '../../contexts/UserContext';
 import ExpenseList from "../ExpenseList";
-import { I18nextProvider } from 'react-i18next';
+import {I18nextProvider, initReactI18next} from 'react-i18next';
 import i18next from "i18next";
 import en from "../../translations/en/common.json";
 import fr from "../../translations/fr/common.json";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
 jest.mock('../../contexts/ExpenseContext', () => {
     // Mock removeExpense function
@@ -23,17 +25,24 @@ jest.mock('../../contexts/ExpenseContext', () => {
     };
 });
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
         },
-        fr: {
-            global: fr
-        },
-    }
-});
+    });
 
 jest.mock('../../contexts/BudgetContext', () => ({
     useBudgetContext: () => ({
