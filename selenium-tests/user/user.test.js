@@ -17,7 +17,8 @@ describe('User Registration Test', () => {
         await driver.get("http://localhost:3000/");
         await driver.manage().setTimeouts({ implicit: 1000 });
 
-        const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        // const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        const createAccountButton = await driver.findElement(By.css('[data-testid="createAccountButton"]'));
         await driver.executeScript("arguments[0].click();", createAccountButton);
         await driver.wait(until.urlIs('http://localhost:3000/signup'), 5000);
 
@@ -34,7 +35,8 @@ describe('User Registration Test', () => {
     test("User should login successfully", async() => {
         await driver.get("http://localhost:3000/");
         await driver.manage().setTimeouts({implicit:1000});
-        const loginAccount = await driver.findElement(By.xpath("//button[contains(text(), 'Login to Your Account')]"));
+        // const loginAccount = await driver.findElement(By.xpath("//button[contains(text(), 'Login to Your Account')]"));
+        const loginAccount = await driver.findElement(By.css('[data-testid="loginButton"]'));
         await driver.executeScript("arguments[0].click()", loginAccount);
         await driver.wait(until.urlIs('http://localhost:3000/login'), 5000);
 
@@ -49,7 +51,8 @@ describe('User Registration Test', () => {
         await driver.get("http://localhost:3000/");
         await driver.manage().setTimeouts({ implicit: 1000 });
 
-        const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        // const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        const createAccountButton = await driver.findElement(By.css('[data-testid="createAccountButton"]'));
         await driver.executeScript("arguments[0].click();", createAccountButton);
         await driver.wait(until.urlIs('http://localhost:3000/signup'), 5000);
 
@@ -70,7 +73,8 @@ describe('User Registration Test', () => {
         await driver.get("http://localhost:3000/");
         await driver.manage().setTimeouts({ implicit: 1000 });
 
-        const loginAccount = await driver.findElement(By.xpath("//button[contains(text(), 'Login to Your Account')]"));
+        // const loginAccount = await driver.findElement(By.xpath("//button[contains(text(), 'Login to Your Account')]"));
+        const loginAccount = await driver.findElement(By.css('[data-testid="loginButton"]'));
         await driver.executeScript("arguments[0].click()", loginAccount);
         await driver.wait(until.urlIs('http://localhost:3000/login'), 5000);
 
@@ -91,7 +95,8 @@ describe('User Registration Test', () => {
         await driver.get("http://localhost:3000/");
         await driver.manage().setTimeouts({ implicit: 1000 });
 
-        const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        // const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        const createAccountButton = await driver.findElement(By.css('[data-testid="createAccountButton"]'));
         await driver.executeScript("arguments[0].click();", createAccountButton);
         await driver.wait(until.urlIs('http://localhost:3000/signup'), 5000);
 
@@ -111,7 +116,8 @@ describe('User Registration Test', () => {
         await driver.get("http://localhost:3000/");
         await driver.manage().setTimeouts({ implicit: 1000 });
 
-        const loginAccount = await driver.findElement(By.xpath("//button[contains(text(), 'Login to Your Account')]"));
+        // const loginAccount = await driver.findElement(By.xpath("//button[contains(text(), 'Login to Your Account')]"));
+        const loginAccount = await driver.findElement(By.css('[data-testid="loginButton"]'));
         await driver.executeScript("arguments[0].click()", loginAccount);
         await driver.wait(until.urlIs('http://localhost:3000/login'), 5000);
 
@@ -129,12 +135,13 @@ describe('User Registration Test', () => {
 
     test("User with name and email already exist", async () => {
         await driver.get("http://localhost:3000/signup");
-        await driver.findElement(By.id('username')).sendKeys(name); // Use specific 'name' and 'email'
+        await driver.findElement(By.id('username')).sendKeys(name);
         await driver.findElement(By.id('email')).sendKeys(email);
         let signUpButton = await driver.findElement(By.xpath("//button[contains(text(), 'Sign Up')]"));
         await driver.executeScript("arguments[0].click();", signUpButton);
         await driver.get("http://localhost:3000/");
-        const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        // const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
+        const createAccountButton = await driver.findElement(By.css('[data-testid="createAccountButton"]'));
         await driver.executeScript("arguments[0].click();", createAccountButton);
         await driver.wait(until.urlIs('http://localhost:3000/signup'), 5000);
         await driver.findElement(By.id('username')).sendKeys(name);
