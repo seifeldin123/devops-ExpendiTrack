@@ -1,16 +1,17 @@
+# Build stage: Use Maven to compile the project
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+WORKDIR /home/app
+# Copy source code and project definition, then package the application
+COPY src ./src
+COPY pom.xml .
+RUN mvn clean package
 
-# Use the official OpenJDK 17 Alpine image as the base image
-FROM openjdk:17-jdk-alpine
-# Argument for the JAR file (passed during build)
-ARG JAR_FILE=target/*.jar
-# Copy the JAR file into the container as 'app.jar'
-COPY ${JAR_FILE} docker-tracker.jar
-# Expose the port that your backend application runs on
-EXPOSE 8080
-# Define the entry point for running the application
-ENTRYPOINT ["java", "-jar", "/docker-tracker.jar"]
+# Runtime stage: Use a slim Java image to run the packaged application
+FROM amazoncorretto:17-alpine
+# Copy the built application jar from the build stage
+COPY --from=build /home/app/target/*.jar /usr/local/lib/backend.jar
+# Ensure the application jar is executable
+RUN chmod +x /usr/local/lib/backend.jar
 
-# Labels providing metadata for the image
-LABEL maintainer="Seifeldin <seifeldin@example.com>, harmeet <harmeet@example.com>, sasha <sasha@example.com>"
-LABEL version="1.0"
-LABEL description="Docker image for the budget Tracker Spring Boot application"
+# Command to run the application
+ENTRYPOINT ["java","-jar","/usr/local/lib/backend.jar"]
