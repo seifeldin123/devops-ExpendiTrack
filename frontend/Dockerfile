@@ -6,7 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm install
 # Copy source code and build static files
 COPY . .
-RUN npm run build
+RUN npm run build:docker
 
 # Production stage: Use Nginx to serve the static files
 FROM nginx:alpine

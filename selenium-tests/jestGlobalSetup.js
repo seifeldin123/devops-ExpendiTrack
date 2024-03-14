@@ -33,7 +33,7 @@ async function isReactAppReady() {
 async function startReactFrontend() {
     // Set BROWSER environment variable to 'none' to prevent opening the browser
     const env = { ...process.env, BROWSER: 'none' };
-    exec("npm start", { cwd: "../frontend", env });
+    exec("npm run start:selenium", { cwd: "../frontend", env });
     console.log('Waiting for React frontend to be ready...');
     const startTime = Date.now();
     const timeout = 60000; // 60 seconds
