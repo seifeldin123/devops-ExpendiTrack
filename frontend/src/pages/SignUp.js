@@ -14,7 +14,7 @@ const SignUp = () => {
     const { t, i18n } = useTranslation();
 
     // Update to hold the error message key instead of the translated message
-    const [errorKey, setErrorKey] = useState('');
+    const [errorKey] = useState('');
 
     const errorMapping = {
         "Invalid input: Invalid email format": "app.creationFailed",
@@ -50,11 +50,7 @@ const SignUp = () => {
             navigate('/dashboard'); // Navigate to the Dashboard upon successful creation
         } catch (error) {
             const key = errorMapping[error.message] || "app.unexpectedError"; // Fallback to a generic error message
-            // setErrorKey(key); // Update the errorKey state
-            // setError(t(key)); // Also update the error message immediately
-            console.log(error);
             setError(t(key));
-
         }
     };
 

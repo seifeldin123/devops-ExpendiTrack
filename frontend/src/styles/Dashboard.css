@@ -8,7 +8,7 @@
 }
 
 /* Specific Styles for Each Form */
-.dashboard-budget-form, .dashboard-expense-form {
+.dashboard-budget-form, .dashboard-expense-form{
     flex: 1;
     padding: 20px;
     background-color: #fff;
@@ -16,7 +16,7 @@
     min-width: 350px;
     width: 100%;
     box-sizing: border-box;
-    max-width: calc(60% - 10px);
+    max-width: 40vw;
 }
 
 /* Additional styling to ensure content is not shrunk */
@@ -25,10 +25,12 @@
 }
 
 /* Styling for .form-section-container specifically */
+
 .dashboard-budget-form .form-section-container, .dashboard-expense-form .form-section-container {
     padding: 15px;
-    background-color: #f8f9fa;
+    background-color: #f4f4f4;
     border-radius: 4px;
+    border: 1px solid #e0e0e0;
 }
 
 /* Ensuring input and select elements inside the specific forms have consistent styling */
@@ -88,6 +90,7 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     padding: 10px;
     margin: 10px;
+    background-color: #f2f6f8;
 }
 
 .card-container {
@@ -145,7 +148,7 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.95);
     animation: fadeIn 0.3s ease-out forwards;
-    padding-top: 5vh;
+    padding-top: 15px;
 }
 
 
@@ -188,14 +191,13 @@
 /* Centering form content inside the modal */
 .modal-body-custom {
     display: flex;
-    justify-content: center;
+    /*justify-content: center;*/
     align-items: center;
     flex-direction: column;
     max-height: 70vh;
     overflow-y: auto;
     padding: 15px;
 }
-
 
 /* Ensure modal content width is responsive and forms are well adjusted */
 .modal-content {
@@ -219,15 +221,6 @@
 }
 
 /* Action buttons end*/
-
-/* Card Design Refinement */
-.custom-card-border {
-    border: 1px solid #e2e6ea;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0.5, 0.07);
-    margin: 10px;
-    transition: all 0.3s ease;
-}
 
 .custom-card-border:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -296,4 +289,35 @@
 .modal-content {
     border-radius: 0.5rem;
     box-shadow: 0 5px 15px rgba(0,0,0,.3);
+}
+
+
+/* Logout Buttons */
+
+#wb-so .modal-body-custom {
+    display: block;
+}
+
+#wb-so .logout-btns .btn {
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-weight: bold;
+}
+
+.logout-btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.logout-btns .btn{
+    margin: 7px;
+}
+
+/* Additional adjustments for the expense list */
+.expenses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Adds space between items */
 }

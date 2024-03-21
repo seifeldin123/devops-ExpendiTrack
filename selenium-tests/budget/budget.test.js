@@ -131,7 +131,10 @@ async function createBudget(driver, budgetName, budgetAmount) {
 }
 
 // Helper function to add a new expense
-async function createExpense(driver, description, amount, budgetName) {
+async function createExpense(driver, description, amount) {
+
+    const createExpenseButton = await driver.findElement(By.css('[data-testid="create-expense-btn"]'));
+    await createExpenseButton.click();
 
     // Wait for the Add Expense form to load
     await driver.wait(until.elementLocated(By.id('expense-description')), 5000);
@@ -142,7 +145,7 @@ async function createExpense(driver, description, amount, budgetName) {
 
     // Select the appropriate budget for the expense
     // Assuming that the select dropdown can be interacted with by typing the budget name
-    await driver.findElement(By.id('budget-category')).sendKeys(budgetName);
+    // await driver.findElement(By.id('budget-category')).sendKeys(budgetName);
 
     // Submit the expense form
     const submitButton = await driver.findElement(By.css('[data-testid="create-expense"]'));
@@ -335,7 +338,7 @@ describe('Budget Calculation Tests', () => {
         await createBudget(driver, 'Food', '750');
 
         // Then, add an expense to the budget
-        await createExpense(driver, 'Restaurant Meals', '250', 'Food');
+        await createExpense(driver, 'Restaurant Meals', '250');
     });
 
     afterAll(async () => {
@@ -354,6 +357,9 @@ describe('Budget Calculation Tests', () => {
             const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
 
             if (budgetTitle.includes('FOOD')) {
+
+                // const viewExpensesButton = await driver.findElement(By.css('[data-testid="view-expenses-btn"]'));
+                // await viewExpensesButton.click();
 
                 // Fetch the displayed values for total spent, remaining, and percent spent
                 const totalSpent = await budgetItem.findElement(By.css('.total-spent')).getText();
@@ -437,7 +443,7 @@ describe('Budget Deletion Tests', () => {
         await createBudget(driver, 'Insurance', '650');
 
         // Then, add an expense to the budget
-        await createExpense(driver, 'Auto insurance', '200', 'Insurance');
+        await createExpense(driver, 'Auto insurance', '200');
 
         // Create another budget without an expense associated with it
         await createBudget(driver, 'Medical', '150');
