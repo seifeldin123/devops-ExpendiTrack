@@ -7,7 +7,6 @@ async function signupAndLogin(driver) {
     await driver.get('http://localhost:3000/');
 
     // Click on the "Create a New Account" button to navigate to the signup page
-    // const createAccountButton = await driver.findElement(By.xpath("//button[contains(text(), 'Create a New Account')]"));
     const createAccountButton = await driver.findElement(By.css('[data-testid="createAccountButton"]'));
     await driver.executeScript("arguments[0].click();", createAccountButton);
 
@@ -133,19 +132,12 @@ async function createBudget(driver, budgetName, budgetAmount) {
 // Helper function to add a new expense
 async function createExpense(driver, description, amount) {
 
-    const createExpenseButton = await driver.findElement(By.css('[data-testid="create-expense-btn"]'));
-    await createExpenseButton.click();
-
     // Wait for the Add Expense form to load
     await driver.wait(until.elementLocated(By.id('expense-description')), 5000);
 
     // Fill in the expense form
     await driver.findElement(By.id('expense-description')).sendKeys(description);
     await driver.findElement(By.id('expense-amount')).sendKeys(amount);
-
-    // Select the appropriate budget for the expense
-    // Assuming that the select dropdown can be interacted with by typing the budget name
-    // await driver.findElement(By.id('budget-category')).sendKeys(budgetName);
 
     // Submit the expense form
     const submitButton = await driver.findElement(By.css('[data-testid="create-expense"]'));
@@ -155,7 +147,26 @@ async function createExpense(driver, description, amount) {
     let successMessageElement = await driver.wait(until.elementLocated(By.css('.expense-message')), 5000);
     const successMessage = await successMessageElement.getText();
     expect(successMessage).toContain('Expense successfully added');
+
+    // Close add expense modal
+    const closeButton = await driver.findElement(By.xpath("//button[contains(text(), 'Close')]"));
+    await closeButton.click();
 }
+
+// Helper Function to click on "Add Expense" button for a specific budget item named "Food"
+async function clickAddExpenseButtonForBudget(driver, budgetName) {
+    const budgetItems = await driver.findElements(By.css('.card-container'));
+    for (let budgetItem of budgetItems) {
+        const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
+        if (budgetTitle.includes(budgetName.toUpperCase())) { // Assuming budget titles are uppercase
+            const addExpenseButton = await budgetItem.findElement(By.css('[data-testid="create-expense-btn"]'));
+            await driver.executeScript("arguments[0].click();", addExpenseButton);
+            return; // Exit the function after clicking the button
+        }
+    }
+    throw new Error(`Budget item with name '${budgetName}' not found.`);
+}
+
 
 describe('Budget Creation Tests - Invalid Data Scenarios', () => {
     let driver;
@@ -338,7 +349,7 @@ describe('Budget Calculation Tests', () => {
         await createBudget(driver, 'Food', '750');
 
         // Then, add an expense to the budget
-        await createExpense(driver, 'Restaurant Meals', '250');
+        // await createExpense(driver, 'Restaurant Meals', '250');
     });
 
     afterAll(async () => {
@@ -358,8 +369,11 @@ describe('Budget Calculation Tests', () => {
 
             if (budgetTitle.includes('FOOD')) {
 
-                // const viewExpensesButton = await driver.findElement(By.css('[data-testid="view-expenses-btn"]'));
-                // await viewExpensesButton.click();
+                // Click the "Add Expense" button for the "Food" budget
+                await clickAddExpenseButtonForBudget(driver, 'Food');
+
+                // Now add an expense to the "Food" budget
+                await createExpense(driver, 'Grocery Shopping', '250');
 
                 // Fetch the displayed values for total spent, remaining, and percent spent
                 const totalSpent = await budgetItem.findElement(By.css('.total-spent')).getText();
@@ -376,6 +390,7 @@ describe('Budget Calculation Tests', () => {
     });
 
     it('Try to Edit Budget to Amount Less Than Expense and Verify Warning Modal Shows Up', async () => {
+
         // Navigate to and trigger the edit form for the 'Utilities' budget
         await clickEditButtonForBudget(driver, 'FOOD');
 
@@ -439,12 +454,6 @@ describe('Budget Deletion Tests', () => {
 
         await loginUser(driver);
 
-        // Create a budget first, since an expense needs a budget to be associated with
-        await createBudget(driver, 'Insurance', '650');
-
-        // Then, add an expense to the budget
-        await createExpense(driver, 'Auto insurance', '200');
-
         // Create another budget without an expense associated with it
         await createBudget(driver, 'Medical', '150');
     });
@@ -460,7 +469,7 @@ describe('Budget Deletion Tests', () => {
         for (let budgetItem of budgetItems) {
             const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
 
-            if (budgetTitle.includes('INSURANCE')) {
+            if (budgetTitle.includes('FOOD')) {
                 const deleteButton = await budgetItem.findElement(By.css('#delete-budget-btn'));
                 await driver.executeScript("arguments[0].click();", deleteButton);
 
