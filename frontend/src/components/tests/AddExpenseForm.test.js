@@ -172,7 +172,7 @@ describe('AddExpenseForm Tests', () => {
             <ExpenseContext.Provider value={{
                 addNewExpense: mockAddNewExpense.mockRejectedValue(new Error(testErrorMessage)),
                 expenses: [],
-                error: testErrorMessage, // Here you're setting error as a string, which is fine for displaying, but ensure setError correctly updates this value if it's used dynamically
+                error: testErrorMessage,
                 resetError: mockResetError,
                 fetchExpenses: mockFetchExpenses,
                 setError: mockSetError, // Provide the mock setError function

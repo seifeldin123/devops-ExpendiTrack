@@ -64,67 +64,91 @@ const Login = () => {
 
 
     return (
-        <div className="container" >
-            <form className="form-horizontal" onSubmit={handleLogin}>
-                <h1>{t("app.login-sign-up")}</h1>
-                {error && <div style={{color: 'red'}}>{error}</div>}
+        <div className="container">
 
+            <h1>{t("app.login-sign-up")}</h1>
 
-                <div className="form-group">
-                    <div>
-                        <label htmlFor="username" className="col-sm-3 control-label">Username</label>
+            <div className="login-form-container">
+
+                <div className="login-form">
+
+                    <div className="login-section-container">
+
+                        <form onSubmit={handleLogin}>
+
+                            <p className="p-titles" >{t("app.loginText")}</p>
+
+                            <div className="form-group">
+                                <label htmlFor="username">
+                                    <span className="field-name">Username</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
+                                </label>
+
+                                <input
+                                    id="username"
+                                    className="form-control"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    onInvalid={(e) => e.target.setCustomValidity(t("app.usernameRequiredMessage"))}
+                                    onInput={(e) => e.target.setCustomValidity('')}
+                                    placeholder="Username"
+                                    required/>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="email">
+                                    <span className="field-name">Email</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
+                                </label>
+
+                                <input
+                                    id="email"
+                                    className="form-control"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onInvalid={(e) => e.target.setCustomValidity(t("app.emailRequiredMessage"))}
+                                    onInput={(e) => e.target.setCustomValidity('')}
+                                    placeholder="Email"
+                                    required/>
+                            </div>
+
+                            {error && (
+                                <div className="alert alert-danger" role="alert">
+                                    <h4>{t("app.budgetItem-the-form-cannot-be-submitted")}</h4>
+                                    <ul>
+                                    <li>{error}</li>
+                                    </ul>
+                                </div>
+                            )}
+
+                            <div className="mrgn-bttm-md button-submit-form">
+                                <button type="submit" className="btn-lg btn-primary">
+                                    {t("app.login-sign-up")} <span className="glyphicon glyphicon-log-in"></span>
+                                </button>
+                            </div>
+
+                        </form>
+
                     </div>
 
-                    <div className="col-sm-9">
-                        <input
-                            id="username"
-                            className="form-control"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            onInvalid={(e) => e.target.setCustomValidity(t("app.usernameRequiredMessage"))}
-                            onInput={(e) => e.target.setCustomValidity('')}
-                            placeholder="Username"
-                            required/>
-                    </div>
                 </div>
 
-                <div className="form-group">
-                    <div>
-                        <label htmlFor="email" className="col-sm-3 control-label">Email</label>
-                    </div>
+                <section>
+                    <p className="mrgn-tp-lg">
 
-                    <div className="col-sm-9">
-                        <input
-                            id="email"
-                            className="form-control"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            onInvalid={(e) => e.target.setCustomValidity(t("app.emailRequiredMessage"))}
-                            onInput={(e) => e.target.setCustomValidity('')}
-                            placeholder="Email"
-                            required/>
-                    </div>
-                </div>
-
-                <div className="col-sm-offset-3 col-sm-9">
-                    <button type="submit" className="btn-lg btn-primary">
-                        {t("app.login-sign-up")} <span className="glyphicon glyphicon-log-in"></span>
-                    </button>
-                </div>
-            </form>
-            <div>
-
-                    <span>{t("app.no-account")}</span> &nbsp;
-                    <button className="btn btn-default" type="button"
-                            onClick={() => navigate('/signup')}>{t("app.sign-up-here")}
-                    </button>
-
+                        <strong> <span>{t("app.no-account")}</span> </strong> &nbsp;
+                        <button className="btn btn-default" type="button"
+                                onClick={() => navigate('/signup')}>{t("app.sign-up-here")}
+                        </button>
+                    </p>
+                </section>
 
             </div>
+
         </div>
-    );
+);
 };
 
 export default Login;

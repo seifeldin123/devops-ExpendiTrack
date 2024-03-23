@@ -96,7 +96,7 @@ async function submitUpdateFormAndCheckError(driver, expectedError) {
 // Helper Function to click on "Edit" button for a specific budget item
 async function clickEditButtonForBudget(driver, budgetName) {
     // Find all budget item containers.
-    const budgetItems = await driver.findElements(By.css('.card-container'));
+    const budgetItems = await driver.findElements(By.css('.budget-item'));
 
     for (let budgetItem of budgetItems) {
         // Find the title of a budget
@@ -155,7 +155,7 @@ async function createExpense(driver, description, amount) {
 
 // Helper Function to click on "Add Expense" button for a specific budget item named "Food"
 async function clickAddExpenseButtonForBudget(driver, budgetName) {
-    const budgetItems = await driver.findElements(By.css('.card-container'));
+    const budgetItems = await driver.findElements(By.css('.budget-item'));
     for (let budgetItem of budgetItems) {
         const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
         if (budgetTitle.includes(budgetName.toUpperCase())) { // Assuming budget titles are uppercase
@@ -361,7 +361,7 @@ describe('Budget Calculation Tests', () => {
     it('Verify budget calculations after adding an expense', async function () {
 
         // Wait for the budget items to be loaded
-        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+        const budgetItems = await driver.wait(until.elementsLocated(By.css('.budget-item')), 5000);
 
         for (let budgetItem of budgetItems) {
             // Find the title of the budget
@@ -422,7 +422,7 @@ describe('Budget Calculation Tests', () => {
         await proceedButton.click();
 
         // Wait for the budget items to be loaded
-        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
+        const budgetItems = await driver.wait(until.elementsLocated(By.css('.budget-item')), 5000);
 
         for (let budgetItem of budgetItems) {
             // Find the title of the budget
@@ -464,7 +464,7 @@ describe('Budget Deletion Tests', () => {
 
     it('Attempt to Delete Budget with Existing Expenses and Delete Warning Modal shows', async () => {
         // Wait for the budget items to be fully loaded
-        const budgetItems = await driver.wait(until.elementsLocated(By.css('.card-container')), 10000);
+        const budgetItems = await driver.wait(until.elementsLocated(By.css('.budget-item')), 10000);
 
         for (let budgetItem of budgetItems) {
             const budgetTitle = await budgetItem.findElement(By.css('.card-title')).getText();
@@ -501,8 +501,8 @@ describe('Budget Deletion Tests', () => {
 
     it('Successfully Delete Budget and Verify Deletion', async () => {
         // Wait for the budget items to be visible
-        await driver.wait(until.elementsLocated(By.css('.card-container')), 5000);
-        let budgetItems = await driver.findElements(By.css('.card-container'));
+        await driver.wait(until.elementsLocated(By.css('.budget-item')), 5000);
+        let budgetItems = await driver.findElements(By.css('.budget-item'));
 
         for (let i = 0; i < budgetItems.length; i++) {
             let budgetItem = budgetItems[i]; // Refetch each iteration to avoid staleness
@@ -526,7 +526,7 @@ describe('Budget Deletion Tests', () => {
         }
 
         // Refetch the budget items to check for deletion
-        budgetItems = await driver.findElements(By.css('.card-container'));
+        budgetItems = await driver.findElements(By.css('.budget-item'));
         const budgetTitlesAfterDeletion = await Promise.all(budgetItems.map(async (item) => await item.findElement(By.css('.card-title')).getText()));
 
         // Verify the specific budget is not present

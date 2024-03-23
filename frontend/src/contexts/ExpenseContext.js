@@ -83,9 +83,6 @@ export const ExpenseProvider = ({ children }) => {
                 setError(t("app.expenseExistsError", { name: expenseName }));
 
             } else {
-                // const key = errorMapping[error.message] || "app.unexpectedError";
-                // setErrorKey(key);
-                // setError(t(key));
                 const normalizedErrorMessage = error.message.toLowerCase();
                 const key = errorMapping[normalizedErrorMessage] || "app.unexpectedError";
                 setErrorKey(key);
@@ -113,9 +110,6 @@ export const ExpenseProvider = ({ children }) => {
                 setError(t("app.expenseExistsError", { name: expenseName }));
 
             } else {
-                // const key = errorMapping[error.message] || "app.unexpectedError";
-                // setErrorKey(key);
-                // setError(t(key));
                 const normalizedErrorMessage = error.message.toLowerCase();
                 const key = errorMapping[normalizedErrorMessage] || "app.unexpectedError";
                 setErrorKey(key);
@@ -143,6 +137,9 @@ export const ExpenseProvider = ({ children }) => {
 
     const resetError = useCallback(() => setError(''), []); // Wrap resetError in useCallback
 
+    const resetExpError = useCallback(() => setError(''), []); // Wrap resetError in useCallback
+
+
     // Use useMemo to memoize the context value to prevent unnecessary re-renders
     const providerValue = useMemo(() => ({
         expenses,
@@ -152,8 +149,9 @@ export const ExpenseProvider = ({ children }) => {
         fetchExpenses,
         error,
         resetError, // Now stable across renders
+        resetExpError,
         setError
-    }), [expenses, addNewExpense, updateExistingExpense, removeExpense, fetchExpenses, error, resetError]);
+    }), [expenses, addNewExpense, updateExistingExpense, removeExpense, fetchExpenses, error, resetError, resetExpError]);
 
     return (
         <ExpenseContext.Provider value={providerValue}>

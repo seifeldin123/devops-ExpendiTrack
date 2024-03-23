@@ -108,10 +108,10 @@
     "add-expenses-proceed": "Proceed",
     "emailRequiredMessage": "Please enter your email address.",
     "usernameRequiredMessage": "Please enter your username",
-    "budgetNameRequired": "Please enter budget number",
+    "budgetNameRequired": "Please enter budget name",
     "budgetAmountRequired": "Please enter budget amount",
     "expenseDescriptionRequired": "Please enter expense name",
-    "expenseAmountRequired": "Please enter expense name",
+    "expenseAmountRequired": "Please enter expense amount",
     "expenseDateRequired": "Please enter date",
     "expenseListTitle": "Expenses",
     "expenseListTitleDelete": "Delete Expense",
@@ -138,7 +138,8 @@
     "expenseDescriptionError": "Invalid input: Expense description should be alphanumeric.",
     "userExist" : "An account with these credentials already exists.",
     "budgetExistsError": "A budget with the name '{{name}}' already exists for this user.",
-    "expenseExistsError": "An expense with the name '{{name}}' already exists for this user."
-
+    "expenseExistsError": "An expense with the name '{{name}}' already exists for this user.",
+    "signupText": "Please fill in this form to create an account.",
+    "loginText": "Please fill in this form to log into your account."
   }
 }

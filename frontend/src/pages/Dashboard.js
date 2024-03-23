@@ -27,12 +27,15 @@ const Dashboard = () => {
         <div className="container" data-testid="dashboard">
             {user && <h1>{t("app.dashboard-welcome")}, {user.name}!</h1>}
 
-            <div>
-                <BudgetList budgets={budgets}/>
-            </div>
+            <div className="dashboard-container">
 
-            <div className="dashboard-forms-container">
-                <AddBudgetForm/>
+                <div className="dashboard-forms-container">
+                    <AddBudgetForm/>
+                </div>
+
+                <div className="budget-list-container">
+                    <BudgetList budgets={budgets}/>
+                </div>
             </div>
 
         </div>

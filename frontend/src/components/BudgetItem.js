@@ -11,7 +11,7 @@ import ExpenseList from "./ExpenseList";
 
 const BudgetItem = ({ budget }) => {
     const { user } = useUserContext();
-    const { expenses } = useExpenseContext();
+    const { expenses, resetExpError } = useExpenseContext();
     const { removeBudget, fetchBudgets, resetError, budgets } = useBudgetContext();
     const { t, i18n} = useTranslation();
 
@@ -65,6 +65,7 @@ const BudgetItem = ({ budget }) => {
 
     const handleCloseModal = () => {
         resetError(); // Assuming resetError is accessible here, either directly or passed down as a prop
+        resetExpError();
         setShowEditModal(false);
         setShowDeleteConfirmation(false);
         setShowDeleteWarning(false);
@@ -113,7 +114,7 @@ const BudgetItem = ({ budget }) => {
     }
 
     return (
-        <div className="card-container col-lg-4 col-md-6 mb-4">
+        <div className="budget-item ">
             <div className="card h-100 shadow-sm custom-card-border">
                 <div className="card-body">
                     <h5 className="card-title" data-testid="budget-title-test-id">
@@ -140,14 +141,14 @@ const BudgetItem = ({ budget }) => {
                         {/* Show "View Expenses" button only if there are expenses for the current budget */}
                         {expensesForCurrentBudget.length > 0 && (
                             <button onClick={handleViewExpensesClick} data-testid="view-expenses-btn"
-                                    className="btn btn-default">
+                                    className="btn btn-sm btn-default">
                                 <span className="glyphicon glyphicon-open"></span>
                                 &nbsp;  {t("app.budgetItem-view")}
                             </button>
                         )}
 
                         <button onClick={handleAddExpenseClick} data-testid="create-expense-btn"
-                                className="btn btn-default">
+                                className="btn btn-sm btn-default">
                             <span className="glyphicon glyphicon-plus"></span>
                             &nbsp;  {t("app.add-expenses-create")}
                         </button>
@@ -157,12 +158,12 @@ const BudgetItem = ({ budget }) => {
 
                     {/* Edit and Delete Buttons */}
                     <div className="action-buttons mrgn-tp-md">
-                        <button onClick={handleEditClick} className="btn btn-default" id="edit-budget-btn"
+                        <button onClick={handleEditClick} className="btn btn-sm btn-default" id="edit-budget-btn"
                                 data-testid="edit-budget">
                             <span className="glyphicon glyphicon-edit"></span>
                             &nbsp; {t("app.budgetItem-edit")}
                         </button>
-                        <button onClick={handleDeleteClick} className="btn btn-danger" id="delete-budget-btn">
+                        <button onClick={handleDeleteClick} className="btn btn-sm btn-danger" id="delete-budget-btn">
                             <span className="glyphicon glyphicon-trash"></span>
                             &nbsp; {t("app.budgetItem-delete")}
                         </button>
@@ -173,7 +174,7 @@ const BudgetItem = ({ budget }) => {
 
             {/* View Expenses Modal */}
             {showViewExpensesModal && (
-                <BasicModal show={showViewExpensesModal} handleClose={handleCloseModal} title={t("app.budgetItem-view")}>
+                <BasicModal show={showViewExpensesModal} handleClose={handleCloseModal} title={t("app.expenseListTitle")}>
                     <ExpenseList expenses={expensesForCurrentBudget} budgets={budgets} />
                 </BasicModal>
             )}

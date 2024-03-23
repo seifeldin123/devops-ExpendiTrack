@@ -74,7 +74,7 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
             resetError();
             resetFormFields(); // Reset the form fields on unsuccessful submission
         }
-        disableFormPopulation(); // Add this line
+        disableFormPopulation();
     };
 
 
@@ -150,13 +150,15 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                 />
             </div>
             {existingBudget ? (
-                <button type="submit" className="btn-lg btn-success" data-testid="updateBudgetButton">
-                    <span className="glyphicon glyphicon-floppy-save"></span>
-                    &nbsp; {t("app.budgetItem-edit")}
-                </button>
+                <div className="button-submit-form">
+                    <button type="submit" className="btn btn-lg btn-success" data-testid="updateBudgetButton">
+                        <span className="glyphicon glyphicon-floppy-save"></span>
+                        &nbsp; {t("app.budgetItem-edit")}
+                    </button>
+                </div>
             ) : (
-                <div className="mrgn-bttm-md">
-                    <button type="submit" className="btn-lg btn-default" data-testid="submitBudgetButton">
+                <div className="mrgn-bttm-md button-submit-form">
+                    <button type="submit" className="btn btn-lg btn-default" data-testid="submitBudgetButton">
                         <span className="glyphicon glyphicon-plus"></span>
                         &nbsp;{t("app.add-budget-create-budget-title")}
                     </button>
@@ -212,13 +214,10 @@ const AddBudgetForm = ({ existingBudget = null, onClose }) => {
                     // Just render the form fields for editing
                     renderFormFields()
                 ) : (
-                    // Wrap the form fields with a panel for adding
-                    <section className="panel panel-primary">
-                        <header className="panel-heading">
-                            <h2 className="panel-title">{t("app.add-budget-create-budget-title")}</h2>
-                        </header>
+                    <div>
+                        <h2 className="h2-titles">{t("app.add-budget-create-budget-title")}</h2>
                         {renderFormFields()}
-                    </section>
+                    </div>
                 )}
             </form>
         </div>

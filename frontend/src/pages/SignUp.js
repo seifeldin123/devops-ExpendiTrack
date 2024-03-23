@@ -56,61 +56,85 @@ const SignUp = () => {
 
     return (
         <div className="container">
-            <form className="form-horizontal" onSubmit={handleSubmit}>
 
-                <h1>{t("app.Sign-up-create")}</h1>
-                {error && <div id="error-message" style={{color: 'red'}}>{error}</div>}
+            <h1>{t("app.Sign-up-create")}</h1>
 
-                <div className="form-group">
-                    <div>
-                        <label htmlFor="username" className="col-sm-3 control-label">Username</label>
-                    </div>
-                    <div className="col-sm-9">
-                        <input
-                            id="username"
-                            className="form-control"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            onInvalid={(e) => e.target.setCustomValidity(t("app.usernameRequiredMessage"))}
-                            placeholder="Username"
-                            required
-                        />
+            <div className="signup-form-container">
+
+                <div className="signup-form">
+
+                    <div className="signup-section-container">
+
+                        <form onSubmit={handleSubmit}>
+
+                            <p className="p-titles" >{t("app.signupText")}</p>
+
+                            <div className="form-group">
+
+                                <label htmlFor="username">
+                                    <span className="field-name">Username</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
+                                </label>
+
+                                <input
+                                    id="username"
+                                    className="form-control"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    onInvalid={(e) => e.target.setCustomValidity(t("app.usernameRequiredMessage"))}
+                                    placeholder="Username"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="email">
+                                    <span className="field-name">Email</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
+                                </label>
+
+                                <input
+                                    id="email"
+                                    className="form-control"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onInvalid={(e) => e.target.setCustomValidity(t("app.emailRequiredMessage"))}
+                                    placeholder="Email"
+                                    required
+                                />
+                            </div>
+
+                            {error && (
+                                <div className="alert alert-danger" role="alert">
+                                    <h4>{t("app.budgetItem-the-form-cannot-be-submitted")}</h4>
+                                    <ul>
+                                    <li id="error-message">{error}</li>
+                                    </ul>
+                                </div>
+                            )}
+
+                            <div className="mrgn-bttm-md button-submit-form">
+                                <button type="submit" className="btn-lg btn-primary">
+                                    {t("app.Sign-up-sign-up")} <span className="glyphicon glyphicon-user"></span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <div>
-                        <label htmlFor="email" className="col-sm-3 control-label">Email</label>
-                    </div>
-                    <div className="col-sm-9">
-                        <input
-                            id="email"
-                            className="form-control"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            onInvalid={(e) => e.target.setCustomValidity(t("app.emailRequiredMessage"))}
-                            placeholder="Email"
-                            required
-                        />
-                    </div>
-                </div>
+                <section>
+                    <p className="mrgn-tp-lg">
+                        <strong> <span>  {t("app.Sign-up-have-account")}</span> </strong>  &nbsp;
+                            <button className="btn btn-default" type="button" onClick={() => navigate('/login')}>
+                            {t("app.Sign-up-login-here")}
+                        </button>
+                    </p>
+                </section>
 
-                <div className="col-sm-offset-3 col-sm-9">
-                    <button type="submit" className="btn-lg btn-primary">
-                        {t("app.Sign-up-sign-up")} <span className="glyphicon glyphicon-user"></span>
-                    </button>
-                </div>
-            </form>
-            <section>
-                <p className="mrgn-tp-lg">
-                    {t("app.Sign-up-have-account")} &nbsp;
-                    <button className="btn btn-default" type="button" onClick={() => navigate('/login')}>
-                        {t("app.Sign-up-login-here")}
-                    </button>
-                </p>
-            </section>
+            </div>
+
         </div>
     );
 };

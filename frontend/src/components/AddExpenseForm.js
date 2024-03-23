@@ -13,6 +13,7 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const { user } = useUserContext(); // Get the current user
     const { t, i18n } = useTranslation();
 
+
     // Ensure budgets is always an array
     budgets = Array.isArray(budgets) ? budgets : [budgets];
 
@@ -29,7 +30,6 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
-    // Initialize form with existingExpense data if present
     useEffect(() => {
         if (existingExpense && existingExpense.budget && budgets.length > 0) {
             setDescription(existingExpense.expensesDescription);
@@ -39,7 +39,9 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
         } else if (budgets && budgets.length > 0) {
             setSelectedBudgetId(budgets[0].budgetId.toString());
         }
+        // resetError();
     }, [existingExpense, budgets]);
+
 
     const handleWarningClose = async (proceed) => {
         setShowWarningModal(false);
@@ -91,6 +93,12 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
             .filter(expense => expense.budget?.budgetId.toString() === selectedBudgetId)
             .reduce((acc, current) => acc + parseFloat(current.expensesAmount), 0);
 
+        // Directly proceed with submission if the expense amount is 0 or negative.
+        if (parseFloat(amount) <= 0) {
+            await submitExpense();
+            return;
+        }
+
         // Adjust total if we are updating an expense.
         if (existingExpense) {
             totalExpensesForBudget -= parseFloat(existingExpense.expensesAmount);
@@ -98,12 +106,13 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
         const newTotal = totalExpensesForBudget + parseFloat(amount);
 
-        // Determine if we should show the warning modal or submit the expense directly.
         if (budgetAmount < newTotal) {
             setShowWarningModal(true);
-        } else {
-            await submitExpense();
+            return
         }
+
+        await submitExpense();
+
     };
 
     return (
@@ -207,13 +216,15 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
                             </div>
 
                             {existingExpense ? (
-                                <button type="submit" className="btn-lg btn-success" data-testid="updateExpenseButton">
-                                    <span className="glyphicon glyphicon-floppy-save"></span>
-                                    &nbsp; {t("app.add-expenses-update")}
-                                </button>
+                                <div className="button-submit-form">
+                                    <button type="submit" className=" btn btn-lg btn-success" data-testid="updateExpenseButton">
+                                        <span className="glyphicon glyphicon-floppy-save"></span>
+                                        &nbsp; {t("app.add-expenses-update")}
+                                    </button>
+                                </div>
                             ) : (
-                                <div className="mrgn-bttm-md">
-                                    <button data-testid="create-expense" type="submit" className="btn-lg btn-default">
+                                <div className="mrgn-bttm-md button-submit-form">
+                                    <button data-testid="create-expense" type="submit" className="btn btn-lg btn-default">
                                         <span className="glyphicon glyphicon-plus"></span>
                                         &nbsp;{t("app.add-expense-create")}
                                     </button>

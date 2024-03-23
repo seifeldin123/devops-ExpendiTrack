@@ -108,10 +108,10 @@
     "add-expenses-proceed": "Procéder",
     "emailRequiredMessage": "Veuillez entrer votre adresse e-mail.",
     "usernameRequiredMessage": "S'il vous plaît entrez votre nom d'utilisateur",
-    "budgetNameRequired": "Veuillez saisir le numéro du budget",
+    "budgetNameRequired": "Veuillez saisir le nom du budget",
     "budgetAmountRequired": "Veuillez saisir le montant du budget",
     "expenseDescriptionRequired": "Veuillez saisir le nom de la dépense",
-    "expenseAmountRequired": "Veuillez saisir le nom de la dépense",
+    "expenseAmountRequired": "Veuillez saisir le montant de la dépense",
     "expenseDateRequired": "Veuillez entrer la date",
     "expenseListTitle": "Dépenses",
     "expenseListTitleDelete": "Supprimer une dépense",
@@ -138,6 +138,8 @@
     "expenseDescriptionError": "Saisie invalide : la description de la dépense doit être alphanumérique.",
     "userExist" : "Un utilisateur avec le nom ou l'adresse e-mail fourni existe déjà.",
     "budgetExistsError": "Un budget avec le nom '{{name}}' existe déjà pour cet utilisateur.",
-    "expenseExistsError": "Un dépense avec le nom '{{name}}' existe déjà pour cet utilisateur."
+    "expenseExistsError": "Un dépense avec le nom '{{name}}' existe déjà pour cet utilisateur.",
+    "signupText": "Veuillez remplir ce formulaire pour créer un compte.",
+    "loginText": "Veuillez remplir ce formulaire pour vous connecter à votre compte."
   }
 }
