@@ -101,7 +101,6 @@ describe('BudgetContext Integration Tests', () => {
         });
 
         expect(BudgetService.getBudgetsByUserId).toHaveBeenCalledWith(user.id);
-        // Assertions for the budget items to be in the document could be added here
     });
 
     it('adds a new budget and updates the context', async () => {

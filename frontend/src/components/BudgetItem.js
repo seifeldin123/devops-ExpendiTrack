@@ -64,7 +64,7 @@ const BudgetItem = ({ budget }) => {
     };
 
     const handleCloseModal = () => {
-        resetError(); // Assuming resetError is accessible here, either directly or passed down as a prop
+        resetError();
         resetExpError();
         setShowEditModal(false);
         setShowDeleteConfirmation(false);

@@ -154,7 +154,7 @@ describe('ExpenseList Component', () => {
 
         // Ensure the modal is no longer displayed
         await waitFor(() => {
-            // Use queryByTestId here to avoid throwing an error when the element is not found
+            // Use queryByTestId to avoid throwing an error when the element is not found
             expect(screen.queryByTestId('modal-title-test-id')).not.toBeInTheDocument();
         });
     });

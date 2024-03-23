@@ -77,7 +77,6 @@ describe('LoginComponent', () => {
 
         // Simulate a click on the "Sign up here" button
         fireEvent.click(screen.getByRole('button', { name: "app.sign-up-here" }));
-        // fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
         // Assert that navigate was called with '/signup'
         expect(navigateMock).toHaveBeenCalledWith('/signup');

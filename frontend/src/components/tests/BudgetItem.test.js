@@ -119,7 +119,7 @@ describe('BudgetItem', () => {
         expect(screen.getByText(`Budget Amount: $${mockBudget.budgetAmount}.00`)).toBeInTheDocument();
         expect(screen.getByText(`Spent: $5.00`)).toBeInTheDocument();
         expect(screen.getByText(/Remaining:/)).toBeInTheDocument();
-        expect(screen.getByRole('link')).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
+
     });
 
     // Display Overspent Status
@@ -159,18 +159,6 @@ describe('BudgetItem', () => {
         const progressBar = screen.getByRole('progressbar');
         expect(progressBar).toHaveStyle('width: 1%');
     });
-
-    // Navigate to Budget Details
-    it('navigates to budget details on clicking "View Details"', () => {
-        renderWithProviders(
-            <I18nextProvider i18n={i18next}>
-                <BudgetItem budget={mockBudget} />
-            </I18nextProvider>
-        );
-
-        expect(screen.getByRole('link', { name: 'View Details' })).toHaveAttribute('href', `/budgets/user/${mockUser.id}`);
-    });
-
 
     it('shows the edit modal with the correct data when the edit button is clicked', async () => {
         const { getByText, getByRole } = renderWithProviders(

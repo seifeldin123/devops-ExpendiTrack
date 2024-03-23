@@ -6,25 +6,34 @@ import { BudgetContext } from '../../contexts/BudgetContext';
 import { ExpenseContext } from '../../contexts/ExpenseContext';
 import Dashboard from '..//Dashboard';
 import axios from 'axios';
-import {I18nextProvider} from "react-i18next";
+import {I18nextProvider, initReactI18next} from "react-i18next";
 import i18next from "i18next";
-import en from "../../translations/en/common.json";
-import fr from "../../translations/fr/common.json";
+
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
 // Mock axios for all tests in this file
 jest.mock('axios');
 
-i18next.init({
-    lng: 'en', // Use English for tests or adjust as necessary
-    resources: {
-        en: {
-            global: en
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
         },
-        fr: {
-            global: fr
-        },
-    }
-});
+    });
+
 describe('Dashboard Component', () => {
     const mockUser = {
         id: 1,
@@ -51,7 +60,7 @@ describe('Dashboard Component', () => {
         axios.get.mockResolvedValueOnce({ data: [mockExpense] }); // Mock fetching expenses
     });
 
-    it('renders user expenses data correctly', async () => {
+    it('renders user budgets data correctly', async () => {
         render(
             <Router>
                 <I18nextProvider i18n={i18next}>
@@ -68,12 +77,12 @@ describe('Dashboard Component', () => {
 
         // Wait for the component to receive the mocked response and update the UI
         await waitFor(() => {
-            expect(screen.getByText("Coffee")).toBeInTheDocument();
-            expect(screen.getByRole('heading', { name: /Groceries/i })).toBeInTheDocument();
-            expect(screen.getByText("$5.00")).toBeInTheDocument(); // Assuming formatCurrency function formats it this way
+            expect(screen.getByText("Budget Name: Groceries")).toBeInTheDocument();
+            expect(screen.getByText("Budget Amount: $500.00")).toBeInTheDocument();
         });
 
+
         // Validate if the user's name is rendered
-        expect(screen.getByText(`app.dashboard-welcome, ${mockUser.name}!`)).toBeInTheDocument();
+        expect(screen.getByText(`Welcome, Harmeet!`)).toBeInTheDocument();
     });
 });

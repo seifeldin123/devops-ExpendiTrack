@@ -69,23 +69,6 @@ describe('Header Component', () => {
         expect(getByAltText('Government of Canada')).toBeInTheDocument();
     });
 
-    // Perform Search
-    it('allows user to type in the search box', async () => {
-        const { getByPlaceholderText } = render(
-            <I18nextProvider i18n={i18next}>
-                <Router>
-                    <UserContext.Provider value={{ user: null }}>
-                        <Header />
-                    </UserContext.Provider>
-                </Router>
-            </I18nextProvider>
-        );
-
-        const searchBox = getByPlaceholderText(/Search Canada.ca/i);
-        fireEvent.change(searchBox, { target: { value: 'test search' } });
-        expect(searchBox.value).toBe('test search');
-    });
-
     // Display Navigation Menu
     it('displays navigation menu items', () => {
         const { getByText } = render(

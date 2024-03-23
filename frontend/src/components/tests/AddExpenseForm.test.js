@@ -82,7 +82,6 @@ describe('AddExpenseForm Tests', () => {
 
         fireEvent.change(screen.getByPlaceholderText('e.g., Walmart'), { target: { value: 'Coffee' } });
         fireEvent.change(screen.getByPlaceholderText('e.g., 150.47'), { target: { value: '5' } });
-        fireEvent.change(screen.getByTestId('budget-category'), { target: { value: '1' } });
         fireEvent.change(screen.getByTestId('expense-date'), { target: { value: '2024-02-06' } });
 
         await act(async () => {
@@ -128,7 +127,6 @@ describe('AddExpenseForm Tests', () => {
         fireEvent.change(getByTestId('expense-description'), { target: { value: 'Test Expense' } });
         fireEvent.change(getByPlaceholderText('e.g., 150.47'), { target: { value: '100' } });
         fireEvent.change(getByTestId('expense-date'), { target: { value: '2024-02-06' } });
-        fireEvent.change(getByTestId('budget-category'), { target: { value: mockBudgets[0].budgetId.toString() } });
 
         // Attempt to submit the form
         await act(async () => {
@@ -152,8 +150,6 @@ describe('AddExpenseForm Tests', () => {
             </I18nextProvider>,
                 { wrapper: Wrapper });
 
-
-        fireEvent.change(screen.getByTestId('budget-category'), { target: { value: '1' } });
         fireEvent.change(screen.getByPlaceholderText('e.g., Walmart'), { target: { value: 'Big Shopping' } });
         fireEvent.change(screen.getByPlaceholderText('e.g., 150.47'), { target: { value: '600' } });
         fireEvent.change(screen.getByTestId('expense-date'), { target: { value: '2024-02-06' } });
@@ -183,7 +179,6 @@ describe('AddExpenseForm Tests', () => {
             </ExpenseContext.Provider>
         );
 
-        fireEvent.change(screen.getByTestId('budget-category'), { target: { value: '2' } });
         fireEvent.change(screen.getByPlaceholderText('e.g., Walmart'), { target: { value: 'Internet' } });
         fireEvent.change(screen.getByPlaceholderText('e.g., 150.47'), { target: { value: '60' } });
         fireEvent.change(screen.getByTestId('expense-date'), { target: { value: '2024-02-06' } });
@@ -202,7 +197,7 @@ describe('AddExpenseForm Tests', () => {
 
         fireEvent.change(screen.getByPlaceholderText('e.g., Walmart'), { target: { value: 'Dinner' } });
         fireEvent.change(screen.getByPlaceholderText('e.g., 150.47'), { target: { value: '80' } });
-        fireEvent.change(screen.getByTestId('budget-category'), { target: { value: '1' } });
+
         fireEvent.change(screen.getByTestId('expense-date'), { target: { value: '2024-02-06' } });
 
         await act(async () => {
