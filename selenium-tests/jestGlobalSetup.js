@@ -53,7 +53,7 @@ async function startReactFrontend() {
     });
 }
 
-module.exports = async () => {
+const localSetup = async () => {
     console.log('Ensuring ports 8080 and 3000 are free...');
     await Promise.all([
         exec('npx kill-port 8080'),
@@ -65,4 +65,43 @@ module.exports = async () => {
 
     console.log('Starting React frontend...');
     await startReactFrontend();
+};
+
+// Helper function to check service availability
+async function checkServiceHealth(url, timeout = 60000) {
+    const startTime = Date.now();
+    while (true) {
+        try {
+            await axios.get(url);
+            console.log(`Service at ${url} is up.`);
+            break; // Exit loop if request succeeds
+        } catch (error) {
+            if (Date.now() - startTime > timeout) {
+                throw new Error(`Timeout waiting for service at ${url} to be ready.`);
+            }
+            // Wait for 1 second before retrying
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+}
+
+
+const dockerSetup = async () => {
+    console.log('Waiting for backend and frontend services to be ready...');
+
+    // Replace these URLs with the ones appropriate for setup
+    await checkServiceHealth('http://backend:8080/users/find?name=Jane&email=jane@example.com'); // Assuming backend has a health check endpoint
+    await checkServiceHealth('http://frontend/'); // Checking if the frontend service is up
+
+    console.log('Services are ready. Running tests...');
+};
+
+module.exports = async () => {
+    const testEnv = process.env.TEST_ENV || 'local'; // Default to 'local' if TEST_ENV is not set
+
+    if (testEnv === 'docker') {
+        await dockerSetup();
+    } else {
+        await localSetup();
+    }
 };

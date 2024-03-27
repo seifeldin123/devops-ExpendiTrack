@@ -1,17 +1,22 @@
 const { By, until } = require('selenium-webdriver');
 const buildDriver = require('../configs/webdriverSetup');
 
+// Determine the base URL dynamically
+const APP_BASE_URL = process.env.APP_BASE_URL || 'http://localhost:3000';
+
 // Helper function to sign up and log in a user
 async function signupAndLogin(driver) {
     // Navigate to the main/welcome page
-    await driver.get('http://localhost:3000/');
+    await driver.get(`${APP_BASE_URL}/`);
+
 
     // Click on the "Create a New Account" button to navigate to the signup page
     const createAccountButton = await driver.findElement(By.css('[data-testid="createAccountButton"]'));
     await driver.executeScript("arguments[0].click();", createAccountButton);
 
     // Wait for navigation to the signup page
-    await driver.wait(until.urlIs('http://localhost:3000/signup'), 5000);
+    await driver.wait(until.urlIs(`${APP_BASE_URL}/signup`), 5000);
+
 
     // Fill in the signup form
     await driver.findElement(By.id('username')).sendKeys('testUser');
@@ -22,13 +27,15 @@ async function signupAndLogin(driver) {
     await driver.executeScript("arguments[0].click();", submitButton);
 
     // Wait for navigation to the dashboard
-    await driver.wait(until.urlIs('http://localhost:3000/dashboard'), 5000);
+    await driver.wait(until.urlIs(`${APP_BASE_URL}/dashboard`), 5000);
+
 }
 
 // Helper function to log in a user
 async function loginUser(driver) {
     // Navigate to the login page
-    await driver.get('http://localhost:3000/login');
+    await driver.get(`${APP_BASE_URL}/login`);
+
 
     // Fill in the login form
     await driver.findElement(By.id('username')).sendKeys('testUser');
@@ -39,7 +46,7 @@ async function loginUser(driver) {
     await driver.executeScript("arguments[0].click();", loginButton);
 
     // Wait for navigation to the dashboard or another indicator of successful login
-    await driver.wait(until.urlIs('http://localhost:3000/dashboard'), 5000);
+    await driver.wait(until.urlIs(`${APP_BASE_URL}/dashboard`), 5000);
 }
 
 

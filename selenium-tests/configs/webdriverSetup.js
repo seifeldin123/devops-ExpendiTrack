@@ -1,7 +1,7 @@
 const { Builder } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 
-async function buildDriver(locale = 'en-US', headlessMode = 'new') { // Default locale is set to English US, and default headless mode is set to 'new'
+async function buildDriver(locale = 'en-US', headlessMode = 'new') {
     let options = new chrome.Options();
     options.addArguments(`--lang=${locale}`);
 
@@ -12,10 +12,15 @@ async function buildDriver(locale = 'en-US', headlessMode = 'new') { // Default 
         options.addArguments('--headless'); // For traditional headless mode
     }
 
-    return await new Builder()
-        .forBrowser('chrome')
-        .setChromeOptions(options)
-        .build();
+    // Initialize the WebDriver Builder
+    let builder = new Builder().forBrowser('chrome').setChromeOptions(options);
+
+    // Use the Selenium Standalone Server if SELENIUM_REMOTE_URL is specified
+    if (process.env.SELENIUM_REMOTE_URL) {
+        builder = builder.usingServer(process.env.SELENIUM_REMOTE_URL);
+    }
+
+    return await builder.build();
 }
 
 module.exports = buildDriver;

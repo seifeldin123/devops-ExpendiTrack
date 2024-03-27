@@ -1,6 +1,5 @@
 version: '3.8'
 services:
-
   db:
     image: mysql:8.0
     environment:
@@ -11,7 +10,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -40,17 +39,34 @@ services:
       - backend
     networks:
       - app_network
-
-  nginx:
-    image: nginx:alpine
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./frontend/build:/usr/share/nginx/html:ro
     ports:
       - "80:80"
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    volumes:
+      - /dev/shm:/dev/shm
     depends_on:
-      - frontend
       - backend
+      - frontend
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  selenium-tests:
+    build:
+      context: ./selenium-tests
+      dockerfile: Dockerfile
+    depends_on:
+      selenium:
+        condition: service_healthy
+    environment:
+      - SELENIUM_REMOTE_URL=http://selenium:4444/wd/hub
+      - APP_BASE_URL=http://frontend
     networks:
       - app_network
 

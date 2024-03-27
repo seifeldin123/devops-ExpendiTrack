@@ -10,6 +10,10 @@ RUN npm run build:docker
 
 # Production stage: Use Nginx to serve the static files
 FROM nginx:alpine
+
+# Copy the custom nginx.conf file to the container
+COPY .docker/nginx.conf /etc/nginx/nginx.conf
+
 # Copy static files from build stage to Nginx serve directory
 COPY --from=build /app/build /usr/share/nginx/html
 
