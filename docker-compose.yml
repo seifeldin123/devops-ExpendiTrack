@@ -56,6 +56,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    environment:
+      # SE_NODE_OVERRIDE_MAX_SESSIONS must be set to "true" to respect the max sessions setting
+      SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
+      SE_NODE_MAX_SESSIONS: 5
 
   selenium-tests:
     build:
