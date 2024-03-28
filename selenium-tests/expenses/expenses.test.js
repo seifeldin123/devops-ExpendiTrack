@@ -1,6 +1,9 @@
 const { By, until } = require('selenium-webdriver');
 const buildDriver = require('../configs/webdriverSetup');
 
+// Determine the base URL dynamically
+const APP_BASE_URL = process.env.APP_BASE_URL || 'http://localhost:3000';
+
 describe('TestCreateExpenses', () => {
     let driver;
 
@@ -15,7 +18,9 @@ describe('TestCreateExpenses', () => {
     });
 
     async function loginAndNavigateToExpenses() {
-        await driver.get('http://localhost:3000/');
+//        await driver.get('http://localhost:3000/');
+        await driver.get(`${APP_BASE_URL}/`);
+
         await (await driver.findElement(By.xpath("//li[1]//button[1]"))).click();
         // Fill in the login form
         const nameField = await driver.findElement(By.xpath("//input[@id='username']"));
@@ -28,7 +33,9 @@ describe('TestCreateExpenses', () => {
     }
 
     test('A: Create expenses with valid data', async () => {
-        await driver.get('http://localhost:3000/');
+//        await driver.get('http://localhost:3000/');
+        await driver.get(`${APP_BASE_URL}/`);
+
         await (await driver.findElement(By.xpath("//li[2]//button[1]"))).click();
         // Fill in the signup form
         const nameField = await driver.findElement(By.xpath("//input[@id='username']"));
