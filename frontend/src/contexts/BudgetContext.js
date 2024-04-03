@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import {getBudgetsByUserId, createBudget, deleteBudget, updateBudget} from '../services/BudgetService';
 import { useUserContext } from "./UserContext";
+import {useTranslation} from "react-i18next";
+
 
 export const BudgetContext = createContext();
 
@@ -10,7 +12,39 @@ export const BudgetProvider = ({ children }) => {
     const [budgets, setBudgets] = useState([]);
     const { user } = useUserContext();
     const [error, setError] = useState('');
+
+    const { t, i18n } = useTranslation();
+
+    // Update to hold the error message key instead of the translated message
+    const [errorKey, setErrorKey] = useState('');
+
+    const [dynamicErrorContent, setDynamicErrorContent] = useState({});
+
+    const errorMapping = useMemo(() => ({
+        "Invalid input: Budget amount cannot be negative or zero.": "app.invalidBudgetInput",
+        "Invalid input: BudgetDescription must be alphanumeric": "app.budgetDescriptionError",
+        "unexpectedError": "app.unexpectedError",
+    }), []);
+
+    useEffect(() => {
+        const handleLanguageChange = () => {
+            // Check if there's an error key set and if dynamic content is needed
+            if (errorKey && Object.keys(dynamicErrorContent).length > 0) {
+                setError(t(errorKey, dynamicErrorContent));
+            }
+        };
+
+        // Listen for language changes
+        i18n.on('languageChanged', handleLanguageChange);
+
+        // Cleanup function to remove the event listener
+        return () => {
+            i18n.off('languageChanged', handleLanguageChange);
+        };
+    }, [i18n, errorKey, dynamicErrorContent, t]);
+
     const userId = user?.id;
+    const [shouldPopulateForm, setShouldPopulateForm] = useState(false);
 
     const fetchBudgets = useCallback(async (userId) => {
         try {
@@ -24,6 +58,15 @@ export const BudgetProvider = ({ children }) => {
             const errorMessage = error.message || 'An unexpected error occurred';
             setError(errorMessage);
         }
+    }, []);
+
+    // Functions to toggle the state of updating input form fields during budget update
+    const enableFormPopulation = useCallback(() => {
+        setShouldPopulateForm(true);
+    }, []);
+
+    const disableFormPopulation = useCallback(() => {
+        setShouldPopulateForm(false);
     }, []);
 
 
@@ -43,11 +86,24 @@ export const BudgetProvider = ({ children }) => {
             setError('');
 
         } catch (error) {
-            const errorMessage = error.message || 'An unexpected error occurred';
-            setError(errorMessage);
+            if (error.message.startsWith("A budget with the name")) {
+                // Extract the dynamic budget name from the error message
+                const budgetNameMatch = error.message.match(/"([^"]+)"/);
+                const budgetName = budgetNameMatch ? budgetNameMatch[1] : "Unknown";
+
+                // Use a dynamic key or a placeholder message in translations
+                setDynamicErrorContent({ name: budgetName });
+                setErrorKey("app.budgetExistsError"); // Assume this is a generic key in translations
+                setError(t("app.budgetExistsError", { name: budgetName }));
+            } else {
+                // Handle other errors as before
+                const key = errorMapping[error.message] || "app.unexpectedError";
+                setErrorKey(key);
+                setError(t(key));
+            }
         }
 
-    }, [userId]); // Corrected dependency
+    }, [userId, errorMapping, t]); // Corrected dependency
 
     const updateExistingBudget = useCallback(async (budgetId, budgetData) => {
         if (!budgetId) {
@@ -61,10 +117,23 @@ export const BudgetProvider = ({ children }) => {
             );
             setError('');
         } catch (error) {
-            const errorMessage = error.message || 'An unexpected error occurred';
-            setError(errorMessage);
+            if (error.message.startsWith("A budget with the name")) {
+                // Extract the dynamic budget name from the error message
+                const budgetNameMatch = error.message.match(/"([^"]+)"/);
+                const budgetName = budgetNameMatch ? budgetNameMatch[1] : "Unknown";
+
+                // Use a dynamic key or a placeholder message in translations
+                setDynamicErrorContent({ name: budgetName });
+                setErrorKey("app.budgetExistsError"); // Assume this is a generic key in translations
+                setError(t("app.budgetExistsError", { name: budgetName }));
+            } else {
+                // Handle other errors as before
+                const key = errorMapping[error.message] || "app.unexpectedError";
+                setErrorKey(key);
+                setError(t(key));
+            }
         }
-    }, [setBudgets, setError]);
+    }, [setBudgets, setError, errorMapping, t]);
 
     const removeBudget = useCallback(async (budgetId) => {
         try {
@@ -72,6 +141,7 @@ export const BudgetProvider = ({ children }) => {
             setBudgets(prevBudgets => prevBudgets.filter(budget => budget.budgetId !== budgetId));
             setError('');
         } catch (error) {
+
             const errorMessage = error.message || 'An unexpected error occurred';
             setError(errorMessage);
         }
@@ -85,12 +155,15 @@ export const BudgetProvider = ({ children }) => {
         budgets,
         addNewBudget,
         updateExistingBudget,
+        shouldPopulateForm,
+        enableFormPopulation,
+        disableFormPopulation,
         removeBudget,
         fetchBudgets,
         error,
         setError,
         resetError,
-    }), [budgets, addNewBudget, updateExistingBudget, removeBudget, fetchBudgets, error, resetError]);
+    }), [budgets, addNewBudget, updateExistingBudget, shouldPopulateForm, enableFormPopulation, disableFormPopulation, removeBudget, fetchBudgets, error, resetError]);
 
     return (
         <BudgetContext.Provider value={providerValue}>

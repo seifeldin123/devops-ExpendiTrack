@@ -1,17 +1,28 @@
-import React, { useState} from 'react';
-import { Link } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
 import { useUserContext } from "../contexts/UserContext";
 import { calculateTotalSpent, formatCurrency } from "../helpers/HelperFunctions";
 import { useExpenseContext } from "../contexts/ExpenseContext";
 import BasicModal from './Modal';
 import AddBudgetForm from './AddBudgetForm';
 import { useBudgetContext } from "../contexts/BudgetContext";
-
+import {useTranslation} from "react-i18next";
+import AddExpenseForm from "./AddExpenseForm";
+import ExpenseList from "./ExpenseList";
 
 const BudgetItem = ({ budget }) => {
     const { user } = useUserContext();
-    const { expenses } = useExpenseContext();
-    const { removeBudget, fetchBudgets, resetError } = useBudgetContext();
+    const { expenses, resetExpError } = useExpenseContext();
+    const { removeBudget, fetchBudgets, resetError, budgets } = useBudgetContext();
+    const { t, i18n} = useTranslation();
+
+    // Filter expenses for the current budget
+    const expensesForCurrentBudget = expenses.filter(expense => expense.budget.budgetId === budget.budgetId);
+
+
+    useEffect(() => {
+    }, [i18n.language]);
+
+    const { enableFormPopulation } = useBudgetContext();
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -22,8 +33,13 @@ const BudgetItem = ({ budget }) => {
     const remaining = budget.budgetAmount - totalSpent;
     const percentSpent = Math.min((totalSpent / budget.budgetAmount) * 100, 100);
 
+    const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
+
+    const [showViewExpensesModal, setShowViewExpensesModal] = useState(false);
+
+
     const ProgressBar = ({ percentSpent }) => {
-        let progressBarClass = "progress-bar progress-bar-striped progress-bar-animated";
+        let progressBarClass = "progress-bar progress-bar-striped progress-bar-animated percent-spent";
 
         if (percentSpent <= 50) {
             progressBarClass += " bg-success";
@@ -48,14 +64,19 @@ const BudgetItem = ({ budget }) => {
     };
 
     const handleCloseModal = () => {
-        resetError(); // Assuming resetError is accessible here, either directly or passed down as a prop
+        resetError();
+        resetExpError();
         setShowEditModal(false);
         setShowDeleteConfirmation(false);
         setShowDeleteWarning(false);
+        setShowAddExpenseModal(false);
+        setShowViewExpensesModal(false);
+
     };
 
     const handleEditClick = () => {
         resetError(); // Assuming resetError() is available and resets the global error state
+        enableFormPopulation();
         setShowEditModal(true);
     };
 
@@ -82,51 +103,101 @@ const BudgetItem = ({ budget }) => {
         }
     }
 
+    const handleAddExpenseClick = async () => {
+        resetError(); // Assuming resetError() is available and resets the global error state
+        setShowAddExpenseModal(true);
+    }
+
+    const handleViewExpensesClick = async () => {
+        resetError(); // Assuming resetError() is available and resets the global error state
+        setShowViewExpensesModal(true);
+    }
+
     return (
-        <div className="card-container col-lg-4 col-md-6 mb-4">
+        <div className="budget-item ">
             <div className="card h-100 shadow-sm custom-card-border">
                 <div className="card-body">
-                    <h5 className="card-title" data-testid="budget-title-test-id"><strong >Budget Name: {budget.budgetDescription}</strong></h5>
-                    <p className="card-text"><strong>Budgeted
-                        Amount: {formatCurrency(budget.budgetAmount)}</strong></p>
-                    <p className="card-text"><strong>Spent: {formatCurrency(totalSpent)}</strong></p>
-                    <p className={`card-text`}>
+                    <h5 className="card-title" data-testid="budget-title-test-id">
+                        <strong>{t("app.add-budget-budget-name")}: {budget.budgetDescription}</strong></h5>
+                    <p className="card-text"><strong>
+                        {t("app.add-budget-amount")}: {formatCurrency(budget.budgetAmount)}</strong></p>
+                    <p className="card-text total-spent">
+                        <strong>{t("app.budgetItem-spent")}: {formatCurrency(totalSpent)}</strong></p>
+                    <p className={`card-text remaining`}>
                         <strong
-                            className={`${remaining < 0 ? 'text-danger' : 'text-success'}`}>{remaining < 0 ? `Overspent: ${formatCurrency(-remaining)}` : `Remaining: ${formatCurrency(remaining)}`}</strong>
+                            className={`${remaining < 0 ? 'text-danger' : 'text-success'}`}>
+                            {remaining < 0 ?
+                                `${t("app.budgetItem-overspent")}: ${formatCurrency(-remaining)}` :
+                                `${t("app.budgetItem-remaining")}: ${formatCurrency(remaining)}`
+                            }
+                        </strong>
                     </p>
 
-                    <ProgressBar percentSpent={percentSpent} />
+                    <ProgressBar percentSpent={percentSpent}/>
 
-                    <div>
-                        <Link to={`/budgets/user/${user.id}`} className="card-link">View Details</Link>
+                    <hr className="brdr-bttm"/>
+
+                    <div className="action-buttons mrgn-tp-md">
+                        {/* Show "View Expenses" button only if there are expenses for the current budget */}
+                        {expensesForCurrentBudget.length > 0 && (
+                            <button onClick={handleViewExpensesClick} data-testid="view-expenses-btn"
+                                    className="btn btn-sm btn-default">
+                                <span className="glyphicon glyphicon-open"></span>
+                                &nbsp;  {t("app.budgetItem-view")}
+                            </button>
+                        )}
+
+                        <button onClick={handleAddExpenseClick} data-testid="create-expense-btn"
+                                className="btn btn-sm btn-default">
+                            <span className="glyphicon glyphicon-plus"></span>
+                            &nbsp;  {t("app.add-expenses-create")}
+                        </button>
                     </div>
+
+                    <hr className="brdr-bttm"/>
+
                     {/* Edit and Delete Buttons */}
                     <div className="action-buttons mrgn-tp-md">
-                        <button onClick={handleEditClick} className="btn btn-default">
+                        <button onClick={handleEditClick} className="btn btn-sm btn-default" id="edit-budget-btn"
+                                data-testid="edit-budget">
                             <span className="glyphicon glyphicon-edit"></span>
-                            &nbsp; Edit Budget
+                            &nbsp; {t("app.budgetItem-edit")}
                         </button>
-                        <button onClick={handleDeleteClick} className="btn btn-danger">
+                        <button onClick={handleDeleteClick} className="btn btn-sm btn-danger" id="delete-budget-btn">
                             <span className="glyphicon glyphicon-trash"></span>
-                            &nbsp; Delete Budget
+                            &nbsp; {t("app.budgetItem-delete")}
                         </button>
                     </div>
                 </div>
             </div>
+
+
+            {/* View Expenses Modal */}
+            {showViewExpensesModal && (
+                <BasicModal show={showViewExpensesModal} handleClose={handleCloseModal} title={t("app.expenseListTitle")}>
+                    <ExpenseList expenses={expensesForCurrentBudget} budgets={budgets} />
+                </BasicModal>
+            )}
+
+            {/* Add Expense Modal */}
+            {showAddExpenseModal && <BasicModal show={showAddExpenseModal} handleClose={handleCloseModal} title={t("app.add-expenses-create")}>
+                <AddExpenseForm budgets={budget} onClose={() => setShowAddExpenseModal(false)}/>
+            </BasicModal>}
+
             {/* Edit Modal */}
-            {showEditModal && <BasicModal show={showEditModal} handleClose={handleCloseModal} title="Edit Budget">
+            {showEditModal && <BasicModal show={showEditModal} handleClose={handleCloseModal} title={t("app.budgetListEdit")}>
                 <AddBudgetForm existingBudget={budget} onClose={() => setShowEditModal(false)}/>
             </BasicModal>}
 
             {/* Delete confirmation Modal */}
-            {showDeleteConfirmation && <BasicModal show={showDeleteConfirmation} handleClose={handleCloseModal}  title="Confirm Deletion">
+            {showDeleteConfirmation && <BasicModal show={showDeleteConfirmation} handleClose={handleCloseModal}  title={t("app.budgetListConfirmDeletion")}>
                 <div className="text-center">
-                    <h5>Are you sure you want to delete this budget?</h5>
+                    <h5>{t("app.budgetItem-are-you-sure-delete")}</h5>
                     <div className="action-buttons mrgn-tp-md">
-                        <button className="btn btn-danger m-2" onClick={handleDeleteConfirmation}>Confirm Delete
+                        <button className="btn btn-danger m-2" onClick={handleDeleteConfirmation}>{t("app.budgetItem-confirm-delete")}
                         </button>
                         <button className="btn btn-default m-2"
-                                onClick={() => setShowDeleteConfirmation(false)}>Cancel
+                                onClick={() => setShowDeleteConfirmation(false)}>{t("app.budgetItem-cancel")}
                         </button>
                     </div>
                 </div>
@@ -135,7 +206,7 @@ const BudgetItem = ({ budget }) => {
             {/* Delete Warning Modal */}
             {showDeleteWarning && <BasicModal show={showDeleteWarning} handleClose={handleCloseModal} title="Cannot Delete Budget">
                 <div className="text-center">
-                    <p><strong>This budget cannot be deleted because it has associated expenses. Please remove these expenses before attempting to delete the budget.</strong></p>
+                    <p><strong>{t("app.budgetItem-cannot-delete")}</strong></p>
                 </div>
             </BasicModal>}
         </div>

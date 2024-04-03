@@ -3,15 +3,18 @@ import { useUserContext } from '../contexts/UserContext';
 import { useBudgetContext } from "../contexts/BudgetContext";
 import BudgetList from "../components/BudgetList";
 import AddBudgetForm from "../components/AddBudgetForm";
-import ExpenseList from "../components/ExpenseList";
-import AddExpenseForm from "../components/AddExpenseForm";
 import {useExpenseContext} from "../contexts/ExpenseContext";
 import '../styles/Dashboard.css';
+import {useTranslation} from "react-i18next";
 
 const Dashboard = () => {
     const { user } = useUserContext();
     const { budgets, fetchBudgets } = useBudgetContext();
-    const { expenses, fetchExpenses } = useExpenseContext();
+    const { fetchExpenses } = useExpenseContext();
+    const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
 
     useEffect(() => {
         if (user && user.id) {
@@ -22,17 +25,19 @@ const Dashboard = () => {
 
     return (
         <div className="container" data-testid="dashboard">
-            {user && <h1>Welcome, {user.name}!</h1>}
+            {user && <h1>{t("app.dashboard-welcome")}, {user.name}!</h1>}
 
-            <div className="dashboard-forms-container">
-                <AddBudgetForm/>
-                {Array.isArray(budgets) && budgets.length > 0 && <AddExpenseForm budgets={budgets}/>}
+            <div className="dashboard-container">
+
+                <div className="dashboard-forms-container">
+                    <AddBudgetForm/>
+                </div>
+
+                <div className="budget-list-container">
+                    <BudgetList budgets={budgets}/>
+                </div>
             </div>
 
-            <div>
-                <BudgetList budgets={budgets}/>
-                <ExpenseList expenses={expenses} budgets={budgets} />
-            </div>
         </div>
     );
 };

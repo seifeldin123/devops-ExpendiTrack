@@ -3,19 +3,33 @@ import { useExpenseContext } from '../contexts/ExpenseContext';
 import { formatDate} from '../helpers/HelperFunctions';
 import { useUserContext } from '../contexts/UserContext';
 import BasicModal from "./Modal";
+import {useTranslation} from "react-i18next";
 
 const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
-    const [date, setDate] = useState('');
     const [selectedBudgetId, setSelectedBudgetId] = useState('');
-    const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses } = useExpenseContext();
+    const { addNewExpense, fetchExpenses, updateExistingExpense, error, resetError, expenses, setError } = useExpenseContext();
     const { user } = useUserContext(); // Get the current user
+    const { t, i18n } = useTranslation();
+
+
+    // Ensure budgets is always an array
+    budgets = Array.isArray(budgets) ? budgets : [budgets];
+
+    useEffect(() => {
+    }, [i18n.language]);
+
+
+    const [date, setDate] = useState(() => {
+        const today = new Date();
+        const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+        return localDate.toISOString().slice(0, 10);
+    });
 
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
-    // Initialize form with existingExpense data if present
     useEffect(() => {
         if (existingExpense && existingExpense.budget && budgets.length > 0) {
             setDescription(existingExpense.expensesDescription);
@@ -25,7 +39,9 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
         } else if (budgets && budgets.length > 0) {
             setSelectedBudgetId(budgets[0].budgetId.toString());
         }
+        // resetError();
     }, [existingExpense, budgets]);
+
 
     const handleWarningClose = async (proceed) => {
         setShowWarningModal(false);
@@ -60,7 +76,8 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
             setTimeout(() => setShowSuccessAlert(false), 5000); // Adjust duration as needed
             fetchExpenses(user.id); // Refresh expense list
             setSelectedBudgetId(budgets.length > 0 ? budgets[0].budgetId.toString() : '');
-        } catch (serverError) {
+        } catch (error) {
+            setError(error);
             setShowSuccessAlert(false);
             resetError();
         }
@@ -76,6 +93,12 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
             .filter(expense => expense.budget?.budgetId.toString() === selectedBudgetId)
             .reduce((acc, current) => acc + parseFloat(current.expensesAmount), 0);
 
+        // Directly proceed with submission if the expense amount is 0 or negative.
+        if (parseFloat(amount) <= 0) {
+            await submitExpense();
+            return;
+        }
+
         // Adjust total if we are updating an expense.
         if (existingExpense) {
             totalExpensesForBudget -= parseFloat(existingExpense.expensesAmount);
@@ -83,190 +106,171 @@ const AddExpenseForm = ({ existingExpense, budgets, onClose }) => {
 
         const newTotal = totalExpensesForBudget + parseFloat(amount);
 
-        // Determine if we should show the warning modal or submit the expense directly.
         if (budgetAmount < newTotal) {
             setShowWarningModal(true);
-        } else {
-            await submitExpense();
+            return
         }
+
+        await submitExpense();
+
     };
-
-
 
     return (
         <div className="dashboard-expense-form">
             <form onSubmit={handleSubmit}>
-                <section className="panel panel-primary">
+                    <section >
 
-                    <header className="panel-heading">
-                        <h2 className="panel-title">{existingExpense ? 'Edit Expense' : 'Create Expense'}</h2>
-                    </header>
-
-                    <div className="form-section-container">
-                        <div className="form-group mrgn-tp-sm">
-                            <label htmlFor="expense-description">
-                                <span className="field-name">Expense Name</span> <strong
-                                className="required">(required)</strong>
-                            </label>
-
-                            <div>
-                                <input
-                                    data-testid="expense-description-input"
-                                    type="text"
-                                    className="form-control"
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="e.g., Walmart"
-                                    id="expense-description"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="expense-amount">
-                                <span className="field-name">Expense Amount</span> <strong
-                                className="required">(required)</strong>
-                            </label>
-
-                            <div>
-                                <input
-                                    data-testid="expense-amount-input"
-                                    type="number"
-                                    className="form-control"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    placeholder="e.g., 150.47"
-                                    id="expense-amount"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-
-                            {existingExpense ? (
-                                <label htmlFor="expense-date">
-                                    <span className="field-name">Expense Date</span>
+                        <div className="form-section-container">
+                            <div className="form-group mrgn-tp-sm">
+                                <label htmlFor="expense-description">
+                                    <span className="field-name">{t("app.add-expenses-add")}</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
                                 </label>
-                            ) : (
-                                <label htmlFor="expense-date">
-                                    <span className="field-name">Expense Date</span> <strong
-                                    className="required">(required)</strong>
-                                </label>
-                            )}
 
-                            {existingExpense ? (
-                                // If editing an existing expense, display the date as text
-                                <div id="expense-date" className="form-control-plaintext">
-                                {formatDate(existingExpense.expensesDate)}
+                                <div>
+                                    <input
+                                        data-testid="expense-description"
+                                        type="text"
+                                        className="form-control"
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        onInvalid={(e) => e.target.setCustomValidity(t("app.expenseDescriptionRequired"))}
+                                        onInput={(e) => e.target.setCustomValidity('')}
+                                        placeholder="e.g., Walmart"
+                                        id="expense-description"
+                                        required
+                                    />
                                 </div>
-                            ) : (
+                            </div>
 
-                                // If adding a new expense, display the date input field
-                                <input
-                                    data-testid="expense-date"
-                                    type="date"
-                                    className="form-control"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    placeholder="Date"
-                                    id="expense-date"
-                                    required
-                                />
-                            )}
-                        </div>
-
-                        <div className="form-group">
-
-                            {existingExpense ? (
-                                <label htmlFor="budget-category">
-                                    <span className="field-name"  >Budget Category</span>
+                            <div className="form-group">
+                                <label htmlFor="expense-amount">
+                                    <span className="field-name">{t("app.add-expenses-amount")}</span> <strong
+                                    className="required">{t("app.add-budget-required")}</strong>
                                 </label>
-                            ) : (
-                                <label htmlFor="budget-category">
-                                    <span className="field-name">Budget Category</span> <strong
-                                    className="required">(required)</strong>
-                                </label>
-                            )}
 
-                            {existingExpense ? (
-                                // If editing an existing expense, display the budget description as text
+                                <div>
+                                    <input
+                                        data-testid="expense-amount-input"
+                                        type="number"
+                                        className="form-control"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        onInvalid={(e) => e.target.setCustomValidity(t("app.expenseAmountRequired"))}
+                                        onInput={(e) => e.target.setCustomValidity('')}
+                                        placeholder="e.g., 150.47"
+                                        id="expense-amount"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+
+                                {existingExpense ? (
+                                    <label htmlFor="expense-date">
+                                        <span className="field-name">{t("app.add-expenses-date")}</span>
+                                    </label>
+                                ) : (
+                                    <label htmlFor="expense-date">
+                                        <span className="field-name">{t("app.add-expenses-date")}</span> <strong
+                                        className="required">{t("app.add-budget-required")}</strong>
+                                    </label>
+                                )}
+
+                                {existingExpense ? (
+                                    // If editing an existing expense, display the date as text
+                                    <div id="expense-date" className="form-control-plaintext">
+                                        {formatDate(existingExpense.expensesDate)}
+                                    </div>
+                                ) : (
+
+                                    // If adding a new expense, display the date input field
+                                    <input
+                                        data-testid="expense-date"
+                                        type="date"
+                                        className="form-control"
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        onInvalid={(e) => e.target.setCustomValidity(t("app.expenseDateRequired"))}
+                                        onInput={(e) => e.target.setCustomValidity('')}
+                                        placeholder="Date"
+                                        id="expense-date"
+                                        required
+                                    />
+                                )}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="budget-category">
+                                    <span className="field-name">{t("app.add-budget-budget-name")}</span>
+                                </label>
+
                                 <div id="budget-category" className="form-control-plaintext">
-                                {existingExpense.budget.budgetDescription}
+                                    {existingExpense ? (
+                                        existingExpense.budget.budgetDescription
+                                    ) : (
+                                        budgets.find(budget => budget.budgetId.toString() === selectedBudgetId)?.budgetDescription || t("app.add-expenses-budget-selection")
+                                    )}
+                                </div>
+                            </div>
+
+                            {existingExpense ? (
+                                <div className="button-submit-form">
+                                    <button type="submit" className=" btn btn-lg btn-success" data-testid="updateExpenseButton">
+                                        <span className="glyphicon glyphicon-floppy-save"></span>
+                                        &nbsp; {t("app.add-expenses-update")}
+                                    </button>
                                 </div>
                             ) : (
-                                // If adding a new expense, display the dropdown for budget selection
-                                <select
-                                    data-testid="budget-category"
-                                    className="form-control"
-                                    value={selectedBudgetId}
-                                    onChange={(e) => setSelectedBudgetId(e.target.value)}
-                                    id="budget-category"
-                                    required>
-                                    <option defaultValue value="">Select Budget</option>
-                                    {budgets.map(budget => (
-                                        <option key={budget.budgetId} value={budget.budgetId}>
-                                            {budget.budgetDescription}
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="mrgn-bttm-md button-submit-form">
+                                    <button data-testid="create-expense" type="submit" className="btn btn-lg btn-default">
+                                        <span className="glyphicon glyphicon-plus"></span>
+                                        &nbsp;{t("app.add-expense-create")}
+                                    </button>
+                                </div>
                             )}
+                            {/* Success and error alerts */}
+                            {showSuccessAlert && !error && (
+                                <div className="expense-message alert alert-success" role="alert">
+                                    <button type="button" className="close" data-dismiss="alert" aria-label="Close"
+                                            onClick={() => setShowSuccessAlert(false)}>
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <p>{t("app.add-expense-successfully")} {existingExpense ? t("app.add-budget-updated") : t("app.add-expenses-added")}!</p>
+                                </div>
+                            )}
+
+                            {error && (
+                                <div className="alert alert-danger" role="alert">
+                                    <h4>{t("app.add-expenses-form-cannot-be-submitted")}</h4>
+                                    <ul>
+                                        <li>{error}</li>
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* Warning modal similar to the one in AddBudgetForm */}
+                            <BasicModal
+                                show={showWarningModal}
+                                handleClose={() => handleWarningClose(false)}
+                                title="Warning"
+                            >
+                                <p><strong>{t("app.add-expenses-exceeds-budget")}</strong></p>
+                                <div>
+                                    <button onClick={() => handleWarningClose(true)}
+                                            className="btn btn-danger mrgn-rght-lg">{t("app.add-expenses-proceed")}
+                                    </button>
+                                    <button onClick={() => handleWarningClose(false)}
+                                            className="btn btn-default">{t("app.budgetItem-cancel")}
+                                    </button>
+                                </div>
+                            </BasicModal>
                         </div>
-
-                        {existingExpense ? (
-                            <button type="submit" className="btn-lg btn-success">
-                                <span className="glyphicon glyphicon-floppy-save"></span>
-                                &nbsp; Update Expense
-                            </button>
-                        ) : (
-                            <div className="mrgn-bttm-md">
-                                <button data-testid="create-expense" type="submit" className="btn-lg btn-default">
-                                    <span className="glyphicon glyphicon-plus"></span>
-                                    &nbsp;Create Expense
-                                </button>
-                            </div>
-                        )}
-                        {/* Success and error alerts */}
-                        {showSuccessAlert && !error && (
-                            <div className="alert alert-success" role="alert">
-                                <button type="button" className="close" data-dismiss="alert" aria-label="Close"
-                                        onClick={() => setShowSuccessAlert(false)}>
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <p>Expense successfully {existingExpense ? 'updated' : 'added'}!</p>
-                            </div>
-                        )}
-
-                        {error && (
-                            <div className="alert alert-danger" role="alert">
-                                <h4>The form could not be submitted because these errors were found:</h4>
-                                <ul>
-                                    <li>{error}</li>
-                                </ul>
-                            </div>
-                        )}
-
-                        {/* Warning modal similar to the one in AddBudgetForm */}
-                        <BasicModal
-                            show={showWarningModal}
-                            handleClose={() => handleWarningClose(false)}
-                            title="Warning"
-                        >
-                            <p><strong>{`Adding this expense exceeds your budget. Do you want to proceed?`}</strong></p>
-                            <div>
-                                <button onClick={() => handleWarningClose(true)}
-                                        className="btn btn-danger mrgn-rght-lg">Proceed
-                                </button>
-                                <button onClick={() => handleWarningClose(false)} className="btn btn-default">Cancel
-                                </button>
-                            </div>
-                        </BasicModal>
-                    </div>
-                </section>
+                    </section>
             </form>
         </div>
-    );
+);
 };
 
 export default AddExpenseForm;

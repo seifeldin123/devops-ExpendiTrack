@@ -12,7 +12,7 @@ export const formatCurrency = (amount) => {
 };
 
 // Date formatting function
-export const formatDate = (dateString) => {
+export const formatDate = (dateString, language) => {
     // Extract the year, month, and day from the dateString assuming YYYY-MM-DD format
     const [year, month, day] = dateString.split('T')[0].split('-').map(num => parseInt(num, 10));
 
@@ -20,9 +20,10 @@ export const formatDate = (dateString) => {
     const date = new Date(year, month - 1, day);
 
     // Format the date as needed, for example, toLocaleDateString()
-    return date.toLocaleDateString('en-US', {
+    const formatter =  Intl.DateTimeFormat(language, {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
+    return formatter.format(date);
 };

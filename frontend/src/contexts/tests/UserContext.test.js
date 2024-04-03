@@ -1,7 +1,23 @@
 import React, { useContext } from 'react';
 import {render, screen, act, fireEvent} from '@testing-library/react';
 import { UserContext, UserProvider } from '../UserContext';
+import i18next from "i18next";
+import {I18nextProvider} from "react-i18next";' '
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
 
+
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
+});
 // A mock component to consume our context
 const MockConsumerComponent = () => {
     // Access user and setUser from the UserContext using useContext
@@ -23,9 +39,11 @@ describe('UserContext', () => {
     it('provides a user object and setUser function', () => {
         // Render MockConsumerComponent wrapped in UserProvider
         render(
+            <I18nextProvider i18n={i18next}>
             <UserProvider>
                 <MockConsumerComponent />
             </UserProvider>
+            </I18nextProvider>
         );
         // Expectation 1: Initial state should display 'No User'
         expect(screen.getByText(/No User/i)).toBeInTheDocument();
@@ -42,9 +60,11 @@ describe('UserContext', () => {
     // Verify UserContext Availability
     it('UserContext is available within UserProvider', () => {
         render(
+            <I18nextProvider i18n={i18next}>
             <UserProvider>
                 <MockConsumerComponent />
             </UserProvider>
+            </I18nextProvider>
         );
         // If 'No User' is displayed, it means the context is available and providing a default value.
         expect(screen.getByText('User: No User')).toBeInTheDocument();
@@ -53,9 +73,11 @@ describe('UserContext', () => {
     // Verify User State Initialization
     it('Initial user state is null', () => {
         render(
+            <I18nextProvider i18n={i18next}>
             <UserProvider>
                 <MockConsumerComponent />
             </UserProvider>
+            </I18nextProvider>
         );
         expect(screen.getByText('User: No User')).toBeInTheDocument();
     });
@@ -63,9 +85,11 @@ describe('UserContext', () => {
     // Verify setUser Functionality
     it('setUser updates the user state', () => {
         render(
+            <I18nextProvider i18n={i18next}>
             <UserProvider>
                 <MockConsumerComponent />
             </UserProvider>
+            </I18nextProvider>
         );
         // Simulate a click on the 'Set User' button to update the user state.
         act(() => {

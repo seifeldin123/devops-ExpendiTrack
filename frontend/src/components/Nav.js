@@ -1,9 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import {useUserContext} from '../contexts/UserContext';
+import {useTranslation} from "react-i18next";
 
 const Nav = () => {
     const {user} = useUserContext();
+    const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+    }, [i18n.language]);
+
 
     return (
         <nav id="wb-bc" property="breadcrumb">
@@ -15,10 +21,10 @@ const Nav = () => {
                         // Display dashboard and logout for authenticated users
                         <>
                             <li property="itemListElement" typeof="ListItem">
-                                <span property="name"> Budget Management Application</span>
+                                <span property="name">{t("app.app-name")}</span>
                                 <meta property="position" content="2"/>
                             </li>
-                            <li><Link to="/dashboard">Dashboard</Link></li>
+                            <li><Link to="/dashboard">{t("app.dashaboardLink")}</Link></li>
                         </>
                     ) : (
                         // Display login and sign up for unauthenticated users
@@ -38,7 +44,7 @@ const Nav = () => {
                                 <meta property="position" content="2"/>
                             </li>
                             <li property="itemListElement" typeof="ListItem">
-                                <span property="name">Budget Management Application</span>
+                                <span property="name">{t("app.app-name")}</span>
                                 <meta property="position" content="2"/>
                             </li>
                         </>

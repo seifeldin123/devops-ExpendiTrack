@@ -4,6 +4,12 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { UserProvider } from '../../contexts/UserContext';
 import SignUp from '../SignUp';
 import { useNavigate } from 'react-router-dom';
+import {I18nextProvider, initReactI18next} from "react-i18next";
+import i18next from "i18next";
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
 // Mock the useNavigate hook
 jest.mock('react-router-dom', () => ({
@@ -11,6 +17,24 @@ jest.mock('react-router-dom', () => ({
     useNavigate: jest.fn(), // Mock useNavigate
 }));
 
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
+        },
+    });
 describe('SignUpForm', () => {
     let navigateMock;
 
@@ -22,10 +46,13 @@ describe('SignUpForm', () => {
     // Helper function to render the SignUp component within Router and UserProvider
     const renderComponent = () => render(
         <Router>
-            <UserProvider>
-                <SignUp />
-            </UserProvider>
+            <I18nextProvider i18n={i18next}>
+                <UserProvider>
+                    <SignUp />
+                </UserProvider>
+            </I18nextProvider>
         </Router>
+
     );
 
     it('renders the sign-up form with name and email fields and a submit button', () => {

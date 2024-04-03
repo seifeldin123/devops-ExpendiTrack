@@ -2,7 +2,34 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import Footer from '../Footer';
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
+import i18next from "i18next";
+import {I18nextProvider, initReactI18next} from 'react-i18next';
+import {UserContext} from "../../contexts/UserContext";
+import Header from "../Header";
+import {BrowserRouter as Router} from "react-router-dom";
+import enTranslations from "../../translations/en/common.json";
+import frTranslations from "../../translations/fr/common.json";
 
+const resources = {
+    en: {
+        translation: enTranslations,
+    },
+    fr: {
+        translation: frTranslations,
+    },
+};
+
+i18next
+    .use(initReactI18next) // passes i18n down to react-i18next
+    .init({
+        resources,
+        lng: 'en',
+        interpolation: {
+            escapeValue: false, // react already safes from xss
+        },
+    });
 describe('Footer Component', () => {
 
     expect.extend(toHaveNoViolations);
@@ -17,10 +44,16 @@ describe('Footer Component', () => {
 
     // Display Government of Canada Information
     it('displays Government of Canada information', () => {
-        const { getByText } = render(<Footer />);
+        const { getByText } = render(
+            <I18nextProvider i18n={i18next}>
+                <Router>
+                        <Footer />
+                </Router>
+            </I18nextProvider>
+        );
         expect(getByText('Government of Canada')).toBeInTheDocument();
         expect(getByText('All contacts')).toBeInTheDocument();
-        expect(getByText('Departments and agencies')).toBeInTheDocument();
+        expect(getByText('Department and agencies')).toBeInTheDocument();
         expect(getByText('About government')).toBeInTheDocument();
     });
 
@@ -34,14 +67,26 @@ describe('Footer Component', () => {
 
     // Verify Main Footer Links
     it('verifies main footer links', () => {
-        const { getByText } = render(<Footer />);
+        const { getByText } = render(
+            <I18nextProvider i18n={i18next}>
+                <Router>
+                    <Footer />
+                </Router>
+            </I18nextProvider>
+        );
         expect(getByText('All contacts').closest('a')).toHaveAttribute('href', 'https://www.canada.ca/en/contact.html');
         // Add checks for other main footer links similarly
     });
 
     // Verify Sub Footer Links
     it('verifies sub footer links', () => {
-        const { getByText } = render(<Footer />);
+        const { getByText } = render(
+            <I18nextProvider i18n={i18next}>
+                <Router>
+                    <Footer />
+                </Router>
+            </I18nextProvider>
+        );
         expect(getByText('Social media').closest('a')).toHaveAttribute('href', 'https://www.canada.ca/en/social.html');
         // Add checks for other sub footer links similarly
     });

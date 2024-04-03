@@ -4,6 +4,10 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Login from '../Login';
 import { UserProvider } from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import {I18nextProvider} from "react-i18next";
+import i18next from "i18next";
+import en from "../../translations/en/common.json";
+import fr from "../../translations/fr/common.json";
 
 // Mock the useNavigate hook
 jest.mock('react-router-dom', () => ({
@@ -14,7 +18,19 @@ jest.mock('react-router-dom', () => ({
 // Mock findUser Service Call
 jest.mock('../../services/UserService', () => ({
     findUser: jest.fn(),
-}))
+}));
+
+i18next.init({
+    lng: 'en', // Use English for tests or adjust as necessary
+    resources: {
+        en: {
+            global: en
+        },
+        fr: {
+            global: fr
+        },
+    }
+});
 
 describe('LoginComponent', () => {
     let navigateMock;
@@ -27,9 +43,11 @@ describe('LoginComponent', () => {
     // Helper function to render the Login within Router and UserProvider
     const renderComponent = () => render(
         <Router>
-            <UserProvider>
-                <Login />
-            </UserProvider>
+            <I18nextProvider i18n={i18next}>
+                <UserProvider>
+                        <Login />
+                </UserProvider>
+            </I18nextProvider>
         </Router>
     );
 
@@ -58,7 +76,7 @@ describe('LoginComponent', () => {
         renderComponent();
 
         // Simulate a click on the "Sign up here" button
-        fireEvent.click(screen.getByText(/Sign up here/i));
+        fireEvent.click(screen.getByRole('button', { name: "app.sign-up-here" }));
 
         // Assert that navigate was called with '/signup'
         expect(navigateMock).toHaveBeenCalledWith('/signup');
@@ -93,7 +111,7 @@ describe('LoginComponent', () => {
         fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
         await waitFor(() => {
-            expect(screen.getByText(/Login failed/)).toBeInTheDocument();
+            expect(screen.getByText(/app.loginFailed/)).toBeInTheDocument();
         });
     });
 
