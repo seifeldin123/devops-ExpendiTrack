@@ -1,21 +1,15 @@
 version: '3.8'
 services:
   db:
-    image: mysql:8.0
-    environment:
-      MYSQL_DATABASE: 'Expendi'
-      MYSQL_USER: 'sa'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
+    build:
+      context: ./db
+      dockerfile: Dockerfile
     volumes:
       - db_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - app_network
+    ports:
+      - "3306:3306"
 
   backend:
     build:
@@ -30,6 +24,8 @@ services:
         condition: service_healthy
     networks:
       - app_network
+    ports:
+      - "8080:8080"
 
   frontend:
     build:
@@ -40,10 +36,12 @@ services:
     networks:
       - app_network
     ports:
-      - "80:80"
+      - "3000:3000"
 
   selenium:
-    image: selenium/standalone-chrome:latest
+    build:
+      context: ./selenium-grid
+      dockerfile: Dockerfile
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
@@ -51,15 +49,7 @@ services:
       - frontend
     networks:
       - app_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-    environment:
-      # SE_NODE_OVERRIDE_MAX_SESSIONS must be set to "true" to respect the max sessions setting
-      SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
-      SE_NODE_MAX_SESSIONS: 5
+
 
   selenium-tests:
     build:
