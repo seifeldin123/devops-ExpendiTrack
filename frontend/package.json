@@ -21,6 +21,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "start:app": "react-scripts start",
     "start:selenium": "env-cmd -f .env.selenium react-scripts start",
     "build": "react-scripts build",
     "build:docker": "env-cmd -f .env.docker react-scripts build",
